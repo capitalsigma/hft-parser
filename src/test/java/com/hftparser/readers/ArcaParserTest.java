@@ -1,13 +1,12 @@
+package com.hftparser.readers;
+
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.readers.ArcaParser;
-import com.readers.DataPoint;
-import com.readers.OrderType;
-import com.containers.WaitFreeQueue;
+import com.hftparser.containers.WaitFreeQueue;
 
 @RunWith(JUnit4.class)
 public class ArcaParserTest {
@@ -72,41 +71,37 @@ public class ArcaParserTest {
 		Thread.sleep(200);
 
 
-		int[][][] expectedBuy = {
-			{
-				{2750000, 1000}
-			},
-			{}
-		};
+        int[][] expectedOneBuy = {
+                {2750000, 1000}
+        };
 
-		int[][][] expectedSell = {
-			{
-				{2750000, 1000},
-				// {980000, 3200}
-			},
-			{
-				{20000, 30000}
-			},
-		};
 
-		int[][][] expectedBuy2 = {
-			{
-				{2750000, 1000},
-				{980000, 3200}
-			},
-			{
-				{20000, 30000}
-			}
-		};
+        int[][] expectedTwoBuy = {
+                {2750000, 1000},
+                // {980000, 3200}
+        };
+        int[][] expectedTwoSell = {
+                {20000, 30000}
+        };
+
+
+        int[][] expectedThreeBuy = {
+                {2750000, 1000},
+                {980000, 3200}
+        };
+        int[][] expectedThreeSell = {
+                {20000, 30000}
+        };
+
 
 		DataPoint buy1Expected =
-			new DataPoint("FOO", expectedBuy, OrderType.Buy, 28800737, 1);
+			new DataPoint("FOO", expectedOneBuy, new int[][] {}, 28800737, 1);
 
 		DataPoint sell1Expected =
-			new DataPoint("FOO", expectedSell, OrderType.Sell, 28800739, 8);
+			new DataPoint("FOO", expectedTwoBuy, expectedTwoSell, 28800739, 8);
 
 		DataPoint buy2Expected =
-			new DataPoint("FOO", expectedBuy2, OrderType.Buy, 28800737, 1);
+			new DataPoint("FOO", expectedThreeBuy, expectedThreeSell, 28800737, 1);
 
 		assertTrue(buy1Expected.equals(outQ.deq()));
 		assertTrue(sell1Expected.equals(outQ.deq()));
@@ -137,27 +132,25 @@ public class ArcaParserTest {
 		outQ.deq();
 		outQ.deq();
 
-		int[][][] expectedOrders1 = {
+		int[][] expectedOrders1Buy =
 			{
 				{980000, 3200},
 				{382500, 900}
-			},
-			{}
+			};
+        int[][] expectedEmptySell = {
+
 		};
 
-		int[][][] expectedOrders2 = {
+		int[][] expectedOrders2Buy =
 			{
 				{980000, 3000},
 				{382500, 900},
-			},
-			{}
-		};
+			};
 
-
-		DataPoint expected1 = new DataPoint("FOO", expectedOrders1, OrderType.Buy,
+		DataPoint expected1 = new DataPoint("FOO", expectedOrders1Buy, expectedEmptySell,
 											29909390, 43);
 
-		DataPoint expected2 = new DataPoint("FOO", expectedOrders2, OrderType.Buy,
+		DataPoint expected2 = new DataPoint("FOO", expectedOrders2Buy, expectedEmptySell,
 											33643922, 2);
 
 		DataPoint toTest1 = outQ.deq();

@@ -4,9 +4,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
-import com.containers.FullException;
-import com.containers.EmptyException;
-import com.containers.WaitFreeQueue;
+import com.hftparser.containers.FullException;
+import com.hftparser.containers.EmptyException;
+import com.hftparser.containers.WaitFreeQueue;
 
 
 // abstract class AbstractExchangeParser {

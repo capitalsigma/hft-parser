@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.zip.GZIPInputStream;
 
-import com.containers.WaitFreeQueue;
+import com.hftparser.containers.WaitFreeQueue;
 
 public class GzipReader implements Runnable {
 	// InputStream file;

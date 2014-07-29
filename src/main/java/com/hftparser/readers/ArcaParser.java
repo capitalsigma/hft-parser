@@ -1,11 +1,10 @@
 package com.hftparser.readers;
 
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.containers.WaitFreeQueue;
+import com.hftparser.containers.WaitFreeQueue;
 
 enum RecordType {
 	Add, Modify, Delete
@@ -187,12 +186,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 			ordersNow.get(ticker).get(OrderType.Buy).topN(LEVELS);
 		int[][] toSellNow =
 			ordersNow.get(ticker).get(OrderType.Sell).topN(LEVELS);
-		int[][][] ordersNow = {toBuyNow, toSellNow};
+
 
 		DataPoint toPush = new DataPoint(ticker,
-										 ordersNow,
-										 ordType,
-										 timeStamp,
+										 toBuyNow,
+                                         toSellNow,
+                timeStamp,
 										 seqNum);
 
 		// System.out.println("About to push a DataPoint.");

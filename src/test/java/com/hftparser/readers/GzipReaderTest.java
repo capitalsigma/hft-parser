@@ -1,21 +1,24 @@
+package com.hftparser.readers;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import com.hftparser.writers.ResolvablePath;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.containers.WaitFreeQueue;
-import com.readers.GzipReader;
+import com.hftparser.containers.WaitFreeQueue;
+import com.hftparser.readers.GzipReader;
 
 
 @RunWith(JUnit4.class)
 public class GzipReaderTest {
-	String TEST_FILE_ONE = "one-line.txt.gz";
-	String TEST_FILE_TWO = "four-lines.txt.gz";
+	String TEST_FILE_ONE = "/one-line.txt.gz";
+	String TEST_FILE_TWO = ResolvablePath.resolve("/four-lines.txt.gz");
 
 	String TEST_ONE_TEXT = "This is test data.";
 	String[] TEST_TWO_TEXTS = {
@@ -39,7 +42,7 @@ public class GzipReaderTest {
 
 	GzipReader instantiate(String fileName, WaitFreeQueue<String> wfq)
 		throws IOException, FileNotFoundException {
-		// ClassLoader loader = GzipReaderTest.class.getClassLoader();
+		// ClassLoader loader = com.hftparser.readers.GzipReaderTest.class.getClassLoader();
 		// String location = loader.getResource(pathToFile).toString();
 
 

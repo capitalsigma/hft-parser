@@ -13,9 +13,13 @@ public class ResolvablePath {
 
 	// answers.opencv.org/question/10236/
 	public static String resolve(String partialPath) {
-		String root = System.getProperty("user.dir");
+/*
+String root = System.getProperty("user.dir");
 
-		return root + "/" + partialPath;
+return root + "/" + partialPath;
+*/
+        URL url = partialPath.getClass().getResource(partialPath);
+        return url.getPath();
 	}
 
 	public String getFull() {

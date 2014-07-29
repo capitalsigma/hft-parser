@@ -1,10 +1,12 @@
+package com.hftparser.containers;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.internal.runners.statements.Fail;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.containers.WaitFreeQueue;
+import com.hftparser.containers.WaitFreeQueue;
 
 
 @RunWith(JUnit4.class)
