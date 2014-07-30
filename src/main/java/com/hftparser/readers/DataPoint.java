@@ -4,11 +4,11 @@ import java.util.Arrays;
 
 // maybe this should go in with the writers
 public class DataPoint {
-    private final int[][] buy;
-    private final int[][] sell;
-    private final int timeStamp;
-    private final long seqNum;
-    private final String ticker;
+    private int[][] buy;
+    private int[][] sell;
+    private int timeStamp;
+    private long seqNum;
+    private String ticker;
 
     public DataPoint(String _ticker,
                      int[][] _buy,

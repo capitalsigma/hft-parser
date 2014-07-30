@@ -18,8 +18,8 @@ public class HDF5Writer implements Runnable {
 	private final WaitFreeQueue<DataPoint> inQueue;
 
     private final int START_SIZE = 100;
-//    following FLUSH_FREQ from the original python
-private final int CHUNK_SIZE = 500000;
+    // following FLUSH_FREQ from the original python
+    private final int CHUNK_SIZE = 500000;
 
     private final String BOOK_DS_NAME = "books";
 

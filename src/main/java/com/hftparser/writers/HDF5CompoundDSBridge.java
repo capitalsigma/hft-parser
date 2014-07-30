@@ -10,10 +10,10 @@ import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 class HDF5CompoundDSBridge<T> {
         private static HDF5GenericStorageFeatures features;
         private long currentOffset;
-        private final IHDF5CompoundWriter writer;
-        private final String fullPath;
-        private final T[] elToWrite;
-        private final HDF5CompoundType<T> type;
+        private IHDF5CompoundWriter writer;
+        private String fullPath;
+        private T[] elToWrite;
+        private HDF5CompoundType<T> type;
 
         public HDF5CompoundDSBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
                                     long startSize, int chunkSize) {

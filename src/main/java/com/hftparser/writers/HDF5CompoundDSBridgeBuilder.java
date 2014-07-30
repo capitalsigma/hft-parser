@@ -3,14 +3,14 @@ package com.hftparser.writers;
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Created by patrick on 7/28/14.
  */
 class HDF5CompoundDSBridgeBuilder<T> {
     private HDF5CompoundType<T> type;
-    private final IHDF5CompoundWriter writer;
+    private IHDF5CompoundWriter writer;
     private long startSize;
     private int chunkSize;
 

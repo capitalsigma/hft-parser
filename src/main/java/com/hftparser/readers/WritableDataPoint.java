@@ -8,7 +8,7 @@ import java.util.Arrays;
  * Created by patrick on 7/29/14.
  */
 public class WritableDataPoint {
-    final private int LEVELS = ArcaParser.LEVELS;
+    private final int LEVELS = ArcaParser.LEVELS;
 
     @CompoundElement(memberName = "bid", dimensions = {LEVELS, 2})
     private int[][] buy;

@@ -20,8 +20,6 @@ class Order {
 	}
 }
 
-// TODO: lookup table of orders (for Modify behavior)
-// TODO: implement Add, Delete, Modify
 public class ArcaParser extends AbstractParser implements Runnable {
 	private final WaitFreeQueue<String> inQueue;
 	// not sure yet what this needs to be
@@ -59,7 +57,9 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
 	// bump this up when in production
     @SuppressWarnings("FieldCanBeLocal")
-    private final int INITIAL_ODRDER_HISTORY_SIZE = 2000;
+    private final int INITIAL_ODRDER_HISTORY_SIZE = 500000;
+
+    private final int OUTPUT_PROGRESS_EVERY = 5000000;
 
 	private static Map<String, RecordType> recordTypeLookup;
 
@@ -288,7 +288,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 	void parseDelete(String[] asSplit) {
 		String ticker;
 		if(ordersNow.containsKey(ticker = asSplit[5])) {
-			System.out.println("Parsing delete");
+//			System.out.println("Parsing delete");
 			long seqNum; 		// need 10 digits
 			long refNum;		// need 20, but just taking last 19
 			OrderType ordType;
@@ -334,6 +334,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 	public void run() {
 		String toParse;
 		String[] asSplit;
+        int linesSoFar = 0;
 
 		RecordType recType;
 
@@ -345,6 +346,11 @@ public class ArcaParser extends AbstractParser implements Runnable {
 			// Work if we got something from the queue, otherwise spin
 			if ((toParse = inQueue.deq()) != null) {
 //                System.out.println("Parser got a line:" + toParse);
+                linesSoFar++;
+
+                if (linesSoFar % OUTPUT_PROGRESS_EVERY == 0) {
+                    System.out.printf("Parsed %d lines\n", linesSoFar);
+                }
 
                 // Split into fields
                 asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);

@@ -13,8 +13,11 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
+// WARNING: TURNING ON ASSERTIONS BREAKS SOMETHING INSIDE OF THE CISD CODE
+// NEVER, EVER, EVER TURN ON ASSERTIONS
 class ParseRun {
-    private static final int QUEUE_SIZE = 1000;
+    private static final int LINE_QUEUE_SIZE = 500000;
+    private static final int POINT_QUEUE_SIZE = 500000;
 
     private static class Args {
         @Parameter
@@ -43,8 +46,9 @@ class ParseRun {
         Thread readerThread;
         Thread parserThread;
         Thread writerThread;
-
         Thread[] allThreads;
+        long startTime = System.currentTimeMillis();
+        long endTime;
 
         if(args.bookPath == null || args.outPath == null) {
             System.out.println("Book path and output path must be specified.");
@@ -84,8 +88,8 @@ class ParseRun {
 
 
         outFile = new File(args.outPath);
-        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(QUEUE_SIZE);
-        WaitFreeQueue<DataPoint> dataPointQueue = new WaitFreeQueue<>(QUEUE_SIZE);
+        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE);
+        WaitFreeQueue<DataPoint> dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE);
 
         try {
             gzipReader = new GzipReader(GzipInstream, linesReadQueue);
@@ -117,12 +121,26 @@ class ParseRun {
             for (Thread t : allThreads) {
                 t.join();
             }
-        } catch (InterruptedException e) {
-            System.out.println("A thread was ended prematurely. Stopping");
+        } catch (Exception e) {
+            System.out.println("A thread threw an exception:" + e.toString());
+            System.out.println("Stopping.");
             return;
         }
 
+        endTime = System.currentTimeMillis();
         System.out.println("Successfully created " + args.outPath);
+        printRunTime(startTime, endTime);
+
+        System.out.println("Information for String queue:");
+        linesReadQueue.printUsage();
+        System.out.println("Information for Datapoint queue:");
+        dataPointQueue.printUsage();
+    }
+
+    private static void printRunTime(long startMs, long endMs) {
+        double diff = endMs - startMs;
+
+        System.out.printf("Total time: %.3f sec", diff / 1000);
     }
 
     private static String[] parseSymbolFile(File symbolFile)
