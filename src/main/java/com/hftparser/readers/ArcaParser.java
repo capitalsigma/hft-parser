@@ -1,6 +1,7 @@
 package com.hftparser.readers;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -203,17 +204,26 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
 	int makePrice(String priceString) {
 		String[] parts = priceString.split("\\.");
+        int floatPart;
+        int intPart;
+        int sizeOfFloatPart = 0;
 
 		// System.out.println("got price: " + priceString);
-		// System.out.println("parsing price: " + Arrays.toString(parts));
+		System.out.println("parsing price: " + Arrays.toString(parts));
 
-		assert parts.length == 2 && parts[1].length() <= 6;
+		assert parts.length == 1 || (parts.length == 2 && parts[1].length() <= 6);
 
 
-		int intPart = Integer.parseInt(parts[0]);
-		int floatPart = Integer.parseInt(parts[1]);
+		intPart = Integer.parseInt(parts[0]);
+
+        if(parts.length == 2) {
+            floatPart = Integer.parseInt(parts[1]);
+            sizeOfFloatPart = parts[1].length();
+        } else {
+            floatPart = 0;
+        }
 		int toRet = intPart * PRICE_INTEGER_OFFSET +
-			(int)Math.pow(10, PRICE_OFFSET_EXP - parts[1].length()) * floatPart;
+			(int)Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
 
 		// System.out.printf("int part: %d, float part: %d\n", intPart, floatPart);
 		// System.out.printf("toRet: %d\n", toRet);
@@ -334,31 +344,34 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
 			// Work if we got something from the queue, otherwise spin
 			if ((toParse = inQueue.deq()) != null) {
-				// Split into fields
-				asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);
+                System.out.println("Parser got a line:" + toParse);
 
-				// System.out.println("asSplit: " + Arrays.toString(asSplit));
+                // Split into fields
+                asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);
 
-				// Also note that containsKey is O(1)
-				if((recType = recordTypeLookup.get(asSplit[0])) == null){
-					// skip if it's not add, modify, delete
-					continue;
-				}
+                // System.out.println("asSplit: " + Arrays.toString(asSplit));
 
-				switch(recType) {
-				case Add:
-					parseAdd(asSplit);
-					break;
-				case Modify:
-					parseModify(asSplit);
-					break;
-				case Delete:
-					parseDelete(asSplit);
-					break;
-				}
-			}
+                // Also note that containsKey is O(1)
+                if ((recType = recordTypeLookup.get(asSplit[0])) == null) {
+                    // skip if it's not add, modify, delete
+                    continue;
+                }
+
+                switch (recType) {
+                    case Add:
+                        parseAdd(asSplit);
+                        break;
+                    case Modify:
+                        parseModify(asSplit);
+                        break;
+                    case Delete:
+                        parseDelete(asSplit);
+                        break;
+                }
+            }
 
 		}
+        outQueue.acceptingOrders = false;
 
 	}
 

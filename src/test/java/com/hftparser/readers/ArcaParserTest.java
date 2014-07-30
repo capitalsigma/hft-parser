@@ -30,6 +30,9 @@ public class ArcaParserTest {
 	String TEST_MODIFY_BUY2 =
 		"M,2,12884902050,3000,0.98,33643,922,FOO,B,B,AARCA,B,";
 
+    String TEST_WHOLE =
+        "A,1,12884901908,B,B,1000,FOO,2.75,28800,737,B,AARCA,";
+
 
 
 	@Test
@@ -50,6 +53,29 @@ public class ArcaParserTest {
 	// 						  new WaitFreeQueue<DataPoint>(capacity));
 	// }
 
+    @Test
+    public void testAddWhole() throws Exception {
+        WaitFreeQueue<String> inQ = new WaitFreeQueue<String>(5);
+        WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<DataPoint>(5);
+
+        ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ);
+        inQ.enq(TEST_WHOLE);
+        Thread runThread = new Thread(parser);
+        // parser.run();
+        runThread.start();
+        Thread.sleep(200);
+
+        int[][] expectedOneBuy = {
+                {275000000, 1000}
+        };
+
+        DataPoint buy1Expected =
+                new DataPoint("FOO", expectedOneBuy, new int[][] {}, 28800737, 1);
+
+        assertTrue(buy1Expected.equals(outQ.deq()));
+
+    }
+
 	@Test
 	public void testAdd() throws Exception {
 		WaitFreeQueue<String> inQ = new WaitFreeQueue<String>(5);
@@ -68,7 +94,7 @@ public class ArcaParserTest {
 
 
 		// sleep 200ms
-		Thread.sleep(200);
+        Thread.sleep(200);
 
 
         int[][] expectedOneBuy = {

@@ -62,6 +62,7 @@ public class HDF5Writer implements Runnable {
         try {
             while (inQueue.acceptingOrders || !inQueue.isEmpty()) {
                 if ((dataPoint = inQueue.deq()) != null) {
+                    System.out.println("Writer got a datapoint.");
                     writePoint(dataPoint);
                 }
             }
@@ -77,5 +78,13 @@ public class HDF5Writer implements Runnable {
         config.syncMode(IHDF5WriterConfigurator.SyncMode.SYNC_BLOCK);
         config.performNumericConversions();
         return config.writer();
+    }
+
+    public IHDF5Writer getFileWriter() {
+        return fileWriter;
+    }
+
+    public HashMap<String, HDF5CompoundDSBridge<WritableDataPoint>> getDsForTicker() {
+        return dsForTicker;
     }
 }
