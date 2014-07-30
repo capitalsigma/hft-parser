@@ -12,13 +12,16 @@ import java.util.concurrent.atomic.AtomicLong;
 public class WaitFreeQueue<T> {
 	private volatile int head = 0;
     private volatile int tail = 0;
+    private final Backoffable inBackoff;
+    private final Backoffable outBackoff;
 	private final T[] items;
 	volatile public boolean acceptingOrders;
     private AtomicLong fullHits ;
     private AtomicLong emptyHits;
 
 
-	public WaitFreeQueue(int capacity) {
+
+	public WaitFreeQueue(int capacity, Backoffable inBackoff, Backoffable outBackoff) {
         //noinspection unchecked
         items = (T[])new Object[capacity];
 		head = 0;
@@ -27,12 +30,20 @@ public class WaitFreeQueue<T> {
 
         fullHits = new AtomicLong();
         emptyHits = new AtomicLong();
+
+        this.inBackoff = inBackoff;
+        this.outBackoff = outBackoff;
+    }
+
+    public WaitFreeQueue(int capacity) {
+        this(capacity, new NoOpBackoff(), new NoOpBackoff());
     }
 
 	public boolean enq(T x) {
 		if(tail - head == items.length) {
 			// throw new FullException();
             fullHits.incrementAndGet();
+            inBackoff.backoff();
 			return false;
 		} else {
 			items[tail % items.length] = x;
@@ -45,6 +56,7 @@ public class WaitFreeQueue<T> {
 		if (isEmpty()) {
             // throw new EmptyException();
             emptyHits.incrementAndGet();
+            outBackoff.backoff();
             return null;
         } else {
 			T x = items[head % items.length];
@@ -58,6 +70,6 @@ public class WaitFreeQueue<T> {
 	}
 
     public void printUsage() {
-        System.out.printf("Full hits: %s\nEmpty hits: %s", fullHits.toString(), emptyHits.toString());
+        System.out.printf("Full hits: %s\nEmpty hits: %s\n", fullHits.toString(), emptyHits.toString());
     }
 }

@@ -154,7 +154,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 					   OrderType ordType,
 					   String ticker,
 					   int timeStamp) {
-		processRecord(recType, seqNum, refNum, ordType, -1, ticker, -1, timeStamp);
+        processRecord(recType, seqNum, refNum, ordType, -1, ticker, -1, timeStamp);
 	}
 
 	void processRecord(RecordType recType,

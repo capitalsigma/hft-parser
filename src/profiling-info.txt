@@ -1,0 +1,22 @@
+First run:
+    LINE_QUEUE_SIZE = 500000;
+    POINT_QUEUE_SIZE = 500000;
+    CHUNK_SIZE = 500000
+    syc type SYNC_BLOCK
+
+    result: 920 sec
+
+Run with counts of empty/full hits:
+    LINE_QUEUE_SIZE = 500000;
+    POINT_QUEUE_SIZE = 500000;
+    CHUNK_SIZE = 500000
+    syc type SYNC_BLOCK
+
+    Total time: 888.547 sec
+
+    Information for String queue:
+        Full hits: 23703892716
+        Empty hits:   62863244
+    Information for Datapoint queue:
+         Full hits: 20963185989
+         Empty hits:  401275169

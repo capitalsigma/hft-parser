@@ -3,6 +3,7 @@ package com.hftparser.main;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.hftparser.containers.Backoff;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.ArcaParser;
 import com.hftparser.readers.DataPoint;
@@ -18,6 +19,9 @@ import java.util.List;
 class ParseRun {
     private static final int LINE_QUEUE_SIZE = 500000;
     private static final int POINT_QUEUE_SIZE = 500000;
+
+    private static final int MIN_BACKOFF = 20;
+    private static final int MAX_BACKOFF = 500;
 
     private static class Args {
         @Parameter
@@ -88,8 +92,12 @@ class ParseRun {
 
 
         outFile = new File(args.outPath);
-        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE);
-        WaitFreeQueue<DataPoint> dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE);
+        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE,
+                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
+                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
+        WaitFreeQueue<DataPoint> dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE,
+                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
+                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
 
         try {
             gzipReader = new GzipReader(GzipInstream, linesReadQueue);
@@ -140,7 +148,7 @@ class ParseRun {
     private static void printRunTime(long startMs, long endMs) {
         double diff = endMs - startMs;
 
-        System.out.printf("Total time: %.3f sec", diff / 1000);
+        System.out.printf("Total time: %.3f sec\n", diff / 1000);
     }
 
     private static String[] parseSymbolFile(File symbolFile)
