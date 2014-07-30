@@ -12,8 +12,7 @@ public class DataPoint {
     private long seqNum;
     private String ticker;
 
-
-	public DataPoint(String _ticker,
+    public DataPoint(String _ticker,
                      int[][] _buy,
                      int[][] _sell,
                      int _timeStamp,
@@ -25,7 +24,13 @@ public class DataPoint {
 		seqNum = _seqNum;
 	}
 
-	public void print() {
+
+    public String getTicker() {
+        return ticker;
+    }
+
+
+    public void print() {
         System.out.println("Information for hashcode: " + this.hashCode());
 		System.out.printf("my tick: %s\n", ticker);
 		System.out.printf("my seq: %d\n", seqNum);
@@ -47,13 +52,18 @@ public class DataPoint {
                 Arrays.deepEquals(other.buy, buy) &&
                 Arrays.deepEquals(other.sell, sell);
 
-        System.out.println("Testing pair:");
-
-        print();
-        other.print();
-
-        System.out.println("Equal?" + res);
+//        System.out.println("Testing pair:");
+//
+//        print();
+//        other.print();
+//
+//        System.out.println("Equal?" + res);
 
 		return res;
 	}
+
+    public WritableDataPoint getWritable(){
+        return new WritableDataPoint(buy, sell, timeStamp, seqNum);
+
+    }
 }

@@ -5,6 +5,7 @@ import ch.systemsx.cisd.hdf5.HDF5GenericStorageFeatures;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -15,7 +16,7 @@ class HDF5CompoundDSBridge<T> {
         private long currentOffset;
         private IHDF5CompoundWriter writer;
         private String fullPath;
-        private ArrayList<T> elToWrite;
+        private T[] elToWrite;
         private HDF5CompoundType<T> type;
 
         public HDF5CompoundDSBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
@@ -30,7 +31,7 @@ class HDF5CompoundDSBridge<T> {
 
             this.writer.createArray(fullPath, type, startSize, chunkSize);
             currentOffset = 0;
-            elToWrite = new ArrayList<T>(1);
+            elToWrite = (T[]) new Object[1];
         }
 
         private void initFeatures() {
@@ -43,7 +44,15 @@ class HDF5CompoundDSBridge<T> {
         }
 
         public void appendElement(T element) {
-            elToWrite.set(0, element);
-            writer.writeArrayBlockWithOffset(fullPath, type, (T[]) elToWrite.toArray(), currentOffset++);
+            elToWrite[0] = element;
+            writer.writeArrayBlockWithOffset(fullPath, type, elToWrite, currentOffset++);
+        }
+
+        public T[] readBlock(long offset, int blocksize) {
+            return writer.readArrayBlockWithOffset(fullPath, type, blocksize, offset);
+        }
+
+        public T[] readBlock(long offset){
+            return readBlock(offset, 1);
         }
 }

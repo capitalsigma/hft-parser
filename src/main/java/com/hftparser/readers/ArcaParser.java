@@ -47,7 +47,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
     private int IMPORTANT_SYMBOL_COUNT = 13;
 
 	// like in Python -- this is our top N values in buy/sell prices we care about
-    private int LEVELS = 10;
+    public static final int LEVELS = 10;
 
 	// offset for integer part of the price -- we pass it around as a
 	// float to avoid floating point error. So we make the int part
