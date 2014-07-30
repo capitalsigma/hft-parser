@@ -7,12 +7,14 @@ package com.hftparser.containers;
 
 // Source: The Art of Multiprocessor Programming, p. 69
 public class WaitFreeQueue<T> {
-	volatile int head = 0, tail = 0;
-	T[] items;
+	private volatile int head = 0;
+    private volatile int tail = 0;
+	private final T[] items;
 	volatile public boolean acceptingOrders;
 
 	public WaitFreeQueue(int capacity) {
-		items = (T[])new Object[capacity];
+        //noinspection unchecked
+        items = (T[])new Object[capacity];
 		head = 0;
 		tail = 0;
 		acceptingOrders = true;

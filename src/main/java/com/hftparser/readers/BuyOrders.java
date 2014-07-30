@@ -7,7 +7,7 @@ class BuyOrders extends MarketOrderCollection {
 	// descending sort for prices, following utils.py
     private BuyOrders(int startCapacity){
 		super(startCapacity);
-		sortedKeys = new TreeSet<Integer>(Collections.reverseOrder());
+		sortedKeys = new TreeSet<>(Collections.reverseOrder());
 	}
 
 	public BuyOrders() {

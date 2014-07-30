@@ -12,16 +12,16 @@ import com.hftparser.readers.WritableDataPoint;
 
 
 public class HDF5Writer implements Runnable {
-	HashMap<String, HDF5CompoundDSBridge<WritableDataPoint>> dsForTicker;
-    HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder;
-	IHDF5Writer fileWriter;
-	WaitFreeQueue<DataPoint> inQueue;
+	private final HashMap<String, HDF5CompoundDSBridge<WritableDataPoint>> dsForTicker;
+    private final HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder;
+	private final IHDF5Writer fileWriter;
+	private final WaitFreeQueue<DataPoint> inQueue;
 
-    int START_SIZE = 100;
+    private final int START_SIZE = 100;
 //    following FLUSH_FREQ from the original python
-    int CHUNK_SIZE = 500000;
+private final int CHUNK_SIZE = 500000;
 
-    String BOOK_DS_NAME = "books";
+    private final String BOOK_DS_NAME = "books";
 
 	// Here we try to open up a new HDF5 file in the path we've been
 	// given, and raise abstraction-appropriate exceptions if
@@ -31,14 +31,14 @@ public class HDF5Writer implements Runnable {
 
         fileWriter = getDefaultWriter(outFile);
 
-        bridgeBuilder = new HDF5CompoundDSBridgeBuilder<WritableDataPoint>(fileWriter);
+        bridgeBuilder = new HDF5CompoundDSBridgeBuilder<>(fileWriter);
 
         bridgeBuilder.setStartSize(START_SIZE);
         bridgeBuilder.setChunkSize(CHUNK_SIZE);
         bridgeBuilder.setTypeFromInferred(WritableDataPoint.class);
 
         // TODO: we know how big it is, we should inst. appropriately
-		dsForTicker = new HashMap<String, HDF5CompoundDSBridge<WritableDataPoint>>();
+		dsForTicker = new HashMap<>();
 
         inQueue = _inQueue;
 	}

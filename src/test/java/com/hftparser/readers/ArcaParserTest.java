@@ -8,16 +8,17 @@ import org.junit.runners.JUnit4;
 
 import com.hftparser.containers.WaitFreeQueue;
 
+@SuppressWarnings("UnusedAssignment")
 @RunWith(JUnit4.class)
 public class ArcaParserTest {
-	String[] TEST_TICKERS = {"FOO", "BAR"};
+	private final String[] TEST_TICKERS = {"FOO", "BAR"};
 
-	String TEST_ADD_BUY1 =
+	private final String TEST_ADD_BUY1 =
 		"A,1,12884901908,B,B,1000,FOO,2.75,28800,737,B,AARCA,";
-	String TEST_ADD_BUY2 =
+	private final String TEST_ADD_BUY2 =
 		"A,1,12884902050,B,B,3200,FOO,0.98,28800,737,B,AARCA,";
 
-	String TEST_ADD_SELL1 =
+	private final String TEST_ADD_SELL1 =
 		"A,8,12884902687,B,S,30000,FOO,0.02,28800,739,B,AARCA,";
 	String TEST_ADD_SELL2 =
 		"A,12,12884902091,B,S,200000,BAR,0.0195,28800,740,B,AARCA,";
@@ -25,13 +26,13 @@ public class ArcaParserTest {
 	String TEST_DELETE_BUY1 =
 		"D,2,12884901908,28800,857,FOO,B,B,AARCA,B,";
 
-	String TEST_MODIFY_BUY1 =
+	private final String TEST_MODIFY_BUY1 =
 		"M,43,12884901908,900,0.3825,29909,390,FOO,B,B,AARCA,B,";
-	String TEST_MODIFY_BUY2 =
+	private final String TEST_MODIFY_BUY2 =
 		"M,2,12884902050,3000,0.98,33643,922,FOO,B,B,AARCA,B,";
 
-    String TEST_WHOLE =
-        "A,1,12884901908,B,B,1000,FOO,2.75,28800,737,B,AARCA,";
+    private final String TEST_WHOLE =
+        "A,1,12884901908,B,B,1000,FOO,275,28800,737,B,AARCA,";
 
 
 
@@ -55,8 +56,8 @@ public class ArcaParserTest {
 
     @Test
     public void testAddWhole() throws Exception {
-        WaitFreeQueue<String> inQ = new WaitFreeQueue<String>(5);
-        WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<DataPoint>(5);
+        WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
+        WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
         ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ);
         inQ.enq(TEST_WHOLE);
@@ -78,8 +79,8 @@ public class ArcaParserTest {
 
 	@Test
 	public void testAdd() throws Exception {
-		WaitFreeQueue<String> inQ = new WaitFreeQueue<String>(5);
-		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<DataPoint>(5);
+		WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
+		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
 		ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ);
 
@@ -136,8 +137,8 @@ public class ArcaParserTest {
 
 	@Test
 	public void testDelete() throws Exception {
-		WaitFreeQueue<String> inQ = new WaitFreeQueue<String>(5);
-		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<DataPoint>(5);
+		WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
+		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
 		ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ);
 

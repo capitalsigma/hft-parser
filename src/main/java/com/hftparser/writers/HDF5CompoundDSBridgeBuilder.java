@@ -8,9 +8,9 @@ import com.sun.istack.internal.NotNull;
 /**
  * Created by patrick on 7/28/14.
  */
-public class HDF5CompoundDSBridgeBuilder<T> {
+class HDF5CompoundDSBridgeBuilder<T> {
     private HDF5CompoundType<T> type;
-    private IHDF5CompoundWriter writer;
+    private final IHDF5CompoundWriter writer;
     private long startSize;
     private int chunkSize;
 
@@ -47,7 +47,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         } else {
-            return new HDF5CompoundDSBridge<T>(name, type, writer, startSize, chunkSize);
+            return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize);
         }
         
     }

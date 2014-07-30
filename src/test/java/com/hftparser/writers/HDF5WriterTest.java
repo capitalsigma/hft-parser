@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 //import ncsa.hdf.object.FileFormat;
 
-import ch.systemsx.cisd.hdf5.IHDF5Writer;
 import com.hftparser.readers.WritableDataPoint;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,20 +13,19 @@ import org.junit.runners.JUnit4;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.DataPoint;
 import com.hftparser.writers.HDF5Writer;
-import com.hftparser.writers.ResolvablePath;
 
 import java.io.File;
 import java.util.HashMap;
 
 @RunWith(JUnit4.class)
 public class HDF5WriterTest {
-    HDF5Writer writer;
-    WaitFreeQueue<DataPoint> inQ;
-    String OUT_FILE_PATH = "test-out.h5";
+    private HDF5Writer writer;
+    private WaitFreeQueue<DataPoint> inQ;
+    private final String OUT_FILE_PATH = "test-out.h5";
 
     @Before
     public void setUp() throws Exception {
-        inQ = new WaitFreeQueue<DataPoint>(5);
+        inQ = new WaitFreeQueue<>(5);
         writer = new HDF5Writer(inQ, new File(OUT_FILE_PATH));
     }
 

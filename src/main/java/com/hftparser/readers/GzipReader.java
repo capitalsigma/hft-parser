@@ -11,8 +11,8 @@ import com.hftparser.containers.WaitFreeQueue;
 
 public class GzipReader implements Runnable {
 	// InputStream file;
-	BufferedReader reader;
-	WaitFreeQueue<String> queue;
+    private BufferedReader reader;
+	private final WaitFreeQueue<String> queue;
 
 	// TODO: find out what encoding the files actually use, and set it
 	// correctly for InputStreamReader

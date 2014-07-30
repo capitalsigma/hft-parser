@@ -13,12 +13,12 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParseRun {
-    private static int QUEUE_SIZE = 10;
+class ParseRun {
+    private static final int QUEUE_SIZE = 1000;
 
     private static class Args {
         @Parameter
-        private List<String> parameters = new ArrayList<String>();
+        private List<String> parameters = new ArrayList<>();
 
         @Parameter(names = {"-symbols", "-s"}, description = "CSV containing symbols")
         private String symbolPath;
@@ -127,7 +127,7 @@ public class ParseRun {
 
     private static String[] parseSymbolFile(File symbolFile)
             throws IOException {
-        ArrayList<String> ret = new ArrayList<String>();
+        ArrayList<String> ret = new ArrayList<>();
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(symbolFile));
 

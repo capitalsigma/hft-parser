@@ -3,8 +3,8 @@ package com.hftparser.writers;
 /**
  * Created by patrick on 7/28/14.
  */
-public class DatasetNameBuilder {
-    String group;
+class DatasetNameBuilder {
+    private final String group;
 
     public DatasetNameBuilder(String group) {
         this.group = group;

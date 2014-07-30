@@ -3,8 +3,8 @@ package com.hftparser.writers;
 import java.net.URL;
 
 public class ResolvablePath {
-	String partialPath;
-	String fullPath;
+	private final String partialPath;
+	private final String fullPath;
 
 	public ResolvablePath(String _partialPath) {
 		partialPath = _partialPath;

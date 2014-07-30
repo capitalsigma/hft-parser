@@ -2,11 +2,7 @@ package com.hftparser.readers;
 
 import static org.junit.Assert.*;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
@@ -14,6 +10,7 @@ import com.hftparser.readers.BuyOrders;
 import com.hftparser.readers.MarketOrderCollection;
 import com.hftparser.readers.SellOrders;
 
+@SuppressWarnings("UnusedAssignment")
 @RunWith(JUnit4.class)
 public class MarketOrderCollectionTest {
 

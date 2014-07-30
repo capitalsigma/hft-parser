@@ -1,16 +1,14 @@
 package com.hftparser.readers;
 
-import ch.systemsx.cisd.hdf5.CompoundElement;
-
 import java.util.Arrays;
 
 // maybe this should go in with the writers
 public class DataPoint {
-    private int[][] buy;
-    private int[][] sell;
-    private int timeStamp;
-    private long seqNum;
-    private String ticker;
+    private final int[][] buy;
+    private final int[][] sell;
+    private final int timeStamp;
+    private final long seqNum;
+    private final String ticker;
 
     public DataPoint(String _ticker,
                      int[][] _buy,

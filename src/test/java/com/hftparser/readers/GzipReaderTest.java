@@ -3,7 +3,6 @@ package com.hftparser.readers;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import com.hftparser.writers.ResolvablePath;
 import org.junit.Assert;
@@ -15,20 +14,21 @@ import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.GzipReader;
 
 
+@SuppressWarnings("UnusedAssignment")
 @RunWith(JUnit4.class)
 public class GzipReaderTest {
-	String TEST_FILE_ONE = "/one-line.txt.gz";
-	String TEST_FILE_TWO = ResolvablePath.resolve("/four-lines.txt.gz");
+	private final String TEST_FILE_ONE = "/one-line.txt.gz";
+	private final String TEST_FILE_TWO = ResolvablePath.resolve("/four-lines.txt.gz");
 
-	String TEST_ONE_TEXT = "This is test data.";
-	String[] TEST_TWO_TEXTS = {
+	private final String TEST_ONE_TEXT = "This is test data.";
+	private final String[] TEST_TWO_TEXTS = {
 		"This is more",
 		 "and more",
 		 "and more",
 		 "test data."
 	};
 
-	String RESOURCES_DIR = "/test/test-data/";
+	private final String RESOURCES_DIR = "/test/test-data/";
 
 	String buildPath(String fileName){
 		String root = System.getProperty("user.dir");
@@ -41,7 +41,7 @@ public class GzipReaderTest {
 
 
 	GzipReader instantiate(String fileName, WaitFreeQueue<String> wfq)
-		throws IOException, FileNotFoundException {
+		throws IOException {
 		// ClassLoader loader = com.hftparser.readers.GzipReaderTest.class.getClassLoader();
 		// String location = loader.getResource(pathToFile).toString();
 
@@ -74,8 +74,8 @@ public class GzipReaderTest {
 	@Test
 	public void testRun() {
 		try {
-			WaitFreeQueue<String> wfqOne = new WaitFreeQueue<String>(5);
-			WaitFreeQueue<String> wfqTwo = new WaitFreeQueue<String>(5);
+			WaitFreeQueue<String> wfqOne = new WaitFreeQueue<>(5);
+			WaitFreeQueue<String> wfqTwo = new WaitFreeQueue<>(5);
 
 			GzipReader readerOne = instantiate(TEST_FILE_ONE, wfqOne);
 			GzipReader readerTwo = instantiate(TEST_FILE_TWO, wfqTwo);

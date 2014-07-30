@@ -1,22 +1,19 @@
 package com.hftparser.readers;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
-public abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
+abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
 	TreeSet<Integer> sortedKeys;
 
 	// In case we want to do something special later
-	public MarketOrderCollection() {
+    MarketOrderCollection() {
 		// default size (can't define as a property)
 		this(10);
 	}
 
-	public MarketOrderCollection(int startCapacity) {
+	MarketOrderCollection(int startCapacity) {
 		super(startCapacity);
 	}
 

@@ -1,7 +1,6 @@
 package com.hftparser.readers;
 
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,8 +11,8 @@ enum RecordType {
 }
 
 class Order {
-	int price;
-	int quantity;
+	final int price;
+	final int quantity;
 
 	public Order(int _price, int _quantity) {
 		price = _price;
@@ -24,28 +23,29 @@ class Order {
 // TODO: lookup table of orders (for Modify behavior)
 // TODO: implement Add, Delete, Modify
 public class ArcaParser extends AbstractParser implements Runnable {
-	private WaitFreeQueue<String> inQueue;
+	private final WaitFreeQueue<String> inQueue;
 	// not sure yet what this needs to be
-    private WaitFreeQueue<DataPoint> outQueue;
-	private String[] tickers;
+    private final WaitFreeQueue<DataPoint> outQueue;
+	@SuppressWarnings("FieldCanBeLocal")
+    private final String[] tickers;
 
 	// TODO: would it be faster to try to use eg an enum here?
 
 	// TODO: according to stackoverflow.com/questions/81346/, we can
 	// save time if we roll a MutableLong to use for qtys. we can do
 	// this later if it's not fast enough
-    private Map<String, Map<OrderType, MarketOrderCollection>> ordersNow;
+    private final Map<String, Map<OrderType, MarketOrderCollection>> ordersNow;
 
 	// We're here abusing the fact that (at least within a day), there
 	// are less than 2^64 orders, and saving just the end of the
 	// 20-digit order reference number. This may break.
-    private Map<Long, Order> orderHistory;
+    private final Map<Long, Order> orderHistory;
 
 	// Split CSVs on commas
-    private String INPUT_SPLIT = ",";
+    private final String INPUT_SPLIT = ",";
 
 	// For modify, we need to pull at most 12 things out of record
-    private int IMPORTANT_SYMBOL_COUNT = 13;
+    private final int IMPORTANT_SYMBOL_COUNT = 13;
 
 	// like in Python -- this is our top N values in buy/sell prices we care about
     public static final int LEVELS = 10;
@@ -54,11 +54,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 	// float to avoid floating point error. So we make the int part
 	// bigger by this amount, and add in the float part in the
 	// lower-order digits.
-    private int PRICE_OFFSET_EXP = 6;
-	private int PRICE_INTEGER_OFFSET = (int)Math.pow(10, 6);
+    private final int PRICE_OFFSET_EXP = 6;
+	private final int PRICE_INTEGER_OFFSET = (int)Math.pow(10, 6);
 
 	// bump this up when in production
-    private int INITIAL_ODRDER_HISTORY_SIZE = 2000;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int INITIAL_ODRDER_HISTORY_SIZE = 2000;
 
 	private static Map<String, RecordType> recordTypeLookup;
 
@@ -69,23 +70,22 @@ public class ArcaParser extends AbstractParser implements Runnable {
 		inQueue = _inQueue;
 		outQueue = _outQueue;
 
-		ordersNow = new HashMap<String,
-			Map<OrderType, MarketOrderCollection>>(tickers.length);
+		ordersNow = new HashMap<>(tickers.length);
 
-		orderHistory = new HashMap<Long, Order>(INITIAL_ODRDER_HISTORY_SIZE);
+		orderHistory = new HashMap<>(INITIAL_ODRDER_HISTORY_SIZE);
 
 
 		// First we initialize with empty hashmaps
 		for (String ticker : tickers) {
 			Map<OrderType, MarketOrderCollection> toAdd =
-				new HashMap<OrderType, MarketOrderCollection>();
+				new HashMap<>();
 			toAdd.put(OrderType.Buy, new BuyOrders());
 			toAdd.put(OrderType.Sell, new SellOrders());
 			ordersNow.put(ticker, toAdd);
 		}
 
 		// Set up a lookup table for our recordTypes
-		recordTypeLookup = new HashMap<String, RecordType>(4);
+		recordTypeLookup = new HashMap<>(4);
 		recordTypeLookup.put("A", RecordType.Add);
 		recordTypeLookup.put("M", RecordType.Modify);
 		recordTypeLookup.put("D", RecordType.Delete);
@@ -189,14 +189,14 @@ public class ArcaParser extends AbstractParser implements Runnable {
 			ordersNow.get(ticker).get(OrderType.Sell).topN(LEVELS);
 
 
-		DataPoint toPush = new DataPoint(ticker,
-										 toBuyNow,
-                                         toSellNow,
+        DataPoint toPush = new DataPoint(ticker,
+                toBuyNow,
+                toSellNow,
                 timeStamp,
-										 seqNum);
+                seqNum);
 
 		// System.out.println("About to push a DataPoint.");
-		toPush.equals(toPush);
+
 		// spin until we successfully push
 		while(!outQueue.enq(toPush)) { }
 	}

@@ -3,10 +3,7 @@ import com.hftparser.readers.ArcaParserTest;
 import com.hftparser.readers.GzipReaderTest;
 import com.hftparser.writers.HDF5CompoundDSBridgeTest;
 import com.hftparser.writers.HDF5WriterTest;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
 import org.junit.runner.RunWith;
-import org.junit.runner.notification.Failure;
 import org.junit.runners.Suite;
 
 @RunWith(Suite.class)

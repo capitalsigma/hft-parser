@@ -2,20 +2,20 @@ package com.hftparser.containers;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import com.hftparser.containers.WaitFreeQueue;
 
 
+@SuppressWarnings("UnusedAssignment")
 @RunWith(JUnit4.class)
 public class WaitFreeQueueTest {
 	@Test
 	public void testInstantiate() {
 		try {
-			WaitFreeQueue<String> stringQueue = new WaitFreeQueue<String>(10);
-			WaitFreeQueue<Integer> intQueue = new WaitFreeQueue<Integer>(15);
+			WaitFreeQueue<String> stringQueue = new WaitFreeQueue<>(10);
+			WaitFreeQueue<Integer> intQueue = new WaitFreeQueue<>(15);
 		} catch (Throwable t) {
 			Assert.fail("Got exception thrown: " + t.toString());
 		}
@@ -23,8 +23,8 @@ public class WaitFreeQueueTest {
 
 	@Test
 	public void testEnqAndDeq() {
-		WaitFreeQueue<String> stringQueue = new WaitFreeQueue<String>(3);
-		WaitFreeQueue<Integer> intQueue = new WaitFreeQueue<Integer>(3);
+		WaitFreeQueue<String> stringQueue = new WaitFreeQueue<>(3);
+		WaitFreeQueue<Integer> intQueue = new WaitFreeQueue<>(3);
 
 		for(int i = 0; i < 3; i++) {
 			Assert.assertTrue(stringQueue.enq("Hello"));
@@ -46,7 +46,7 @@ public class WaitFreeQueueTest {
 
 	@Test
 	public void testAcceptingOrders() {
-		WaitFreeQueue<String> stringQueue = new WaitFreeQueue<String>(3);
+		WaitFreeQueue<String> stringQueue = new WaitFreeQueue<>(3);
 
 		Assert.assertTrue(stringQueue.acceptingOrders);
 		stringQueue.acceptingOrders = false;
@@ -55,7 +55,7 @@ public class WaitFreeQueueTest {
 
 	@Test
 	public void testIsEmpty() {
-		WaitFreeQueue<Integer> intQueue = new WaitFreeQueue<Integer>(4);
+		WaitFreeQueue<Integer> intQueue = new WaitFreeQueue<>(4);
 
 		Assert.assertTrue(intQueue.isEmpty());
 
