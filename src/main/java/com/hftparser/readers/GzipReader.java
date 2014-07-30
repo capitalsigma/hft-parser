@@ -31,7 +31,7 @@ public class GzipReader implements Runnable {
 		try {
 			String toEnq;
 			while((toEnq = reader.readLine()) != null) {
-                System.out.println("Reader read a line:" + toEnq);
+//                System.out.println("Reader read a line:" + toEnq);
                 // loop until we successfully enqueue our new line
                 while (!queue.enq(toEnq)) {
                 }

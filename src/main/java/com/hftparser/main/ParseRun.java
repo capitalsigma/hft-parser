@@ -122,7 +122,7 @@ public class ParseRun {
             return;
         }
 
-        System.out.println("Successfully created" + args.outPath);
+        System.out.println("Successfully created " + args.outPath);
     }
 
     private static String[] parseSymbolFile(File symbolFile)

@@ -209,7 +209,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
         int sizeOfFloatPart = 0;
 
 		// System.out.println("got price: " + priceString);
-		System.out.println("parsing price: " + Arrays.toString(parts));
+//		System.out.println("parsing price: " + Arrays.toString(parts));
 
 		assert parts.length == 1 || (parts.length == 2 && parts[1].length() <= 6);
 
@@ -344,7 +344,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
 			// Work if we got something from the queue, otherwise spin
 			if ((toParse = inQueue.deq()) != null) {
-                System.out.println("Parser got a line:" + toParse);
+//                System.out.println("Parser got a line:" + toParse);
 
                 // Split into fields
                 asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);

@@ -17,8 +17,9 @@ public class HDF5Writer implements Runnable {
 	IHDF5Writer fileWriter;
 	WaitFreeQueue<DataPoint> inQueue;
 
-    int START_SIZE = 10;
-    int CHUNK_SIZE = 10;
+    int START_SIZE = 100;
+//    following FLUSH_FREQ from the original python
+    int CHUNK_SIZE = 500000;
 
     String BOOK_DS_NAME = "books";
 
@@ -62,7 +63,7 @@ public class HDF5Writer implements Runnable {
         try {
             while (inQueue.acceptingOrders || !inQueue.isEmpty()) {
                 if ((dataPoint = inQueue.deq()) != null) {
-                    System.out.println("Writer got a datapoint.");
+//                    System.out.println("Writer got a datapoint.");
                     writePoint(dataPoint);
                 }
             }
