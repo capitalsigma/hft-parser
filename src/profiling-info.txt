@@ -20,3 +20,29 @@ Run with counts of empty/full hits:
     Information for Datapoint queue:
          Full hits: 20963185989
          Empty hits:  401275169
+
+     AND ALSO
+
+     Total time: 866.804 sec
+     Information for String queue:
+     Full hits: 38623300513
+     Empty hits: 15772450
+     Information for Datapoint queue:
+     Full hits: 36597339783
+     Empty hits: 350979092
+
+Run with counts of empty/full hits and backoff:
+    LINE_QUEUE_SIZE = 500000;
+    POINT_QUEUE_SIZE = 500000;
+    CHUNK_SIZE = 500000
+    snyc type SYNC_BLOCK
+    MIN_BACKOFF = 20;
+    MAX_BACKOFF = 500;
+
+    Total time: 869.359 sec
+    Information for String queue:
+    Full hits: 2445
+    Empty hits: 35
+    Information for Datapoint queue:
+    Full hits: 2254
+    Empty hits: 28

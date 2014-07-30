@@ -92,12 +92,12 @@ class ParseRun {
 
 
         outFile = new File(args.outPath);
-        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE,
-                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
-                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
-        WaitFreeQueue<DataPoint> dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE,
-                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
-                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
+        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE);
+//                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
+//                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
+        WaitFreeQueue < DataPoint > dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE);
+//                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
+//                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
 
         try {
             gzipReader = new GzipReader(GzipInstream, linesReadQueue);
