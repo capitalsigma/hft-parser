@@ -3,12 +3,12 @@ package com.hftparser.writers;
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.HDF5GenericStorageFeatures;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
+import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 
 /**
  * Created by patrick on 7/28/14.
  */
 class HDF5CompoundDSBridge<T> {
-        private static HDF5GenericStorageFeatures features;
         private long currentOffset;
         private IHDF5CompoundWriter writer;
         private String fullPath;
@@ -16,30 +16,33 @@ class HDF5CompoundDSBridge<T> {
         private HDF5CompoundType<T> type;
 
         public HDF5CompoundDSBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
-                                    long startSize, int chunkSize) {
+                                    long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig) {
             fullPath = name.getFullPath();
             this.writer = writer;
             this.type = type;
 
-            if(features == null){
-                initFeatures();
-            }
+            HDF5GenericStorageFeatures features = initFeatures(bridgeConfig);
 
-            this.writer.createArray(fullPath, type, startSize, chunkSize);
+            this.writer.createArray(fullPath, type, startSize, chunkSize, features);
             currentOffset = 0;
             //noinspection unchecked
             elToWrite = (T[]) new Object[1];
         }
 
-        private void initFeatures() {
-            HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder=
+        private HDF5GenericStorageFeatures initFeatures(HDF5CompoundDSBridgeConfig bridgeConfig) {
+            HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder =
                     HDF5GenericStorageFeatures.build();
-//            featureBuilder.contiguousStorageLayout();
-            featureBuilder.chunkedStorageLayout();
-            featureBuilder.datasetReplacementEnforceKeepExisting();
-//            featureBuilder.compress();
 
-            features = featureBuilder.features();
+            if(bridgeConfig.isDefault_storage_layout()) {
+                featureBuilder.defaultStorageLayout();
+            }
+
+            featureBuilder.storageLayout(bridgeConfig.getStorage_layout());
+            featureBuilder.deflateLevel(bridgeConfig.getDeflate_level());
+//           TODO: is this necessary? I don't think so (unless we get duplicate types)
+            featureBuilder.datasetReplacementEnforceKeepExisting();
+
+            return featureBuilder.features();
         }
 
         public void appendElement(T element) {

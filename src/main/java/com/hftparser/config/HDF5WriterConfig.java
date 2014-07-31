@@ -98,4 +98,9 @@ public class HDF5WriterConfig {
         result = 31 * result + (perform_numeric_conversions ? 1 : 0);
         return result;
     }
+
+    public static HDF5WriterConfig getDefault() {
+        return new HDF5WriterConfig(true, true, true, IHDF5WriterConfigurator.SyncMode
+                .SYNC_BLOCK, 100, 10);
+    }
 }

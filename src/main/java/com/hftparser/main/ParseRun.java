@@ -5,7 +5,9 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.hftparser.config.BadConfigFileError;
 import com.hftparser.config.ConfigFactory;
+import com.hftparser.config.ParseRunConfig;
 import com.hftparser.containers.Backoff;
+import com.hftparser.containers.Backoffable;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.ArcaParser;
 import com.hftparser.readers.DataPoint;
@@ -21,11 +23,11 @@ import java.util.List;
 // WARNING: TURNING ON ASSERTIONS BREAKS SOMETHING INSIDE OF THE CISD CODE
 // NEVER, EVER, EVER TURN ON ASSERTIONS
 class ParseRun {
-    private static final int LINE_QUEUE_SIZE = 500000;
-    private static final int POINT_QUEUE_SIZE = 500000;
+    private static int LINE_QUEUE_SIZE;
+    private static int POINT_QUEUE_SIZE;
 
-    private static final int MIN_BACKOFF = 20;
-    private static final int MAX_BACKOFF = 500;
+//    private static int MIN_BACKOFF;
+//    private static int MAX_BACKOFF;
 
     private static class Args {
         @Parameter
@@ -61,7 +63,7 @@ class ParseRun {
         Thread parserThread;
         Thread writerThread;
         Thread[] allThreads;
-        ConfigFactory configFactory;
+        ConfigFactory configFactory = null;
         long startTime = System.currentTimeMillis();
         long endTime;
 
@@ -104,13 +106,22 @@ class ParseRun {
         }
 
 
+        ParseRunConfig parseRunConfig = configFactory.getParseRunConfig();
+        setProperties(parseRunConfig);
+
+        Backoffable sBackoffOne = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.String);
+        Backoffable sBackoffTwo = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.String);
+
+        Backoffable dBackoffOne = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.DataPoint);
+        Backoffable dBackoffTwo = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.DataPoint);
+
         outFile = new File(args.outPath);
         WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE,
-                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
-                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
+                sBackoffOne,
+                sBackoffTwo);
         WaitFreeQueue < DataPoint > dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE,
-                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
-                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
+                dBackoffOne,
+                dBackoffTwo);
 
         try {
             gzipReader = new GzipReader(GzipInstream, linesReadQueue);
@@ -161,6 +172,13 @@ class ParseRun {
         double diff = endMs - startMs;
 
         System.out.printf("Total time: %.3f sec\n", diff / 1000);
+    }
+
+    private static void setProperties(ParseRunConfig config) {
+        LINE_QUEUE_SIZE = config.getLine_queue_size();
+        POINT_QUEUE_SIZE = config.getPoint_queue_size();
+
+
     }
 
     private static void printErrAndExit(String err) {

@@ -3,6 +3,7 @@ package com.hftparser.writers;
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
+import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,6 +14,7 @@ class HDF5CompoundDSBridgeBuilder<T> {
     private IHDF5CompoundWriter writer;
     private long startSize;
     private int chunkSize;
+    private HDF5CompoundDSBridgeConfig bridgeConfig;
 
     public HDF5CompoundType<T> getType() {
         return type;
@@ -40,6 +42,11 @@ class HDF5CompoundDSBridgeBuilder<T> {
 
 
     public HDF5CompoundDSBridgeBuilder(IHDF5Writer writer) {
+        this(writer, HDF5CompoundDSBridgeConfig.getDefault());
+    }
+
+    HDF5CompoundDSBridgeBuilder(IHDF5Writer writer, HDF5CompoundDSBridgeConfig bridgeConfig) {
+        this.bridgeConfig = bridgeConfig;
         this.writer = writer.compound();
     }
 
@@ -47,8 +54,8 @@ class HDF5CompoundDSBridgeBuilder<T> {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         } else {
-            return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize);
+            return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);
         }
-        
+
     }
 }

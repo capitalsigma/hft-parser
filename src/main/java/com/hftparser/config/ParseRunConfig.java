@@ -1,5 +1,8 @@
 package com.hftparser.config;
 
+import com.hftparser.containers.Backoff;
+import com.hftparser.containers.Backoffable;
+import com.hftparser.containers.NoOpBackoff;
 import org.json.JSONObject;
 
 /**
@@ -12,6 +15,10 @@ public class ParseRunConfig {
     private final int min_backoff_s;
     private final int max_backoff_s;
     private final int min_backoff_d;
+
+    public static enum BackoffType {
+        String, DataPoint
+    }
 
     public int getLine_queue_size() {
         return line_queue_size;
@@ -62,6 +69,19 @@ public class ParseRunConfig {
         this.max_backoff_s = max_backoff_s;
         this.min_backoff_d = min_backoff_d;
         this.max_backoff_d = max_backoff_d;
+    }
+
+    public Backoffable makeBackoffFor(BackoffType ty) {
+        if (!backoff) {
+            return new NoOpBackoff();
+        }
+
+        if (ty.equals(BackoffType.String)) {
+            return new Backoff(min_backoff_s, max_backoff_s);
+        } else {
+            return new Backoff(min_backoff_d, max_backoff_d);
+        }
+
     }
 
     @Override

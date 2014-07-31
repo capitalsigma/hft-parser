@@ -84,4 +84,9 @@ public class HDF5CompoundDSBridgeConfig {
         result = 31 * result + (int) deflate_level;
         return result;
     }
+
+    public static HDF5CompoundDSBridgeConfig getDefault() {
+        return new HDF5CompoundDSBridgeConfig(true, HDF5StorageLayout.CHUNKED,
+                HDF5GenericStorageFeatures.NO_DEFLATION_LEVEL);
+    }
 }
