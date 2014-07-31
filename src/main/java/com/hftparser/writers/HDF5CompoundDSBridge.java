@@ -34,8 +34,10 @@ class HDF5CompoundDSBridge<T> {
         private void initFeatures() {
             HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder=
                     HDF5GenericStorageFeatures.build();
+//            featureBuilder.contiguousStorageLayout();
             featureBuilder.chunkedStorageLayout();
             featureBuilder.datasetReplacementEnforceKeepExisting();
+//            featureBuilder.compress();
 
             features = featureBuilder.features();
         }

@@ -35,6 +35,12 @@ class ParseRun {
 
         @Parameter(names = {"-out", "-o"}, description = "Output .h5 file")
         private String outPath;
+
+        @Parameter(names = {"-config", "-c"}, description = ".properties config file")
+        private String configPath;
+
+        @Parameter(names = {"-stats", "-s"}, description = "Output file for run statistics")
+        private String statsPath;
     }
 
 
@@ -54,7 +60,7 @@ class ParseRun {
         long startTime = System.currentTimeMillis();
         long endTime;
 
-        if(args.bookPath == null || args.outPath == null) {
+        if(args.bookPath == null || args.outPath == null || args.configPath == null) {
             System.out.println("Book path and output path must be specified.");
             return;
         }
@@ -92,12 +98,12 @@ class ParseRun {
 
 
         outFile = new File(args.outPath);
-        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE);
-//                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
-//                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
-        WaitFreeQueue < DataPoint > dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE);
-//                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
-//                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
+        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE,
+                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
+                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
+        WaitFreeQueue < DataPoint > dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE,
+                new Backoff(MIN_BACKOFF, MAX_BACKOFF),
+                new Backoff(MIN_BACKOFF, MAX_BACKOFF));
 
         try {
             gzipReader = new GzipReader(GzipInstream, linesReadQueue);

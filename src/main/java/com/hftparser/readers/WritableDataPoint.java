@@ -8,13 +8,15 @@ import java.util.Arrays;
  * Created by patrick on 7/29/14.
  */
 public class WritableDataPoint {
-//    TODO: put this somewhere else so it doesn't end up in the output
-    private final int LEVELS = ArcaParser.LEVELS;
 
-    @CompoundElement(memberName = "bid", dimensions = {LEVELS, 2})
+//    NOTE: this is ugly, but this way it doesn't get written out to the output.
+//    TODO: refactor this as an inner class of something to avoid this
+//    private final int LEVELS = ArcaParser.LEVELS;
+
+    @CompoundElement(memberName = "bid", dimensions = {ArcaParser.LEVELS, 2})
     private int[][] buy;
 
-    @CompoundElement(memberName =  "ask", dimensions = {LEVELS, 2})
+    @CompoundElement(memberName =  "ask", dimensions = {ArcaParser.LEVELS, 2})
     private int[][] sell;
 
     @CompoundElement(memberName = "timestamp")
@@ -31,16 +33,16 @@ public class WritableDataPoint {
     }
 
     private int[][] padArray(int[][] toPad){
-        if (toPad.length != LEVELS) {
+        if (toPad.length != ArcaParser.LEVELS) {
             return buildNew(toPad);
         }
         return toPad;
     }
 
     private int[][] buildNew(int[][] toPad){
-        int[][] ret = new int[LEVELS][2];
+        int[][] ret = new int[ArcaParser.LEVELS][2];
 
-        for(int i = 0; i < LEVELS; i++){
+        for(int i = 0; i < ArcaParser.LEVELS; i++){
 //            System.out.println("Checking for line:" + i + ", in.len = " + toPad.length);
             if((toPad.length <= i) || (toPad[i] == null)) {
                 ret[i] = new int[] {0, 0};

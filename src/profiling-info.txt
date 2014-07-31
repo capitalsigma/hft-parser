@@ -46,3 +46,31 @@ Run with counts of empty/full hits and backoff:
     Information for Datapoint queue:
     Full hits: 2254
     Empty hits: 28
+
+Run with counts and featureBuilder.contiguousStorageLayout():
+    LINE_QUEUE_SIZE = 500000;
+    POINT_QUEUE_SIZE = 500000;
+    CHUNK_SIZE = 500000
+    snyc type SYNC_BLOCK
+
+    Total time: 937.901 sec
+    Information for String queue:
+    Full hits: 39830300061
+    Empty hits: 183406937
+    Information for Datapoint queue:
+    Full hits: 36431864524
+    Empty hits: 538576014
+
+Run with counts and .compress():
+    LINE_QUEUE_SIZE = 500000;
+    POINT_QUEUE_SIZE = 500000;
+    CHUNK_SIZE = 500000
+    snyc type SYNC_BLOCK
+
+    Total time: 913.254 sec
+    Information for String queue:
+    Full hits: 41175786278
+    Empty hits: 5275282
+    Information for Datapoint queue:
+    Full hits: 38536780654
+    Empty hits: 538206646

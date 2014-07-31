@@ -57,7 +57,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
 	// bump this up when in production
     @SuppressWarnings("FieldCanBeLocal")
-    private final int INITIAL_ODRDER_HISTORY_SIZE = 500000;
+    private final int INITIAL_ORDER_HISTORY_SIZE = 500000;
 
     private final int OUTPUT_PROGRESS_EVERY = 5000000;
 
@@ -72,7 +72,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
 		ordersNow = new HashMap<>(tickers.length);
 
-		orderHistory = new HashMap<>(INITIAL_ODRDER_HISTORY_SIZE);
+		orderHistory = new HashMap<>(INITIAL_ORDER_HISTORY_SIZE);
 
 
 		// First we initialize with empty hashmaps

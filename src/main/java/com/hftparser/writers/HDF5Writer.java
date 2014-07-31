@@ -19,6 +19,7 @@ public class HDF5Writer implements Runnable {
 
     private final int START_SIZE = 100;
     // following FLUSH_FREQ from the original python
+//      TODO: this is a BYTE SIZE, not a number of rows, and IT SHOULD BE A MULTIPLE OF THE ROW SIZE
     private final int CHUNK_SIZE = 500000;
 
     private final String BOOK_DS_NAME = "books";
@@ -77,7 +78,8 @@ public class HDF5Writer implements Runnable {
         config.keepDataSetsIfTheyExist();
         config.overwrite();
         config.syncMode(IHDF5WriterConfigurator.SyncMode.SYNC_BLOCK);
-        config.performNumericConversions();
+//        config.performNumericConversions();
+
         return config.writer();
     }
 

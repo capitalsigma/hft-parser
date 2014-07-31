@@ -43,7 +43,7 @@ public class WaitFreeQueue<T> {
 		if(tail - head == items.length) {
 			// throw new FullException();
             fullHits.incrementAndGet();
-            inBackoff.backoff();
+//            inBackoff.backoff();
 			return false;
 		} else {
 			items[tail % items.length] = x;
@@ -56,7 +56,7 @@ public class WaitFreeQueue<T> {
 		if (isEmpty()) {
             // throw new EmptyException();
             emptyHits.incrementAndGet();
-            outBackoff.backoff();
+//            outBackoff.backoff();
             return null;
         } else {
 			T x = items[head % items.length];
