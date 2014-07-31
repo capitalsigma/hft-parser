@@ -3,6 +3,8 @@ package com.hftparser.main;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.hftparser.config.BadConfigFileError;
+import com.hftparser.config.ConfigFactory;
 import com.hftparser.containers.Backoff;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.ArcaParser;
@@ -12,7 +14,6 @@ import com.hftparser.writers.HDF5Writer;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,9 +98,8 @@ class ParseRun {
         }
 
         try {
-            String jsonStr = new String(Files.readAllBytes(Paths.get(args.configPath)), "UTF8");
-            configFactory = new ConfigFactory(jsonStr);
-        } catch (BadConfigFileError|IOException e) {
+            configFactory = ConfigFactory.fromPath(args.configPath);
+        } catch (BadConfigFileError | IOException e) {
             printErrAndExit("There was a problem loading your config file: " + e.toString());
         }
 
