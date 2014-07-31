@@ -23,6 +23,6 @@
 	"HDF5CompoundDSBridge" : {
 		"default_storage_layout": false,
 		"storage_layout": "COMPACT",
-		"deflate_layout": "MAX_DEFLATION_LEVEL"
+		"deflate_level": "MAX_DEFLATION_LEVEL"
 	}
 }

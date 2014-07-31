@@ -11,6 +11,9 @@ import com.hftparser.readers.GzipReader;
 import com.hftparser.writers.HDF5Writer;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,9 +50,9 @@ class ParseRun {
     public static void main(String[] argv) {
         Args args = new Args();
         new JCommander(args, argv);
-        String[] symbols;
-        InputStream GzipInstream;
-        GzipReader gzipReader;
+        String[] symbols = null;
+        InputStream GzipInstream = null;
+        GzipReader gzipReader = null;
         ArcaParser parser;
         HDF5Writer writer;
         File outFile;
@@ -57,6 +60,7 @@ class ParseRun {
         Thread parserThread;
         Thread writerThread;
         Thread[] allThreads;
+        ConfigFactory configFactory;
         long startTime = System.currentTimeMillis();
         long endTime;
 
@@ -82,18 +86,21 @@ class ParseRun {
             try {
                 symbols = parseSymbolFile(symbolFile);
             } catch (IOException e) {
-                System.out.println("Got error opening symbol file:" + e.toString());
-                System.out.println("Exiting.");
-                return;
+                printErrAndExit("Got error opening symbol file:" + e.toString());
             }
         }
 
         try {
             GzipInstream = new FileInputStream(new File(args.bookPath));
         } catch (FileNotFoundException e) {
-            System.out.println("Error opening book file.");
-            System.out.println("Exiting");
-            return;
+            printErrAndExit("Error opening book file.");
+        }
+
+        try {
+            String jsonStr = new String(Files.readAllBytes(Paths.get(args.configPath)), "UTF8");
+            configFactory = new ConfigFactory(jsonStr);
+        } catch (BadConfigFileError|IOException e) {
+            printErrAndExit("There was a problem loading your config file: " + e.toString());
         }
 
 
@@ -108,8 +115,7 @@ class ParseRun {
         try {
             gzipReader = new GzipReader(GzipInstream, linesReadQueue);
         } catch(IOException e) {
-            System.out.println("Error opening book file for reading.");
-            return;
+            printErrAndExit("Error opening book file for reading: " + e.toString());
         }
 
         parser = new ArcaParser(symbols, linesReadQueue, dataPointQueue);
@@ -155,6 +161,12 @@ class ParseRun {
         double diff = endMs - startMs;
 
         System.out.printf("Total time: %.3f sec\n", diff / 1000);
+    }
+
+    private static void printErrAndExit(String err) {
+        System.out.println(err);
+        System.out.println("Exiting");
+        System.exit(1);
     }
 
     private static String[] parseSymbolFile(File symbolFile)
