@@ -93,13 +93,9 @@ public class ParseRunConfig {
 
         if (backoff != that.backoff) return false;
         if (line_queue_size != that.line_queue_size) return false;
-        if (max_backoff_d != that.max_backoff_d) return false;
-        if (max_backoff_s != that.max_backoff_s) return false;
-        if (min_backoff_d != that.min_backoff_d) return false;
-        if (min_backoff_s != that.min_backoff_s) return false;
-        if (point_queue_size != that.point_queue_size) return false;
+        return max_backoff_d == that.max_backoff_d && max_backoff_s == that.max_backoff_s && min_backoff_d == that
+                .min_backoff_d && min_backoff_s == that.min_backoff_s && point_queue_size == that.point_queue_size;
 
-        return true;
     }
 
     @Override

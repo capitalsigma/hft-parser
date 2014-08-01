@@ -10,10 +10,10 @@ import com.hftparser.config.HDF5CompoundDSBridgeConfig;
  */
 class HDF5CompoundDSBridge<T> {
         private long currentOffset;
-        private IHDF5CompoundWriter writer;
-        private String fullPath;
-        private T[] elToWrite;
-        private HDF5CompoundType<T> type;
+        private final IHDF5CompoundWriter writer;
+        private final String fullPath;
+        private final T[] elToWrite;
+        private final HDF5CompoundType<T> type;
 
         public HDF5CompoundDSBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
                                     long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig) {
@@ -33,9 +33,9 @@ class HDF5CompoundDSBridge<T> {
             HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder =
                     HDF5GenericStorageFeatures.build();
 
-            if(bridgeConfig.isDefault_storage_layout()) {
-                featureBuilder.defaultStorageLayout();
-            }
+//            if(bridgeConfig.isDefault_storage_layout()) {
+//                featureBuilder.defaultStorageLayout();
+//            }
 
             featureBuilder.storageLayout(bridgeConfig.getStorage_layout());
             featureBuilder.deflateLevel(bridgeConfig.getDeflate_level());

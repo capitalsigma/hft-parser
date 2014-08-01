@@ -79,13 +79,10 @@ public class HDF5WriterConfig {
         HDF5WriterConfig that = (HDF5WriterConfig) o;
 
         if (chunk_size != that.chunk_size) return false;
-        if (keep_datasets_if_they_exist != that.keep_datasets_if_they_exist) return false;
-        if (overwrite != that.overwrite) return false;
-        if (perform_numeric_conversions != that.perform_numeric_conversions) return false;
-        if (start_size != that.start_size) return false;
-        if (sync_mode != that.sync_mode) return false;
+        return keep_datasets_if_they_exist == that.keep_datasets_if_they_exist && overwrite == that.overwrite &&
+                perform_numeric_conversions == that.perform_numeric_conversions && start_size == that.start_size &&
+                sync_mode == that.sync_mode;
 
-        return true;
     }
 
     @Override
@@ -97,6 +94,18 @@ public class HDF5WriterConfig {
         result = 31 * result + (keep_datasets_if_they_exist ? 1 : 0);
         result = 31 * result + (perform_numeric_conversions ? 1 : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "HDF5WriterConfig{" +
+                "start_size=" + start_size +
+                ", chunk_size=" + chunk_size +
+                ", sync_mode=" + sync_mode +
+                ", overwrite=" + overwrite +
+                ", keep_datasets_if_they_exist=" + keep_datasets_if_they_exist +
+                ", perform_numeric_conversions=" + perform_numeric_conversions +
+                '}';
     }
 
     public static HDF5WriterConfig getDefault() {

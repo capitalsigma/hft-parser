@@ -6,7 +6,6 @@ import com.beust.jcommander.Parameter;
 import com.hftparser.config.BadConfigFileError;
 import com.hftparser.config.ConfigFactory;
 import com.hftparser.config.ParseRunConfig;
-import com.hftparser.containers.Backoff;
 import com.hftparser.containers.Backoffable;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.ArcaParser;
@@ -15,8 +14,6 @@ import com.hftparser.readers.GzipReader;
 import com.hftparser.writers.HDF5Writer;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,8 +126,9 @@ class ParseRun {
             printErrAndExit("Error opening book file for reading: " + e.toString());
         }
 
-        parser = new ArcaParser(symbols, linesReadQueue, dataPointQueue);
-        writer = new HDF5Writer(dataPointQueue, outFile);
+        parser = new ArcaParser(symbols, linesReadQueue, dataPointQueue, configFactory.getArcaParserConfig());
+        writer = new HDF5Writer(dataPointQueue, outFile, configFactory.getHdf5WriterConfig(),
+                configFactory.getHdf5CompoundDSBridgeConfig());
 
         readerThread = new Thread(gzipReader);
         parserThread = new Thread(parser);

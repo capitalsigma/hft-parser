@@ -21,7 +21,6 @@
 		"perform_numeric_conversions": false
 	},
 	"HDF5CompoundDSBridge" : {
-		"default_storage_layout": false,
 		"storage_layout": "COMPACT",
 		"deflate_level": "MAX_DEFLATION_LEVEL"
 	}

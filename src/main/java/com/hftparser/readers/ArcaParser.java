@@ -4,6 +4,7 @@ package com.hftparser.readers;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.hftparser.config.ArcaParserConfig;
 import com.hftparser.containers.WaitFreeQueue;
 
 enum RecordType {
@@ -57,18 +58,21 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
 	// bump this up when in production
     @SuppressWarnings("FieldCanBeLocal")
-    private final int INITIAL_ORDER_HISTORY_SIZE = 500000;
-
-    private final int OUTPUT_PROGRESS_EVERY = 5000000;
+    private final int INITIAL_ORDER_HISTORY_SIZE;
+    private final int OUTPUT_PROGRESS_EVERY;
 
 	private static Map<String, RecordType> recordTypeLookup;
 
 	public ArcaParser(String[] _tickers,
 					  WaitFreeQueue<String> _inQueue,
-					  WaitFreeQueue<DataPoint> _outQueue) {
+					  WaitFreeQueue<DataPoint> _outQueue,
+                      ArcaParserConfig config) {
 		tickers = _tickers;
 		inQueue = _inQueue;
 		outQueue = _outQueue;
+
+        INITIAL_ORDER_HISTORY_SIZE = config.getInitial_order_history_size();
+        OUTPUT_PROGRESS_EVERY = config.getOutput_progress_every();
 
 		ordersNow = new HashMap<>(tickers.length);
 
@@ -89,8 +93,13 @@ public class ArcaParser extends AbstractParser implements Runnable {
 		recordTypeLookup.put("A", RecordType.Add);
 		recordTypeLookup.put("M", RecordType.Modify);
 		recordTypeLookup.put("D", RecordType.Delete);
-
 	}
+
+    public ArcaParser(String[] _tickers,
+                      WaitFreeQueue<String> _inQueue,
+                      WaitFreeQueue<DataPoint> _outQueue) {
+        this(_tickers, _inQueue, _outQueue, ArcaParserConfig.getDefault());
+    }
 
 	void processAdd(int qty,
 					int price,
@@ -198,7 +207,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
 		// System.out.println("About to push a DataPoint.");
 
 		// spin until we successfully push
-		while(!outQueue.enq(toPush)) { }
+        //noinspection StatementWithEmptyBody
+        while(!outQueue.enq(toPush)) { }
 	}
 
 

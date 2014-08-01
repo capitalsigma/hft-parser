@@ -2,7 +2,7 @@ package com.hftparser.writers;
 
 import java.net.URL;
 
-public class ResolvablePath {
+class ResolvablePath {
 	private final String partialPath;
 	private final String fullPath;
 
@@ -12,7 +12,7 @@ public class ResolvablePath {
 	}
 
 	// answers.opencv.org/question/10236/
-	public static String resolve(String partialPath) {
+	private static String resolve(String partialPath) {
 /*
 String root = System.getProperty("user.dir");
 

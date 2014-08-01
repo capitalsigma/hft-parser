@@ -69,14 +69,16 @@ public class MarketOrderCollectionTest {
 	}
 
 
-	static void printArray(int[][] arr) {
-		for(int i = 0; i < arr.length; i++) {
-			for(int j = 0; j < arr[i].length; j++) {
-				System.out.print(arr[i][j] + " ");
-			}
-			System.out.println();
-		}
-	}
+// --Commented out by Inspection START (7/31/14 6:09 PM):
+//	static void printArray(int[][] arr) {
+//		for(int i = 0; i < arr.length; i++) {
+//			for(int j = 0; j < arr[i].length; j++) {
+//				System.out.print(arr[i][j] + " ");
+//			}
+//			System.out.println();
+//		}
+//	}
+// --Commented out by Inspection STOP (7/31/14 6:09 PM)
 
 	void checkArraysEqual(int[][] expected, int[][] actual) {
 		// System.out.println("Checking array: ");

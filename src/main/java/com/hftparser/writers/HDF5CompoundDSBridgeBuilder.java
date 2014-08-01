@@ -11,10 +11,10 @@ import org.jetbrains.annotations.NotNull;
  */
 class HDF5CompoundDSBridgeBuilder<T> {
     private HDF5CompoundType<T> type;
-    private IHDF5CompoundWriter writer;
+    private final IHDF5CompoundWriter writer;
     private long startSize;
     private int chunkSize;
-    private HDF5CompoundDSBridgeConfig bridgeConfig;
+    private final HDF5CompoundDSBridgeConfig bridgeConfig;
 
     public HDF5CompoundType<T> getType() {
         return type;

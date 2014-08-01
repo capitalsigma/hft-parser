@@ -8,9 +8,10 @@ import java.util.Random;
 
 // Art of Multiprocessor Programming p. 148
 public class Backoff implements Backoffable {
-    final int minDelay, maxDelay;
-    int limit;
-    final Random random;
+    private final int minDelay;
+    private final int maxDelay;
+    private int limit;
+    private final Random random;
 
     public Backoff(int min, int max) {
         minDelay = min;

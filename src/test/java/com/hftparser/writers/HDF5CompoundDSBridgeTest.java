@@ -21,18 +21,25 @@ public class HDF5CompoundDSBridgeTest {
 
     @Before
     public void setUp() throws  Exception {
-        File file = new File(TEST_PATH);
+        try {
+            File file = new File(TEST_PATH);
 
-        testPoint1 = new WritableDataPoint(new int[][]{{1, 2}}, new int[][] {{3, 4}}, 6, 10l);
-        testPoint2 = new WritableDataPoint(new int[][]{{4, 5}}, new int[][] {{6, 7}}, 7, 101l);
+            testPoint1 = new WritableDataPoint(new int[][]{{1, 2}}, new int[][] {{3, 4}}, 6, 10l);
+            testPoint2 = new WritableDataPoint(new int[][]{{4, 5}}, new int[][] {{6, 7}}, 7, 101l);
 
-        writer = HDF5Writer.getWriter(file);
-        HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer);
-        dtBuilder.setChunkSize(5);
-        dtBuilder.setStartSize(10);
-        dtBuilder.setTypeFromInferred(WritableDataPoint.class);
+            writer = HDF5Writer.getWriter(file);
+            HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer);
+            dtBuilder.setChunkSize(5);
+            dtBuilder.setStartSize(10);
+            dtBuilder.setTypeFromInferred(WritableDataPoint.class);
 
-        dtBridge =  dtBuilder.build(TEST_DS);
+            dtBridge =  dtBuilder.build(TEST_DS);
+
+        } catch (StackOverflowError e) {
+            fail("This library has a bug in HDF5GenericStorageFeatures.java line 425, " +
+                    "that throws it into an infinite loop if .defaultStorageLayout is called. NEVER, " +
+                    "EVER CALL defaultStorageLayout.\n Failed with error: " + e.toString());
+        }
     }
 
     @Test
@@ -42,6 +49,10 @@ public class HDF5CompoundDSBridgeTest {
 
         assertTrue(testPoint1.equals(dtBridge.readBlock(0)[0]));
         assertTrue(testPoint2.equals(dtBridge.readBlock(1)[0]));
+    }
+
+    @Test
+    public void testDoesntOverflowStackBecauseOfALibraryBug() {
     }
 
     @After

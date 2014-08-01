@@ -28,13 +28,13 @@ public class HDF5Writer implements Runnable {
     // given, and raise abstraction-appropriate exceptions if
     // something goes wrong.
     public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue, File outFile, HDF5WriterConfig writerConfig,
-                      HDF5CompoundDSBridgeConfig bridgeConfig) {
+                       HDF5CompoundDSBridgeConfig bridgeConfig) {
 
         fileWriter = getWriter(outFile, writerConfig);
         START_SIZE = writerConfig.getStart_size();
         CHUNK_SIZE = writerConfig.getChunk_size();
 
-        bridgeBuilder = new HDF5CompoundDSBridgeBuilder<>(fileWriter);
+        bridgeBuilder = new HDF5CompoundDSBridgeBuilder<>(fileWriter, bridgeConfig);
 
         bridgeBuilder.setStartSize(START_SIZE);
         bridgeBuilder.setChunkSize(CHUNK_SIZE);
@@ -79,13 +79,17 @@ public class HDF5Writer implements Runnable {
         }
     }
 
-    public static IHDF5Writer getWriter(File file, HDF5WriterConfig writerConfig) {
+    private static IHDF5Writer getWriter(File file, HDF5WriterConfig writerConfig) {
         IHDF5WriterConfigurator config = HDF5Factory.configure(file);
         if(writerConfig.isKeep_datasets_if_they_exist()) {
             config.keepDataSetsIfTheyExist();
         }
         if(writerConfig.isOverwrite()) {
             config.overwrite();
+        }
+
+        if (writerConfig.isPerform_numeric_conversions()) {
+            config.performNumericConversions();
         }
 
         config.syncMode(writerConfig.getSync_mode());

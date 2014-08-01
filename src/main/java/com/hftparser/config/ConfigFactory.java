@@ -34,7 +34,7 @@ public class ConfigFactory {
         return new ConfigFactory(jsonStr);
     }
 
-    public ConfigFactory(String jsonStr) throws BadConfigFileError {
+    private ConfigFactory(String jsonStr) throws BadConfigFileError {
         JSONObject jsonObject = new JSONObject(jsonStr);
 
         parseRunConfig = new ParseRunConfig(jsonObject.getJSONObject("ParseRun"));

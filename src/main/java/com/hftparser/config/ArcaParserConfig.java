@@ -34,10 +34,9 @@ public class ArcaParserConfig {
 
         ArcaParserConfig that = (ArcaParserConfig) o;
 
-        if (initial_order_history_size != that.initial_order_history_size) return false;
-        if (output_progress_every != that.output_progress_every) return false;
+        return initial_order_history_size == that.initial_order_history_size && output_progress_every == that
+                .output_progress_every;
 
-        return true;
     }
 
     @Override
@@ -53,5 +52,9 @@ public class ArcaParserConfig {
                 "initial_order_history_size=" + initial_order_history_size +
                 ", output_progress_every=" + output_progress_every +
                 '}';
+    }
+
+    public static ArcaParserConfig getDefault() {
+        return new ArcaParserConfig(500000, 5000000);
     }
 }

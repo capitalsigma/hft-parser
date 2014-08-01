@@ -10,8 +10,8 @@ import static org.junit.Assert.*;
 
 // TODO: we really want to catch all these JSONExceptions and rethrow a BadConfigFileError
 public class ConfigFactoryTest {
-    String TEST_INFILE = "src/test/resources/test-config.json";
-    ConfigFactory factory;
+    private final String TEST_INFILE = "src/test/resources/test-config.json";
+    private ConfigFactory factory;
 
     @Before
     public void setUp() throws Exception {
@@ -20,7 +20,7 @@ public class ConfigFactoryTest {
 
     @Test
     public void testGetHdf5CompoundDSBridgeConfig() throws Exception {
-        HDF5CompoundDSBridgeConfig expected = new HDF5CompoundDSBridgeConfig(false, HDF5StorageLayout.COMPACT,
+        HDF5CompoundDSBridgeConfig expected = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.COMPACT,
                 HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL);
         HDF5CompoundDSBridgeConfig actual = factory.getHdf5CompoundDSBridgeConfig();
 
@@ -50,7 +50,13 @@ public class ConfigFactoryTest {
     @Test
     public void testGetHdf5WriterConfig() throws Exception {
         HDF5WriterConfig expected = new HDF5WriterConfig(false, true, true,
-                IHDF5WriterConfigurator.SyncMode.SYNC, 100, 500000);
+                IHDF5WriterConfigurator.SyncMode.SYNC, 500000, 100);
         HDF5WriterConfig actual = factory.getHdf5WriterConfig();
+
+        System.out.println("Expected: " + expected.toString());
+        System.out.println("Actual: " + actual.toString());
+
+
+        assertEquals(expected, actual);
     }
 }
