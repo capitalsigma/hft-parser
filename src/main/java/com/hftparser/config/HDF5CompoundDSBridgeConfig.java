@@ -56,9 +56,14 @@ public class HDF5CompoundDSBridgeConfig {
     }
 
     public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level) {
-//        this.default_storage_layout = default_storage_layout;
-        this.storage_layout = storage_layout;
+        //        this.default_storage_layout = default_storage_layout;
+        this(storage_layout, deflate_level, -1);
+    }
+
+    public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level,  int cache_size) {
+        this.cache_size = cache_size;
         this.deflate_level = deflate_level;
+        this.storage_layout = storage_layout;
     }
 
     public HDF5StorageLayout getStorage_layout() {

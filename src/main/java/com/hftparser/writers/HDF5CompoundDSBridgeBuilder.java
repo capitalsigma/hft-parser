@@ -54,7 +54,13 @@ class HDF5CompoundDSBridgeBuilder<T> {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         } else {
-            return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);
+            if (bridgeConfig.getCache_size() > 0) {
+//                System.out.println("Building caching");
+                return new HDF5CompoundDSCachingBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);
+            } else {
+//                System.out.println("Building regular");
+                return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);
+            }
         }
 
     }

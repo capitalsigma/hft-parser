@@ -9,11 +9,11 @@ import com.hftparser.config.HDF5CompoundDSBridgeConfig;
  * Created by patrick on 7/28/14.
  */
 class HDF5CompoundDSBridge<T> {
-        private long currentOffset;
-        private final IHDF5CompoundWriter writer;
-        private final String fullPath;
+        protected long currentOffset;
+        protected final IHDF5CompoundWriter writer;
+        protected final String fullPath;
         private final T[] elToWrite;
-        private final HDF5CompoundType<T> type;
+        protected final HDF5CompoundType<T> type;
 
         public HDF5CompoundDSBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
                                     long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig) {
@@ -29,7 +29,7 @@ class HDF5CompoundDSBridge<T> {
             elToWrite = (T[]) new Object[1];
         }
 
-        private HDF5GenericStorageFeatures initFeatures(HDF5CompoundDSBridgeConfig bridgeConfig) {
+        protected HDF5GenericStorageFeatures initFeatures(HDF5CompoundDSBridgeConfig bridgeConfig) {
 //            System.out.println("Initialized with: " + bridgeConfig.toString());
             HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder = HDF5GenericStorageFeatures
                     .build();

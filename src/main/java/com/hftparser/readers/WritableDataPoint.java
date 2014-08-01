@@ -53,6 +53,36 @@ public class WritableDataPoint {
         return ret;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        WritableDataPoint that = (WritableDataPoint) o;
+
+        return equals(that);
+
+//        if (seqNum != that.seqNum) {
+//            return false;
+//        }
+//        if (timeStamp != that.timeStamp) {
+//            return false;
+//        }
+//
+//        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = timeStamp;
+        result = 31 * result + (int) (seqNum ^ (seqNum >>> 32));
+        return result;
+    }
+
     public boolean equals(WritableDataPoint other){
         return (other != null) &&
                 other.timeStamp == timeStamp &&
@@ -64,5 +94,15 @@ public class WritableDataPoint {
     //    needed for the HDF5 business
     public WritableDataPoint(){
 
+    }
+
+    @Override
+    public String toString() {
+        return "WritableDataPoint{" +
+                "buy=" + Arrays.deepToString(buy) +
+                ", sell=" + Arrays.deepToString(sell) +
+                ", timeStamp=" + timeStamp +
+                ", seqNum=" + seqNum +
+                '}';
     }
 }

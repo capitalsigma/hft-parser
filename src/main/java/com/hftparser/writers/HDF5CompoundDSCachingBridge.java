@@ -1,6 +1,7 @@
 package com.hftparser.writers;
 
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
+import ch.systemsx.cisd.hdf5.HDF5GenericStorageFeatures;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 
@@ -17,6 +18,18 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
         super(name, type, writer, startSize, chunkSize, bridgeConfig);
         cacheSize = bridgeConfig.getCache_size();
         cache = (T[])  new Object[cacheSize];
+
+//        System.out.println("Built caching");
     }
 
+    @Override
+    public void appendElement(T element) {
+        if (currentCacheOffset < cacheSize) {
+            cache[currentCacheOffset++] = element;
+        } else {
+            writer.writeArrayBlockWithOffset(fullPath, type, cache, currentOffset);
+            currentOffset += cacheSize;
+            currentCacheOffset = 0;
+        }
+    }
 }
