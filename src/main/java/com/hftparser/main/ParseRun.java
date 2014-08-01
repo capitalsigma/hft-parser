@@ -42,8 +42,8 @@ class ParseRun {
         @Parameter(names = {"-config", "-c"}, description = ".properties config file")
         private String configPath;
 
-        @Parameter(names = {"-stats", "-s"}, description = "Output file for run statistics")
-        private String statsPath;
+//        @Parameter(names = {"-stats", "-s"}, description = "Output file for run statistics")
+//        private String statsPath;
     }
 
 
