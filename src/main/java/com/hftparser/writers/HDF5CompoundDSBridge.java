@@ -30,16 +30,17 @@ class HDF5CompoundDSBridge<T> {
         }
 
         private HDF5GenericStorageFeatures initFeatures(HDF5CompoundDSBridgeConfig bridgeConfig) {
-            HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder =
-                    HDF5GenericStorageFeatures.build();
+//            System.out.println("Initialized with: " + bridgeConfig.toString());
+            HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder = HDF5GenericStorageFeatures
+                    .build();
 
-//            if(bridgeConfig.isDefault_storage_layout()) {
-//                featureBuilder.defaultStorageLayout();
-//            }
+            //            if(bridgeConfig.isDefault_storage_layout()) {
+            //                featureBuilder.defaultStorageLayout();
+            //            }
 
             featureBuilder.storageLayout(bridgeConfig.getStorage_layout());
             featureBuilder.deflateLevel(bridgeConfig.getDeflate_level());
-//           TODO: is this necessary? I don't think so (unless we get duplicate types)
+            //           TODO: is this necessary? I don't think so (unless we get duplicate types)
             featureBuilder.datasetReplacementEnforceKeepExisting();
 
             return featureBuilder.features();
@@ -47,6 +48,7 @@ class HDF5CompoundDSBridge<T> {
 
         public void appendElement(T element) {
             elToWrite[0] = element;
+//            System.out.println("At offset: " + currentOffset);
             writer.writeArrayBlockWithOffset(fullPath, type, elToWrite, currentOffset++);
         }
 

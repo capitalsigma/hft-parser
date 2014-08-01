@@ -44,11 +44,28 @@ public class HDF5WriterConfig {
         start_size = json.getInt("start_size");
         chunk_size = json.getInt("chunk_size");
 
-        switch(json.getString("sync_mode")) {
-        case "SYNC":
-            sync_mode = IHDF5WriterConfigurator.SyncMode.SYNC;
-            break;
-        default:
+        switch (json.getString("sync_mode")) {
+            case "NO_SYNC":
+                sync_mode = IHDF5WriterConfigurator.SyncMode.NO_SYNC;
+                break;
+
+            case "SYNC":
+                sync_mode = IHDF5WriterConfigurator.SyncMode.SYNC;
+                break;
+
+            case "SYNC_BLOCK":
+                sync_mode = IHDF5WriterConfigurator.SyncMode.SYNC_BLOCK;
+                break;
+
+            case "SYNC_ON_FLUSH":
+                sync_mode = IHDF5WriterConfigurator.SyncMode.SYNC_ON_FLUSH;
+                break;
+
+            case "SYNC_ON_FLUSH_BLOCK":
+                sync_mode = IHDF5WriterConfigurator.SyncMode.SYNC_ON_FLUSH_BLOCK;
+                break;
+
+            default:
                 throw new BadConfigFileError();
         }
 
@@ -57,11 +74,8 @@ public class HDF5WriterConfig {
         perform_numeric_conversions = json.getBoolean("perform_numeric_conversions");
     }
 
-    public HDF5WriterConfig(boolean perform_numeric_conversions,
-                            boolean keep_datasets_if_they_exist,
-                            boolean overwrite,
-                            IHDF5WriterConfigurator.SyncMode sync_mode,
-                            int chunk_size,
+    public HDF5WriterConfig(boolean perform_numeric_conversions, boolean keep_datasets_if_they_exist,
+                            boolean overwrite, IHDF5WriterConfigurator.SyncMode sync_mode, int chunk_size,
                             int start_size) {
         this.perform_numeric_conversions = perform_numeric_conversions;
         this.keep_datasets_if_they_exist = keep_datasets_if_they_exist;
@@ -73,12 +87,18 @@ public class HDF5WriterConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         HDF5WriterConfig that = (HDF5WriterConfig) o;
 
-        if (chunk_size != that.chunk_size) return false;
+        if (chunk_size != that.chunk_size) {
+            return false;
+        }
         return keep_datasets_if_they_exist == that.keep_datasets_if_they_exist && overwrite == that.overwrite &&
                 perform_numeric_conversions == that.perform_numeric_conversions && start_size == that.start_size &&
                 sync_mode == that.sync_mode;
@@ -109,7 +129,6 @@ public class HDF5WriterConfig {
     }
 
     public static HDF5WriterConfig getDefault() {
-        return new HDF5WriterConfig(true, true, true, IHDF5WriterConfigurator.SyncMode
-                .SYNC_BLOCK, 100, 10);
+        return new HDF5WriterConfig(true, true, true, IHDF5WriterConfigurator.SyncMode.SYNC_BLOCK, 100, 10);
     }
 }

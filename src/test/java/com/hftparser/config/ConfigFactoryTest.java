@@ -11,6 +11,7 @@ import static org.junit.Assert.*;
 // TODO: we really want to catch all these JSONExceptions and rethrow a BadConfigFileError
 public class ConfigFactoryTest {
     private final String TEST_INFILE = "src/test/resources/test-config.json";
+    private final String TEST_NUMERIC = "src/test/resources/test-config-numeric-deflate.json";
     private ConfigFactory factory;
 
     @Before
@@ -56,6 +57,19 @@ public class ConfigFactoryTest {
         System.out.println("Expected: " + expected.toString());
         System.out.println("Actual: " + actual.toString());
 
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testGetHdf5CompoundDsBridgeConfigForNumeric() throws Exception {
+        ConfigFactory numFactory = ConfigFactory.fromPath(TEST_NUMERIC);
+
+        HDF5CompoundDSBridgeConfig expected = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.COMPACT, (byte) 2);
+        HDF5CompoundDSBridgeConfig actual = numFactory.getHdf5CompoundDSBridgeConfig();
+
+        System.out.println("Expected: " + expected.toString());
+        System.out.println("Actual: " + actual.toString());
 
         assertEquals(expected, actual);
     }

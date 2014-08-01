@@ -19,6 +19,8 @@ import java.util.List;
 
 // WARNING: TURNING ON ASSERTIONS BREAKS SOMETHING INSIDE OF THE CISD CODE
 // NEVER, EVER, EVER TURN ON ASSERTIONS
+
+// NOTE: CHUNKED data layout is not extensible.
 class ParseRun {
     private static int LINE_QUEUE_SIZE;
     private static int POINT_QUEUE_SIZE;

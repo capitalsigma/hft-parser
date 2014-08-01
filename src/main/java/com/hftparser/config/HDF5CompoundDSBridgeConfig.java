@@ -10,6 +10,7 @@ import org.json.JSONObject;
 public class HDF5CompoundDSBridgeConfig {
     private final HDF5StorageLayout storage_layout;
     private final byte deflate_level;
+    private int cache_size;
 
     HDF5CompoundDSBridgeConfig(JSONObject json) throws BadConfigFileError {
 
@@ -28,7 +29,9 @@ public class HDF5CompoundDSBridgeConfig {
                 throw new BadConfigFileError();
         }
 
-        switch (json.getString("deflate_level")) {
+        String fieldVal = json.optString("deflate_level", "NOSTR");
+        System.out.println("Got: " + fieldVal);
+        switch (json.optString("deflate_level", "NOSTR")) {
             case "MAX_DEFLATION_LEVEL":
                 deflate_level = HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL;
                 break;
@@ -38,8 +41,17 @@ public class HDF5CompoundDSBridgeConfig {
             case "NO_DEFLATION_LEVEL":
                 deflate_level = HDF5GenericStorageFeatures.NO_DEFLATION_LEVEL;
                 break;
-            default:
+            case "NOSTR":
                 throw new BadConfigFileError();
+            default:
+                deflate_level = (byte) json.getInt("deflate_level");
+                break;
+        }
+
+        if (!json.has("cache_size")) {
+            cache_size = -1;
+        }  else {
+            cache_size = json.getInt("cache_size");
         }
     }
 
@@ -57,6 +69,9 @@ public class HDF5CompoundDSBridgeConfig {
         return deflate_level;
     }
 
+    public int getCache_size() {
+        return cache_size;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -87,7 +102,15 @@ public class HDF5CompoundDSBridgeConfig {
     }
 
     public static HDF5CompoundDSBridgeConfig getDefault() {
-        return new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.COMPACT,
+        return new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
                 HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL);
+    }
+
+    @Override
+    public String toString() {
+        return "HDF5CompoundDSBridgeConfig{" +
+                "storage_layout=" + storage_layout +
+                ", deflate_level=" + deflate_level +
+                '}';
     }
 }
