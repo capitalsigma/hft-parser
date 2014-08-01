@@ -75,6 +75,10 @@ public class HDF5Writer implements Runnable {
                 }
             }
         } finally {
+            for (HDF5CompoundDSBridge<WritableDataPoint> bridge : dsForTicker.values()) {
+                bridge.flush();
+            }
+
             fileWriter.close();
         }
     }

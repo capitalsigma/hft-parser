@@ -30,7 +30,7 @@ public class HDF5CompoundDSBridgeConfig {
         }
 
         String fieldVal = json.optString("deflate_level", "NOSTR");
-        System.out.println("Got: " + fieldVal);
+//        System.out.println("Got: " + fieldVal);
         switch (json.optString("deflate_level", "NOSTR")) {
             case "MAX_DEFLATION_LEVEL":
                 deflate_level = HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL;

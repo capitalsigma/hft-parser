@@ -73,4 +73,20 @@ public class HDF5CompoundDSCachingBridgeTest {
         System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
         assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 5), fullPoints));
     }
+
+    @Test
+    public void testFlush() throws Exception {
+        WritableDataPoint[] threeEmpty = new WritableDataPoint[]{emptyPoint, emptyPoint, emptyPoint};
+        WritableDataPoint[] onePointBlock = new WritableDataPoint[]{testPoint1, emptyPoint, emptyPoint};
+
+        assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 3), threeEmpty));
+
+        dtBridge.appendElement(testPoint1);
+
+        assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 3), threeEmpty));
+
+        dtBridge.flush();
+
+        assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 3), onePointBlock));
+    }
 }

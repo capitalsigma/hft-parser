@@ -24,12 +24,17 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
 
     @Override
     public void appendElement(T element) {
-        if (currentCacheOffset < cacheSize) {
-            cache[currentCacheOffset++] = element;
-        } else {
-            writer.writeArrayBlockWithOffset(fullPath, type, cache, currentOffset);
-            currentOffset += cacheSize;
-            currentCacheOffset = 0;
+        cache[currentCacheOffset++] = element;
+
+        if (currentCacheOffset >= cacheSize) {
+            flush();
         }
+    }
+
+    @Override
+    public void flush() {
+        writer.writeArrayBlockWithOffset(fullPath, type, cache, currentOffset);
+        currentOffset += cache.length;
+        currentCacheOffset = 0;
     }
 }
