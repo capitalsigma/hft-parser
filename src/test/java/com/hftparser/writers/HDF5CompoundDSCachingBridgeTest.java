@@ -64,13 +64,13 @@ public class HDF5CompoundDSCachingBridgeTest {
 
     @Test
     public void testAppendElement() throws Exception {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             dtBridge.appendElement(testPoint1);
             System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
             assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 5), emptyPoints));
         }
         dtBridge.appendElement(testPoint1);
-        System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
+//        System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
         assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 5), fullPoints));
     }
 
@@ -88,5 +88,23 @@ public class HDF5CompoundDSCachingBridgeTest {
         dtBridge.flush();
 
         assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 3), onePointBlock));
+    }
+
+    @Test
+    public void testZeroOutExtra() throws Exception {
+        WritableDataPoint[] expected = new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1,
+                testPoint1, testPoint1, emptyPoint, emptyPoint, emptyPoint, emptyPoint,};
+        WritableDataPoint[] actual;
+
+        for (int i = 0; i < 6; i++) {
+            dtBridge.appendElement(testPoint1);
+        }
+        dtBridge.flush();
+
+        actual = dtBridge.readBlock(0, 10);
+
+        System.out.println("Got: (testZeroOutExtra) " + Arrays.deepToString(actual));
+
+        assertTrue(Arrays.deepEquals(expected, actual));
     }
 }
