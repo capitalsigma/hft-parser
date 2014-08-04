@@ -15,4 +15,5 @@ cmd_to_run="$JAVA -Xms$MAX_MEM -Xmx$MAX_MEM $JAVA_FLAGS $target_jar $in_book $ou
 
 echo $cmd_to_run > $out_logfile
 cat ${3} >> $out_logfile
-$cmd_to_run 2>&1 | tee $out_logfile
+echo $4 >> $out_logfile
+$cmd_to_run 2>&1 | tee -a $out_logfile

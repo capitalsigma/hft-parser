@@ -6,6 +6,8 @@ import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import com.hftparser.readers.WritableDataPoint;
 
+import java.util.Arrays;
+
 /**
  * Created by patrick on 7/31/14.
  */
@@ -39,11 +41,19 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
 
     @Override
     public void flush() {
-        zeroOutExtra();
+        T[] toWrite = cutoffExtra();
 
-        writer.writeArrayBlockWithOffset(fullPath, type, cache, currentOffset);
+        writer.writeArrayBlockWithOffset(fullPath, type, toWrite, currentOffset);
         currentOffset += currentCacheOffset;
         currentCacheOffset = 0;
+    }
+
+    private T[] cutoffExtra() {
+        if (currentCacheOffset == cache.length) {
+            return cache;
+        } else {
+            return Arrays.copyOfRange(cache, 0, currentCacheOffset);
+        }
     }
 
     private void zeroOutExtra() {

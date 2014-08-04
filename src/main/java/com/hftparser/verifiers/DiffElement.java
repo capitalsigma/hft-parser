@@ -23,8 +23,8 @@ public class DiffElement {
     @Override
     public String toString() {
         return "DiffElement{" +
-                "expected=" + expected.toString() +
-                ", actual=" + actual.toString() +
+                "expected=" + (expected != null ? expected.toString() : null) +
+                ", actual=" + (actual != null ? actual.toString() : null) +
                 ", index=" + index +
                 '}';
     }

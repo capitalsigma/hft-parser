@@ -30,7 +30,7 @@ public class HDF5CompoundDSCachingBridgeTest {
         try {
             File file = new File(TEST_PATH);
 
-            testPoint1 = new WritableDataPoint(new int[][]{{1, 2}}, new int[][] {{3, 4}}, 6, 10l);
+            testPoint1 = new WritableDataPoint(new int[][]{{1, 2}}, new int[][]{{3, 4}}, 6, 10l);
             emptyPoint = new WritableDataPoint(new int[][]{}, new int[][]{}, 0, 0l);
 
             emptyPoints = new WritableDataPoint[]{emptyPoint, emptyPoint, emptyPoint, emptyPoint, emptyPoint,};
@@ -38,21 +38,21 @@ public class HDF5CompoundDSCachingBridgeTest {
 
 
             HDF5CompoundDSBridgeConfig config = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
-                    HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL, 5);
+                                                                               HDF5GenericStorageFeatures
+                                                                                       .MAX_DEFLATION_LEVEL, 5);
 
             writer = HDF5Writer.getWriter(file);
-            HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer,
-                    config);
+            HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer, config);
             dtBuilder.setChunkSize(5);
-            dtBuilder.setStartSize(10);
+            dtBuilder.setStartSize(5);
             dtBuilder.setTypeFromInferred(WritableDataPoint.class);
 
-            dtBridge =  dtBuilder.build(TEST_DS);
+            dtBridge = dtBuilder.build(TEST_DS);
 
         } catch (StackOverflowError e) {
             fail("This library has a bug in HDF5GenericStorageFeatures.java line 425, " +
-                    "that throws it into an infinite loop if .defaultStorageLayout is called. NEVER, " +
-                    "EVER CALL defaultStorageLayout.\n Failed with error: " + e.toString());
+                         "that throws it into an infinite loop if .defaultStorageLayout is called. NEVER, " +
+                         "EVER CALL defaultStorageLayout.\n Failed with error: " + e.toString());
         }
 
     }
@@ -70,7 +70,7 @@ public class HDF5CompoundDSCachingBridgeTest {
             assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 5), emptyPoints));
         }
         dtBridge.appendElement(testPoint1);
-//        System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
+        //        System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
         assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 5), fullPoints));
     }
 
@@ -91,9 +91,11 @@ public class HDF5CompoundDSCachingBridgeTest {
     }
 
     @Test
-    public void testZeroOutExtra() throws Exception {
+    public void testCutoffExtraEqual() throws Exception {
+        //        Note that we don't do this anymore, but it looks like readBlock just gives us zero-value elements
+        // if the requested element doesn't exist. So we'll leave this test.
         WritableDataPoint[] expected = new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1,
-                testPoint1, testPoint1, emptyPoint, emptyPoint, emptyPoint, emptyPoint,};
+                testPoint1, testPoint1};
         WritableDataPoint[] actual;
 
         for (int i = 0; i < 6; i++) {
@@ -106,5 +108,16 @@ public class HDF5CompoundDSCachingBridgeTest {
         System.out.println("Got: (testZeroOutExtra) " + Arrays.deepToString(actual));
 
         assertTrue(Arrays.deepEquals(expected, actual));
+    }
+
+    @Test
+    public void testCuttofExtraCorrectLength() throws Exception {
+        for (int i = 0; i < 6; i++) {
+            dtBridge.appendElement(testPoint1);
+        }
+
+        dtBridge.flush();
+
+        assertEquals(6, dtBridge.readArray().length);
     }
 }
