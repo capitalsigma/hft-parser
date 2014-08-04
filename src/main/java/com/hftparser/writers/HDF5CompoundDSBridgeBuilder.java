@@ -14,6 +14,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     private final IHDF5CompoundWriter writer;
     private long startSize;
     private int chunkSize;
+    private boolean cutoff;
     private final HDF5CompoundDSBridgeConfig bridgeConfig;
 
     public HDF5CompoundType<T> getType() {
@@ -40,6 +41,9 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         this.chunkSize = chunkSize;
     }
 
+    public void setCutoff(boolean cutoff) {
+        this.cutoff = cutoff;
+    }
 
     public HDF5CompoundDSBridgeBuilder(IHDF5Writer writer) {
         this(writer, HDF5CompoundDSBridgeConfig.getDefault());
@@ -48,6 +52,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     HDF5CompoundDSBridgeBuilder(IHDF5Writer writer, HDF5CompoundDSBridgeConfig bridgeConfig) {
         this.bridgeConfig = bridgeConfig;
         this.writer = writer.compound();
+        this.cutoff = bridgeConfig.isCutoff();
     }
 
     public HDF5CompoundDSBridge<T> build(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
@@ -55,8 +60,15 @@ public class HDF5CompoundDSBridgeBuilder<T> {
             throw new HDF5FormatNotFoundException();
         } else {
             if (bridgeConfig.getCache_size() > 0) {
-//                System.out.println("Building caching");
-                return new HDF5CompoundDSCachingBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);
+                //                System.out.println("Building caching");
+                if (cutoff) {
+                    return new HDF5CompoundDSCutoffCachingBridge<>(name, type, writer, startSize, chunkSize,
+                                                                   bridgeConfig);
+                } else {
+                    return new HDF5CompoundDSZeroOutCachingBridge<>(name, type, writer, startSize, chunkSize,
+                                                                   bridgeConfig);
+                }
+
             } else {
 //                System.out.println("Building regular");
                 return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);

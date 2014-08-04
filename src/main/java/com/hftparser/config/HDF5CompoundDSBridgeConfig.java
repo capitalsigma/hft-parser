@@ -11,10 +11,9 @@ public class HDF5CompoundDSBridgeConfig {
     private final HDF5StorageLayout storage_layout;
     private final byte deflate_level;
     private int cache_size;
+    private boolean cutoff;
 
     HDF5CompoundDSBridgeConfig(JSONObject json) throws BadConfigFileError {
-
-
         switch (json.getString("storage_layout")) {
             case "COMPACT":
                 storage_layout = HDF5StorageLayout.COMPACT;
@@ -53,7 +52,13 @@ public class HDF5CompoundDSBridgeConfig {
         }  else {
             cache_size = json.getInt("cache_size");
         }
-    }
+
+        if (!json.has("cutoff")) {
+            cutoff = false;
+        } else {
+            cutoff = json.getBoolean("cutoff");
+        }
+   }
 
     public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level) {
         //        this.default_storage_layout = default_storage_layout;
@@ -64,6 +69,15 @@ public class HDF5CompoundDSBridgeConfig {
         this.cache_size = cache_size;
         this.deflate_level = deflate_level;
         this.storage_layout = storage_layout;
+        cutoff = false;
+    }
+
+    public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level, int cache_size,
+                                      boolean cutoff) {
+        this.storage_layout = storage_layout;
+        this.deflate_level = deflate_level;
+        this.cache_size = cache_size;
+        this.cutoff = cutoff;
     }
 
     public HDF5StorageLayout getStorage_layout() {
@@ -97,6 +111,10 @@ public class HDF5CompoundDSBridgeConfig {
         }
 
         return true;
+    }
+
+    public boolean isCutoff() {
+        return cutoff;
     }
 
     @Override

@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
-public class HDF5CompoundDSCachingBridgeTest {
+public class HDF5CompoundDSCutoffCachingBridgeTest {
     private final String TEST_PATH = "test-out.h5";
     private final DatasetName TEST_DS = new DatasetName("group", "foo");
     private WritableDataPoint testPoint1;
@@ -46,6 +46,7 @@ public class HDF5CompoundDSCachingBridgeTest {
             dtBuilder.setChunkSize(5);
             dtBuilder.setStartSize(5);
             dtBuilder.setTypeFromInferred(WritableDataPoint.class);
+            dtBuilder.setCutoff(true);
 
             dtBridge = dtBuilder.build(TEST_DS);
 

@@ -44,7 +44,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
     // Split CSVs on commas
     private final String INPUT_SPLIT = ",";
-    private final Pattern SPLITTER;
+//    private final Pattern SPLITTER;
 //    private final Pattern ROW_NEEDED;
 
 
@@ -97,7 +97,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
         recordTypeLookup.put("M", RecordType.Modify);
         recordTypeLookup.put("D", RecordType.Delete);
 
-        SPLITTER = Pattern.compile(INPUT_SPLIT);
+//        SPLITTER = Pattern.compile(INPUT_SPLIT);
 
 //        SPLITTER = Splitter.on(INPUT_SPLIT).trimResults().omitEmptyStrings();
     }
@@ -338,13 +338,15 @@ public class ArcaParser extends AbstractParser implements Runnable {
                     System.out.printf("Parsed %d lines\n", linesSoFar);
                 }
 
-                if ((recType = recordTypeLookup.get(toParse.substring(0, 1))) == null) {
+                asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);
+
+                // System.out.println("asSplit: " + Arrays.toString(asSplit));
+
+                // Also note that containsKey is O(1)
+                if ((recType = recordTypeLookup.get(asSplit[0])) == null) {
                     // skip if it's not add, modify, delete
                     continue;
                 }
-
-                // Split into fields
-                asSplit = SPLITTER.split(toParse, IMPORTANT_SYMBOL_COUNT);
 
                 // System.out.println("asSplit: " + Arrays.toString(asSplit));
 

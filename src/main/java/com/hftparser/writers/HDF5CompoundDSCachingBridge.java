@@ -11,12 +11,12 @@ import java.util.Arrays;
 /**
  * Created by patrick on 7/31/14.
  */
-public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
-    private final T[] cache;
-    private final int cacheSize;
-    private int currentCacheOffset;
+public abstract class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
+    protected final T[] cache;
+    protected final int cacheSize;
+    protected int currentCacheOffset;
 //    private final static WritableDataPoint emptyPoint = new WritableDataPoint(new int[][]{}, new int[][]{}, 0, 0l);
-    private final T emptyPoint;
+protected final T emptyPoint;
 
     public HDF5CompoundDSCachingBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
                                 long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig){
@@ -41,27 +41,14 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
 
     @Override
     public void flush() {
-        T[] toWrite = cutoffExtra();
+        T[] toWrite = fixUp();
 
         writer.writeArrayBlockWithOffset(fullPath, type, toWrite, currentOffset);
         currentOffset += currentCacheOffset;
         currentCacheOffset = 0;
     }
 
-    private T[] cutoffExtra() {
-        if (currentCacheOffset == cache.length) {
-            return cache;
-        } else {
-            return Arrays.copyOfRange(cache, 0, currentCacheOffset);
-        }
-    }
 
-    private void zeroOutExtra() {
-//        System.out.println("Flushing. Current offset: " + currentCacheOffset + ".");
-        for (int i = currentCacheOffset; i < cache.length; i++) {
-//            System.out.println("Zeroing out " + i);
-
-            cache[i] = emptyPoint;
-        }
-    }
+//    template method
+    abstract protected T[] fixUp();
 }
