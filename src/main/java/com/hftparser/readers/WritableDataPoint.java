@@ -14,16 +14,16 @@ public class WritableDataPoint {
 //    private final int LEVELS = ArcaParser.LEVELS;
 //NOTE: 172 bytes per record
     @CompoundElement(memberName = "bid", dimensions = {ArcaParser.LEVELS, 2})
-    private int[][] buy;
+    protected int[][] buy;
 
     @CompoundElement(memberName =  "ask", dimensions = {ArcaParser.LEVELS, 2})
-    private int[][] sell;
+    protected int[][] sell;
 
     @CompoundElement(memberName = "timestamp")
-    private int timeStamp;
+    protected int timeStamp;
 
     @CompoundElement(memberName = "seqnum")
-    private long seqNum;
+    protected long seqNum;
 
     public WritableDataPoint(int[][] buy, int[][] sell, int timeStamp, long seqNum) {
         this.buy = padArray(buy);

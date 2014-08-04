@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by patrick on 8/4/14.
  */
-public class HDF5CompoundVerifier<T> {
+public class HDF5CompoundVerifier<S, T> {
     private final IHDF5Reader expectedReader;
     private final IHDF5Reader actualReader;
     private final boolean READ_LINK_TARGETS = false;
@@ -66,8 +66,32 @@ public class HDF5CompoundVerifier<T> {
         return compareLinkInfos(expectedInfos, actualInfos);
     }
 
+    public DiffElement diff(String rootGroup, String dataset) {
+        List<HDF5LinkInformation> expectedInfos = getInformationForGroup(expectedReader, rootGroup);
+        List<HDF5LinkInformation> actualInfos = getInformationForGroup(actualReader, rootGroup);
+
+        HDF5LinkInformation expectedInfo = getDatasetLink(expectedInfos, dataset);
+        HDF5LinkInformation actualInfo = getDatasetLink(actualInfos, dataset);
+
+        if (expectedInfo == null || actualInfo == null) {
+            return new DiffElement(expectedInfo, actualInfo);
+        } else {
+            return compareDatasets(expectedInfo, actualInfo);
+        }
+    }
+
     public DiffElement diff() {
         return diff(ROOT);
+    }
+
+    HDF5LinkInformation getDatasetLink(List<HDF5LinkInformation> infos, String dataset) {
+        for (HDF5LinkInformation info : infos) {
+            if (info.getName().equals(dataset)) {
+                return info;
+            }
+        }
+
+        return null;
     }
 
     private List<HDF5LinkInformation> getInformationForGroup(IHDF5Reader reader, String path) {
@@ -96,7 +120,7 @@ public class HDF5CompoundVerifier<T> {
                         break;
 
                     case DATASET:
-                        toRet = compareDataSets(expectedLink, actualLink);
+                        toRet = compareDatasets(expectedLink, actualLink);
                         break;
 
                     default:
@@ -114,12 +138,16 @@ public class HDF5CompoundVerifier<T> {
     }
 
     private T[] getArrayForBridgeBuilder(HDF5CompoundDSBridgeBuilder<T> builder, HDF5LinkInformation linkInformation) {
-        HDF5CompoundDSReadOnlyBridge<T> bridge = builder.build(DatasetName.fromHDF5LinkInformation(linkInformation));
+        return getArrayForBridgeBuilder(builder, DatasetName.fromHDF5LinkInformation(linkInformation));
+    }
+
+    private T[] getArrayForBridgeBuilder(HDF5CompoundDSBridgeBuilder<T> builder, DatasetName name) {
+        HDF5CompoundDSReadOnlyBridge<T> bridge = builder.build(name);
 
         return bridge.readArray();
     }
 
-    private DiffElement compareDataSets(HDF5LinkInformation expectedLink, HDF5LinkInformation actualLink) {
+    private DiffElement compareDatasets(HDF5LinkInformation expectedLink, HDF5LinkInformation actualLink) {
         T[] expectedArray = getArrayForBridgeBuilder(expectedBridgeBuilder, expectedLink);
         T[] actualArray = getArrayForBridgeBuilder(actualBridgeBuilder, actualLink);
 
