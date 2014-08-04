@@ -6,6 +6,7 @@ import java.util.TreeSet;
 
 abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
 	TreeSet<Integer> sortedKeys;
+    private int keyCount;
 
 	// In case we want to do something special later
     MarketOrderCollection() {
@@ -15,12 +16,13 @@ abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
 
 	MarketOrderCollection(int startCapacity) {
 		super(startCapacity);
-	}
+        keyCount = 0;
+    }
 
 	public int[][] topN(int topN) {
 		// can't zip lists in Java
 
-		int[][] ret = new int[Math.min(sortedKeys.size(), topN)][2];
+		int[][] ret = new int[Math.min(keyCount, topN)][2];
 
 		// for(Integer i = 0; i < topN; i++) {
 		int i = 0;
@@ -54,10 +56,12 @@ abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
 		if(quantity == 0) {
  			// System.out.println("Removing.");
 			sortedKeys.remove(price);
-		} else {
+            keyCount--;
+        } else {
 			// System.out.println("Adding.");
 			sortedKeys.add(price);
-		}
+            keyCount++;
+        }
 
 		// System.out.println("Updated sortedKeys: " +
 		// 				   Arrays.toString(sortedKeys.toArray()));

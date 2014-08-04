@@ -12,7 +12,7 @@ public class WritableDataPoint {
 //    NOTE: this is ugly, but this way it doesn't get written out to the output.
 //    TODO: refactor this as an inner class of something to avoid this
 //    private final int LEVELS = ArcaParser.LEVELS;
-
+//NOTE: 172 bytes per record
     @CompoundElement(memberName = "bid", dimensions = {ArcaParser.LEVELS, 2})
     private int[][] buy;
 

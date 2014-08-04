@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by patrick on 7/28/14.
  */
-class HDF5CompoundDSBridgeBuilder<T> {
+public class HDF5CompoundDSBridgeBuilder<T> {
     private HDF5CompoundType<T> type;
     private final IHDF5CompoundWriter writer;
     private long startSize;
@@ -62,6 +62,13 @@ class HDF5CompoundDSBridgeBuilder<T> {
                 return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);
             }
         }
+    }
 
+    public HDF5CompoundDSReadOnlyBridge<T> buildReadOnly(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
+        if (type == null || writer == null) {
+            throw new HDF5FormatNotFoundException();
+        }
+
+        return new HDF5CompoundDSReadOnlyBridge<>(name, type, writer);
     }
 }

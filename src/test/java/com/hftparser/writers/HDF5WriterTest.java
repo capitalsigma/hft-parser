@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 //import ncsa.hdf.object.FileFormat;
 
 import com.hftparser.readers.WritableDataPoint;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,5 +57,11 @@ public class HDF5WriterTest {
 
         assertTrue(expected1.equals(dsBridge.readBlock(0)[0]));
         assertTrue(expected2.equals(dsBridge.readBlock(1)[0]));
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        inQ.acceptingOrders = false;
+        Thread.sleep(20);
     }
 }

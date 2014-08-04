@@ -8,22 +8,20 @@ import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 /**
  * Created by patrick on 7/28/14.
  */
-class HDF5CompoundDSBridge<T> {
+class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
     protected long currentOffset;
-    protected final IHDF5CompoundWriter writer;
-    protected final String fullPath;
+//    protected final IHDF5CompoundWriter writer;
+//    protected final String fullPath;
     private final T[] elToWrite;
-    protected final HDF5CompoundType<T> type;
+//    protected final HDF5CompoundType<T> type;
 
     public HDF5CompoundDSBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
                                 long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig) {
-        fullPath = name.getFullPath();
-        this.writer = writer;
-        this.type = type;
+        super(name, type, writer);
 
         HDF5GenericStorageFeatures features = initFeatures(bridgeConfig);
 
-        this.writer.createArray(fullPath, type, startSize, chunkSize, features);
+        writer.createArray(name.getFullPath(), type, startSize, chunkSize, features);
         currentOffset = 0;
         //noinspection unchecked
         elToWrite = (T[]) new Object[1];
@@ -52,13 +50,6 @@ class HDF5CompoundDSBridge<T> {
         writer.writeArrayBlockWithOffset(fullPath, type, elToWrite, currentOffset++);
     }
 
-    T[] readBlock(long offset, int blocksize) {
-        return writer.readArrayBlockWithOffset(fullPath, type, blocksize, offset);
-    }
-
-    public T[] readBlock(long offset){
-        return readBlock(offset, 1);
-    }
 
     public void flush() {
 
