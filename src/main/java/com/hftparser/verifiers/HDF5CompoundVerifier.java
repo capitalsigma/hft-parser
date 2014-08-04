@@ -14,16 +14,16 @@ import java.util.List;
 /**
  * Created by patrick on 8/4/14.
  */
-public class HDF5CompoundVerifier<S, T> {
+public class HDF5CompoundVerifier<S extends T, T> {
     private final IHDF5Reader expectedReader;
     private final IHDF5Reader actualReader;
     private final boolean READ_LINK_TARGETS = false;
-    private final HDF5CompoundDSBridgeBuilder<T> expectedBridgeBuilder;
+    private final HDF5CompoundDSBridgeBuilder<S> expectedBridgeBuilder;
     private final HDF5CompoundDSBridgeBuilder<T> actualBridgeBuilder;
     private final String ROOT;
 
     public HDF5CompoundVerifier(IHDF5Reader expectedReader, IHDF5Reader actualReader,
-                                HDF5CompoundDSBridgeBuilder<T> expectedBridgeBuilder,
+                                HDF5CompoundDSBridgeBuilder<S> expectedBridgeBuilder,
                                 HDF5CompoundDSBridgeBuilder<T> actualBridgeBuilder, String root) {
         this.actualBridgeBuilder = actualBridgeBuilder;
         this.expectedBridgeBuilder = expectedBridgeBuilder;
@@ -32,11 +32,16 @@ public class HDF5CompoundVerifier<S, T> {
         ROOT = root;
     }
 
-    public HDF5CompoundVerifier(IHDF5Writer expectedWriter, IHDF5Writer actualWriter, Class<T> typeForBridge,
-                                String root) {
+    public HDF5CompoundVerifier(IHDF5Writer expectedWriter, IHDF5Writer actualWriter,
+                                                 Class<S> typeForBridge, String root) {
+
         actualBridgeBuilder = new HDF5CompoundDSBridgeBuilder<>(actualWriter);
         expectedBridgeBuilder = new HDF5CompoundDSBridgeBuilder<>(expectedWriter);
-        actualBridgeBuilder.setTypeFromInferred(typeForBridge);
+
+        Class<T> actualTypeForBridge = (Class<T>) typeForBridge;
+//        Class<S> expectedTypeForBridge = (Class<S>) typeForBridge;
+
+        actualBridgeBuilder.setTypeFromInferred(actualTypeForBridge);
         expectedBridgeBuilder.setTypeFromInferred(typeForBridge);
 
         actualReader = actualWriter;
@@ -44,12 +49,12 @@ public class HDF5CompoundVerifier<S, T> {
         ROOT = root;
     }
 
-    public HDF5CompoundVerifier(IHDF5Writer expectedWriter, IHDF5Writer actualWriter, Class<T> typeForBridge) {
+    public HDF5CompoundVerifier(IHDF5Writer expectedWriter, IHDF5Writer actualWriter, Class<S> typeForBridge) {
         this(expectedWriter, actualWriter, typeForBridge, "/");
     }
 
     public HDF5CompoundVerifier(IHDF5Reader expectedReader, IHDF5Reader actualReader,
-                               HDF5CompoundDSBridgeBuilder<T> expectedBridgeBuilder,
+                               HDF5CompoundDSBridgeBuilder<S> expectedBridgeBuilder,
                                HDF5CompoundDSBridgeBuilder<T> actualBridgeBuilder) {
         this(expectedReader, actualReader, expectedBridgeBuilder, actualBridgeBuilder, "/");
     }
@@ -137,18 +142,18 @@ public class HDF5CompoundVerifier<S, T> {
         return null;
     }
 
-    private T[] getArrayForBridgeBuilder(HDF5CompoundDSBridgeBuilder<T> builder, HDF5LinkInformation linkInformation) {
+    private <R extends T> R[] getArrayForBridgeBuilder(HDF5CompoundDSBridgeBuilder<R> builder, HDF5LinkInformation linkInformation) {
         return getArrayForBridgeBuilder(builder, DatasetName.fromHDF5LinkInformation(linkInformation));
     }
 
-    private T[] getArrayForBridgeBuilder(HDF5CompoundDSBridgeBuilder<T> builder, DatasetName name) {
-        HDF5CompoundDSReadOnlyBridge<T> bridge = builder.build(name);
+    private <R extends T> R[] getArrayForBridgeBuilder(HDF5CompoundDSBridgeBuilder<R> builder, DatasetName name) {
+        HDF5CompoundDSReadOnlyBridge<R> bridge = builder.build(name);
 
         return bridge.readArray();
     }
 
     private DiffElement compareDatasets(HDF5LinkInformation expectedLink, HDF5LinkInformation actualLink) {
-        T[] expectedArray = getArrayForBridgeBuilder(expectedBridgeBuilder, expectedLink);
+        S[] expectedArray = getArrayForBridgeBuilder(expectedBridgeBuilder, expectedLink);
         T[] actualArray = getArrayForBridgeBuilder(actualBridgeBuilder, actualLink);
 
         System.out.println("got arrays of length: " + expectedArray.length + ", " + actualArray.length);

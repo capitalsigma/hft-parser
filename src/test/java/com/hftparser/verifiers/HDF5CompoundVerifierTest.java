@@ -16,7 +16,7 @@ public class HDF5CompoundVerifierTest {
 
     String TEST_H5_DIFFERENT_GROUPS = "src/test/resources/full-first-200.h5";
 
-    HDF5CompoundVerifier<WritableDataPoint> verifier;
+    HDF5CompoundVerifier<WritableDataPoint, WritableDataPoint> verifier;
 
 
     @Before

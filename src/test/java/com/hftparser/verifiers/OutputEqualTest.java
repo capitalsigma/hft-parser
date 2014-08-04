@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 /**
  * Created by patrick on 8/4/14.
  */
-//@Ignore
+@Ignore
 public class OutputEqualTest {
     String MY_DATA = "src/test/resources/java-out.h5";
     String PYTHON_DATA = "src/test/resources/python-out.h5";
@@ -36,8 +36,8 @@ public class OutputEqualTest {
 //        HDF5CompoundVerifier<WritableDataPoint> verifier = new HDF5CompoundVerifier<>(actualWriter, expectedWriter,
 //                                                                                      WritableDataPoint.class);
 
-        HDF5CompoundVerifier<WritableDataPoint> verifier = new HDF5CompoundVerifier<WritableDataPoint>
-                (expectedWriter, actualWriter, (HDF5CompoundDSBridgeBuilder<WritableDataPoint>) expectedBuilder, actualBuilder);
+        HDF5CompoundVerifier<PythonWritableDataPoint, WritableDataPoint> verifier = new HDF5CompoundVerifier<>
+                (expectedWriter, actualWriter, expectedBuilder, actualBuilder);
 
         String[] symbols = new String[]{
                 "SPY", "DIA", "QQQ",
