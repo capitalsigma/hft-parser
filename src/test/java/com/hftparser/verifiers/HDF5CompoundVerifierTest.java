@@ -74,19 +74,17 @@ public class HDF5CompoundVerifierTest {
 
         assertEquals(diff.getIndex(), 200);
 
-
-        //         TODO: figure out how to compare these
         return diff;
     }
 
     @Test
     public void testDiffDsMissingLeft() throws Exception {
-        DiffElement diff = testDiffDSMissing(TEST_H5_PATH, TEST_H5_MISSING_LINE_PATH);
+        testDiffDSMissing(TEST_H5_PATH, TEST_H5_MISSING_LINE_PATH);
     }
 
     @Test
     public void testDiffDsMissingRight() throws Exception {
-        DiffElement diff = testDiffDSMissing(TEST_H5_MISSING_LINE_PATH, TEST_H5_PATH);
+        testDiffDSMissing(TEST_H5_MISSING_LINE_PATH, TEST_H5_PATH);
     }
 
     @Test
@@ -95,5 +93,20 @@ public class HDF5CompoundVerifierTest {
         DiffElement right = testDiffDSMissing(TEST_H5_MISSING_LINE_PATH, TEST_H5_PATH);
 
         assertEquals(left, right);
+    }
+
+    @Test
+    public void testDifferentGroups() throws Exception {
+        setVerifierForPaths(TEST_H5_PATH, TEST_H5_DIFFERENT_GROUPS);
+
+        DiffElement diff = verifier.diff();
+
+        System.out.println("Got diff: " + diff.deepToString());
+
+        assertEquals(-1, diff.index);
+        assertNotNull(diff.getExpected());
+        assertNull(diff.getActual());
+
+        assertEquals(diff.getExpected().getPath(), "/AAPL");
     }
 }

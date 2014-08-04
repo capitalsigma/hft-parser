@@ -41,7 +41,7 @@ class ParseRun {
         @Parameter(names = {"-out", "-o"}, description = "Output .h5 file")
         private String outPath;
 
-        @Parameter(names = {"-config", "-c"}, description = ".properties config file")
+        @Parameter(names = {"-config", "-c"}, description = "JSON-formatted config file")
         private String configPath;
 
 //        @Parameter(names = {"-stats", "-s"}, description = "Output file for run statistics")
