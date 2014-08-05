@@ -170,6 +170,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         MarketOrderCollection toUpdate = ordersNow.get(ticker).get(ordType);
 
+        System.out.println("parsing for refnum: " + refNum);
+
 
         switch (recType) {
             case Add:
@@ -277,7 +279,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
             timeStamp = makeTimestamp(asSplit[8], asSplit[9]);
 
-
+            System.out.println("Adding refnum: " + refNum);
             orderHistory.put(refNum, new Order(price, qty));
 
             processRecord(recType, seqNum, refNum, ordType, qty, ticker, price, timeStamp);

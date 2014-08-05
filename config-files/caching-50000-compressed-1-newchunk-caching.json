@@ -28,7 +28,7 @@
 		"cutoff": false
 	},
 	"MarketOrderCollection": {
-	    "start_capacity": 100,
+	    "start_capacity": 5000,
 	    "max_key_count": 10,
 	    "caching": true
 	}

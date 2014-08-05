@@ -65,6 +65,7 @@ class ParseRun {
         Thread writerThread;
         Thread[] allThreads;
         ConfigFactory configFactory = null;
+
         long startTime = System.currentTimeMillis();
         long endTime;
 

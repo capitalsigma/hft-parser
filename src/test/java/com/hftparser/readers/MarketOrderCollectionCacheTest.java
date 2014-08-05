@@ -24,6 +24,13 @@ public class MarketOrderCollectionCacheTest {
 //    }
 
     @Test
+    public void testGet() throws Exception {
+        orderCollection.put(10, 5);
+
+        assertEquals(orderCollection.get(10), (Integer) 5);
+    }
+
+    @Test
     public void testIsDirty() throws Exception {
         assertTrue(orderCollection.isDirty());
 
