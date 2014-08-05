@@ -40,6 +40,14 @@ class Order {
 
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "price=" + price +
+                ", quantity=" + quantity +
+                '}';
+    }
 }
 
 public class ArcaParser extends AbstractParser implements Runnable {
@@ -160,8 +168,11 @@ public class ArcaParser extends AbstractParser implements Runnable {
         assert orderHistory.containsKey(refNum);
 
         Order changedOrder = new Order(price, qty);
-
         Order toModify = orderHistory.get(refNum);
+
+        System.out.println("toModify: " + toModify.toString());
+        System.out.println("changedOrder: " + changedOrder.toString());
+        System.out.println("Equal? " + changedOrder.equals(toModify));
 
 //        otherwise we write out too many records
         if (changedOrder.equals(toModify)) {
@@ -219,6 +230,9 @@ public class ArcaParser extends AbstractParser implements Runnable {
         Map<OrderType, MarketOrderCollection> ordersForTicker = ordersNow.get(ticker);
         MarketOrderCollection buyOrders = ordersForTicker.get(OrderType.Buy);
         MarketOrderCollection sellOrders = ordersForTicker.get(OrderType.Sell);
+
+//        System.out.println("buy orders dirty? " + buyOrders.isDirty());
+//        System.out.println("sell orders dirty? " + sellOrders.isDirty());
 
         if ((buyOrders.isDirty() || sellOrders.isDirty())) {
             long[][] toBuyNow = buyOrders.topN();

@@ -64,4 +64,15 @@ public class DataPoint {
         return new WritableDataPoint(buy, sell, timeStamp, seqNum);
 
     }
+
+    @Override
+    public String toString() {
+        return "DataPoint{" +
+                "buy=" + Arrays.deepToString(buy) +
+                ", sell=" + Arrays.deepToString(sell) +
+                ", timeStamp=" + timeStamp +
+                ", seqNum=" + seqNum +
+                ", ticker='" + ticker + '\'' +
+                '}';
+    }
 }

@@ -25,49 +25,24 @@ public class MarketOrderCollectionCacheTest {
 
     @Test
     public void testGet() throws Exception {
-        orderCollection.put(10, 5);
+        orderCollection.put(10l, 5l);
 
-        assertEquals(orderCollection.get(10), (Integer) 5);
+        assertEquals(orderCollection.get(10l), (Long) 5l);
     }
 
     @Test
     public void testIsDirty() throws Exception {
         assertTrue(orderCollection.isDirty());
 
-        orderCollection.put(10, 5);
+        orderCollection.put(10l, 5l);
 
         assertTrue(orderCollection.isDirty());
 
-        orderCollection.put(11, 5);
+        orderCollection.put(11l, 5l);
 
         assertTrue(orderCollection.isDirty());
 
-        orderCollection.put(12, 5);
-
-        assertTrue(orderCollection.isDirty());
-
-        orderCollection.topN();
-
-        assertFalse(orderCollection.isDirty());
-
-        System.out.println("orderCollection: " + orderCollection.toString());
-
-        orderCollection.put(5, 5);
-
-        assertFalse(orderCollection.isDirty());
-
-        orderCollection.put(6, 7);
-        orderCollection.put(7, 8);
-
-        System.out.println("orderCollection: " + orderCollection.toString());
-
-        orderCollection.put(10, 3);
-
-        System.out.println("orderCollection: " + orderCollection.toString());
-
-        assertFalse(orderCollection.isDirty());
-
-        orderCollection.put(12, 0);
+        orderCollection.put(12l, 5l);
 
         assertTrue(orderCollection.isDirty());
 
@@ -75,7 +50,32 @@ public class MarketOrderCollectionCacheTest {
 
         assertFalse(orderCollection.isDirty());
 
-        orderCollection.put(13, 1);
+        System.out.println("orderCollection: " + orderCollection.toString());
+
+        orderCollection.put(5l, 5l);
+
+        assertFalse(orderCollection.isDirty());
+
+        orderCollection.put(6l, 7l);
+        orderCollection.put(7l, 8l);
+
+        System.out.println("orderCollection: " + orderCollection.toString());
+
+        orderCollection.put(10l, 3l);
+
+        System.out.println("orderCollection: " + orderCollection.toString());
+
+        assertFalse(orderCollection.isDirty());
+
+        orderCollection.put(12l, 0l);
+
+        assertTrue(orderCollection.isDirty());
+
+        orderCollection.topN();
+
+        assertFalse(orderCollection.isDirty());
+
+        orderCollection.put(13l, 1l);
 
         assertTrue(orderCollection.isDirty());
     }

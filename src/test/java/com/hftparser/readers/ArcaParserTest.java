@@ -76,7 +76,9 @@ public class ArcaParserTest {
     }
 
     @Test
-    void testIdenticalModifies() throws Exception {
+    public void testIdenticalModifiesCaching() throws Exception {
+        collectionFactory.setDoCaching(true);
+
         WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
         WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
@@ -90,10 +92,18 @@ public class ArcaParserTest {
         runThread.start();
         Thread.sleep(200);
 
-//        make sure we didn't emit an extra record for the duplicate modify
-        assertNotNull(outQ.deq());
-        assertNotNull(outQ.deq());
-        assertNull(outQ.deq());
+        //        make sure we didn't emit an extra record for the duplicate modify
+        DataPoint one = outQ.deq();
+        DataPoint two = outQ.deq();
+        DataPoint three = outQ.deq();
+
+        System.out.println("one: " + one.toString());
+        System.out.println("two: " + two.toString());
+        System.out.println("three: " + (three != null ? three.toString() : null));
+
+        assertNotNull(one);
+        assertNotNull(two);
+        assertNull(three);
 
     }
 

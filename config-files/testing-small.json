@@ -25,5 +25,10 @@
 		"storage_layout": "CHUNKED",
 		"deflate_level": 1,
 		"cache_size": 200
-	}
+	},
+    "MarketOrderCollection": {
+        "start_capacity": 5000,
+        "max_key_count": 10,
+        "caching": true
+    }
 }

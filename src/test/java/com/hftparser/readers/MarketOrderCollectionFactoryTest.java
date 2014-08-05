@@ -18,13 +18,13 @@ public class MarketOrderCollectionFactoryTest {
     }
 
     void addElsAndTest(MarketOrderCollection orders) {
-        orders.put(10, 5);
-        orders.put(11, 6);
-        orders.put(5, 2);
+        orders.put(10l, 5l);
+        orders.put(11l, 6l);
+        orders.put(5l, 2l);
 
-        assertEquals((int) orders.get(10), 5);
-        assertEquals((int) orders.get(5), 2);
-        assertEquals((int) orders.get(11), 6);
+        assertEquals((long) orders.get(10l), 5l);
+        assertEquals((long) orders.get(5l), 2l);
+        assertEquals((long) orders.get(11l), 6l);
     }
 
     @Test
@@ -33,16 +33,16 @@ public class MarketOrderCollectionFactoryTest {
 
         addElsAndTest(sellOrders);
 
-        int[][] top1 = {{5, 2}};
-        int[][] top2 = {{5, 2}, {10, 5}};
-        int[][] top4 = {{5, 2}, {10, 5}, {11, 6}};
+        long[][] top1 = {{5, 2}};
+        long[][] top2 = {{5, 2}, {10, 5}};
+        long[][] top4 = {{5, 2}, {10, 5}, {11, 6}};
 
         checkArraysEqual(top1, sellOrders.topN(1));
         checkArraysEqual(top2, sellOrders.topN(2));
         checkArraysEqual(top4, sellOrders.topN(4));
     }
 
-    public void checkArraysEqual(int[][] expected, long[][] actual) {
+    public void checkArraysEqual(long[][] expected, long[][] actual) {
         assertTrue(Arrays.deepEquals(expected, actual));
     }
 
@@ -52,9 +52,9 @@ public class MarketOrderCollectionFactoryTest {
 
         addElsAndTest(buyOrders);
 
-        int[][] top1 = {{11, 6}};
-        int[][] top2 = {{11, 6}, {10, 5}};
-        int[][] top4 = {{11, 6}, {10, 5}, {5, 2}};
+        long[][] top1 = {{11, 6}};
+        long[][] top2 = {{11, 6}, {10, 5}};
+        long[][] top4 = {{11, 6}, {10, 5}, {5, 2}};
 
         checkArraysEqual(top1, buyOrders.topN(1));
         checkArraysEqual(top2, buyOrders.topN(2));

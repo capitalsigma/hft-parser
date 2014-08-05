@@ -40,7 +40,7 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
 
 
     @Override
-    public Integer put(Integer price, Integer quantity) {
+    public Long put(Long price, Long quantity) {
 //        System.out.println("decoratedCollection.sortedKeys.headSet(price).size(): " +
 //                                   decoratedCollection.sortedKeys.headSet(price).size());
 
@@ -49,11 +49,6 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
         }
 
         return decoratedCollection.put(price, quantity);
-    }
-
-    @Override
-    public String toString() {
-        return decoratedCollection.toString();
     }
 
     @Override
@@ -67,7 +62,7 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
     }
 
     @Override
-    public Integer get(Object key) {
+    public Long get(Object key) {
         return decoratedCollection.get(key);
     }
 
@@ -77,12 +72,12 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
     }
 
     @Override
-    public void putAll(Map<? extends Integer, ? extends Integer> m) {
+    public void putAll(Map<? extends Long, ? extends Long> m) {
         decoratedCollection.putAll(m);
     }
 
     @Override
-    public Integer remove(Object key) {
+    public Long remove(Object key) {
         return decoratedCollection.remove(key);
     }
 
@@ -102,17 +97,17 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
     }
 
     @Override
-    public Set<Integer> keySet() {
+    public Set<Long> keySet() {
         return decoratedCollection.keySet();
     }
 
     @Override
-    public Collection<Integer> values() {
+    public Collection<Long> values() {
         return decoratedCollection.values();
     }
 
     @Override
-    public Set<Map.Entry<Integer, Integer>> entrySet() {
+    public Set<Map.Entry<Long, Long>> entrySet() {
         return decoratedCollection.entrySet();
     }
 }
