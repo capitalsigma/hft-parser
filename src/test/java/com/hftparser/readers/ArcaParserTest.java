@@ -3,7 +3,6 @@ package com.hftparser.readers;
 import static org.junit.Assert.*;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -61,15 +60,15 @@ public class ArcaParserTest {
         runThread.start();
         Thread.sleep(200);
 
-        int[][] expectedOneBuy = {{2750000, 1000}};
+        long[][] expectedOneBuy = {{2750000, 1000}};
 
-        int[][] expectedTwoBuy = {{382500, 900}};
+        long[][] expectedTwoBuy = {{382500, 900}};
 
-        DataPoint buyExpected = new DataPoint("FOO", expectedOneBuy, new int[][] {}, 28800737, 1);
+        DataPoint buyExpected = new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737, 1);
 
-        DataPoint modifyExpected = new DataPoint("FOO", expectedTwoBuy, new int[][] {}, 29909390, 43);
+        DataPoint modifyExpected = new DataPoint("FOO", expectedTwoBuy, new long[][] {}, 29909390, 43);
 
-        DataPoint deleteExpected = new DataPoint("FOO", new int[][]{}, new int[][]{}, 28800857, 2);
+        DataPoint deleteExpected = new DataPoint("FOO", new long[][]{}, new long[][]{}, 28800857, 2);
 
         assertTrue(outQ.deq().equals(buyExpected));
         assertTrue(outQ.deq().equals(modifyExpected));
@@ -131,12 +130,12 @@ public class ArcaParserTest {
         runThread.start();
         Thread.sleep(200);
 
-        int[][] expectedOneBuy = {
+        long[][] expectedOneBuy = {
                 {275000000, 1000}
         };
 
         DataPoint buy1Expected =
-                new DataPoint("FOO", expectedOneBuy, new int[][] {}, 28800737, 1);
+                new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737, 1);
 
         assertTrue(buy1Expected.equals(outQ.deq()));
 
@@ -163,31 +162,31 @@ public class ArcaParserTest {
         Thread.sleep(200);
 
 
-        int[][] expectedOneBuy = {
+        long[][] expectedOneBuy = {
                 {2750000, 1000}
         };
 
 
-        int[][] expectedTwoBuy = {
+        long[][] expectedTwoBuy = {
                 {2750000, 1000},
                 // {980000, 3200}
         };
-        int[][] expectedTwoSell = {
+        long[][] expectedTwoSell = {
                 {20000, 30000}
         };
 
 
-        int[][] expectedThreeBuy = {
+        long[][] expectedThreeBuy = {
                 {2750000, 1000},
                 {980000, 3200}
         };
-        int[][] expectedThreeSell = {
+        long[][] expectedThreeSell = {
                 {20000, 30000}
         };
 
 
 		DataPoint buy1Expected =
-			new DataPoint("FOO", expectedOneBuy, new int[][] {}, 28800737, 1);
+			new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737, 1);
 
 		DataPoint sell1Expected =
 			new DataPoint("FOO", expectedTwoBuy, expectedTwoSell, 28800739, 8);
@@ -224,16 +223,16 @@ public class ArcaParserTest {
 		outQ.deq();
 		outQ.deq();
 
-		int[][] expectedOrders1Buy =
+		long[][] expectedOrders1Buy =
 			{
 				{980000, 3200},
 				{382500, 900}
 			};
-        int[][] expectedEmptySell = {
+        long[][] expectedEmptySell = {
 
 		};
 
-		int[][] expectedOrders2Buy =
+		long[][] expectedOrders2Buy =
 			{
 				{980000, 3000},
 				{382500, 900},

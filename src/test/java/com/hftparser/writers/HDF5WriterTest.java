@@ -31,8 +31,8 @@ public class HDF5WriterTest {
 
     @Test
     public void testRun() throws Exception {
-        DataPoint testPoint1 = new DataPoint("FOO", new int[][]{{1, 2}}, new int[][] {{3, 4}}, 6, 10l);
-        DataPoint testPoint2 = new DataPoint("FOO", new int[][]{{4, 5}}, new int[][] {{6, 7}}, 7, 101l);
+        DataPoint testPoint1 = new DataPoint("FOO", new long[][]{{1, 2}}, new long[][] {{3, 4}}, 6, 10l);
+        DataPoint testPoint2 = new DataPoint("FOO", new long[][]{{4, 5}}, new long[][] {{6, 7}}, 7, 101l);
 
         WritableDataPoint expected1 = testPoint1.getWritable();
         WritableDataPoint expected2 = testPoint2.getWritable();

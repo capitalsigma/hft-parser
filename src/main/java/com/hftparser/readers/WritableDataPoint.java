@@ -15,38 +15,38 @@ public class WritableDataPoint {
 //NOTE: 172 bytes per record
 
     @CompoundElement(memberName = "bid", dimensions = {ArcaParser.LEVELS, 2})
-    protected int[][] buy;
+    protected long[][] buy;
 
     @CompoundElement(memberName =  "ask", dimensions = {ArcaParser.LEVELS, 2})
-    protected int[][] sell;
+    protected long[][] sell;
 
     @CompoundElement(memberName = "timestamp")
-    private int timeStamp;
+    private long timeStamp;
 
     @CompoundElement(memberName = "seqnum")
     protected long seqNum;
 
-    public WritableDataPoint(int[][] buy, int[][] sell, int timeStamp, long seqNum) {
+    public WritableDataPoint(long[][] buy, long[][] sell, long timeStamp, long seqNum) {
         this.buy = padArray(buy);
         this.sell = padArray(sell);
         this.timeStamp = timeStamp;
         this.seqNum = seqNum;
     }
 
-    private int[][] padArray(int[][] toPad){
+    private long[][] padArray(long[][] toPad){
         if (toPad.length != ArcaParser.LEVELS) {
             return buildNew(toPad);
         }
         return toPad;
     }
 
-    private int[][] buildNew(int[][] toPad){
-        int[][] ret = new int[ArcaParser.LEVELS][2];
+    private long[][] buildNew(long[][] toPad){
+        long[][] ret = new long[ArcaParser.LEVELS][2];
 
         for(int i = 0; i < ArcaParser.LEVELS; i++){
 //            System.out.println("Checking for line:" + i + ", in.len = " + toPad.length);
             if((toPad.length <= i) || (toPad[i] == null)) {
-                ret[i] = new int[] {0, 0};
+                ret[i] = new long[] {0, 0};
             } else {
                 ret[i] = toPad[i];
             }
@@ -75,13 +75,6 @@ public class WritableDataPoint {
 //        }
 //
 //        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = timeStamp;
-        result = 31 * result + (int) (seqNum ^ (seqNum >>> 32));
-        return result;
     }
 
     public boolean equals(WritableDataPoint other){

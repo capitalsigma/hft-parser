@@ -42,7 +42,7 @@ public class MarketOrderCollectionFactoryTest {
         checkArraysEqual(top4, sellOrders.topN(4));
     }
 
-    public void checkArraysEqual(int[][] expected, int[][] actual) {
+    public void checkArraysEqual(int[][] expected, long[][] actual) {
         assertTrue(Arrays.deepEquals(expected, actual));
     }
 

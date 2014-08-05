@@ -9,7 +9,7 @@ import java.util.Set;
  */
 public class MarketOrderCollectionCache extends MarketOrderCollection {
     public MarketOrderCollection decoratedCollection;
-    int[][] cache;
+    long[][] cache;
     private boolean dirty;
 
     public MarketOrderCollectionCache(MarketOrderCollection decoratedCollection) {
@@ -23,12 +23,12 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
 
     //    marking as deprecated because we don't want to use this -- it messes up our cache
     @Deprecated
-    public int[][] topN(int topN) {
+    public long[][] topN(int topN) {
         return decoratedCollection.topN(topN);
     }
 
     @Override
-    public int[][] topN() {
+    public long[][] topN() {
         if (isDirty()) {
             cache = decoratedCollection.topN();
             dirty = false;

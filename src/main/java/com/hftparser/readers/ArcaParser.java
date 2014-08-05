@@ -15,7 +15,7 @@ class Order {
 	final long price;
 	final long quantity;
 
-	public Order(int _price, int _quantity) {
+	public Order(long _price, long _quantity) {
 		price = _price;
 		quantity = _quantity;
 	}
@@ -132,11 +132,11 @@ public class ArcaParser extends AbstractParser implements Runnable {
         this(_tickers, _inQueue, _outQueue, collectionFactory, ArcaParserConfig.getDefault());
     }
 
-    void processAdd(int qty, int price, MarketOrderCollection toUpdate) {
-        Integer oldQty;
+    void processAdd(long qty, long price, MarketOrderCollection toUpdate) {
+        Long oldQty;
 
         if ((oldQty = toUpdate.get(price)) == null) {
-            oldQty = 0;
+            oldQty = 0l;
         }
 
         toUpdate.put(price, qty + oldQty);
@@ -146,13 +146,13 @@ public class ArcaParser extends AbstractParser implements Runnable {
         assert orderHistory.containsKey(refNum);
 
         Order toDelete = orderHistory.get(refNum);
-        int currentQty = toUpdate.get(toDelete.price);
+        Long currentQty = toUpdate.get(toDelete.price);
 
         toUpdate.put(toDelete.price, currentQty - toDelete.quantity);
 
     }
 
-    void processModify(long refNum, int qty, int price, MarketOrderCollection toUpdate) {
+    void processModify(long refNum, long qty, Long price, MarketOrderCollection toUpdate) {
         // Following the Python, we treat a modify as a delete
         // followed by an add. There may be a way to do this that
         // involves fewer read/write operations, but since everything
@@ -170,7 +170,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         // System.out.println("old price: " + toModify.price);
 
-        Integer currentQtyOfOldPrice = toUpdate.get(toModify.price);
+        Long currentQtyOfOldPrice = toUpdate.get(toModify.price);
 
         // System.out.println("Current qty at old price " +
         // 				   currentQtyOfOldPrice.toString());
@@ -179,8 +179,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         // Note that we need to do this AFTER we delete, otherwise we
         // can grab the wrong value
-        Integer currentQtyOfNewPrice = toUpdate.get(price);
-        int qtyOfNewPriceToAdd = currentQtyOfNewPrice == null ? 0 : currentQtyOfNewPrice;
+        Long currentQtyOfNewPrice = toUpdate.get(price);
+        Long qtyOfNewPriceToAdd = currentQtyOfNewPrice == null ? 0 : currentQtyOfNewPrice;
 
 
         orderHistory.put(refNum, changedOrder);
@@ -192,11 +192,11 @@ public class ArcaParser extends AbstractParser implements Runnable {
     // default args, for delete's call
     // TODO: we can do this more cleanly
     void processRecord(RecordType recType, long seqNum, long refNum, OrderType ordType, String ticker, int timeStamp) {
-        processRecord(recType, seqNum, refNum, ordType, -1, ticker, -1, timeStamp);
+        processRecord(recType, seqNum, refNum, ordType, -1l, ticker, -1l, timeStamp);
     }
 
-    void processRecord(RecordType recType, long seqNum, long refNum, OrderType ordType, int qty, String ticker,
-                       int price, int timeStamp) {
+    void processRecord(RecordType recType, long seqNum, long refNum, OrderType ordType, long qty, String ticker,
+                       Long price, int timeStamp) {
         assert ordersNow.containsKey(ticker) && ordersNow.get(ticker).containsKey(ordType);
 
         MarketOrderCollection toUpdate = ordersNow.get(ticker).get(ordType);
@@ -221,8 +221,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
         MarketOrderCollection sellOrders = ordersForTicker.get(OrderType.Sell);
 
         if ((buyOrders.isDirty() || sellOrders.isDirty())) {
-            int[][] toBuyNow = buyOrders.topN();
-            int[][] toSellNow = sellOrders.topN();
+            long[][] toBuyNow = buyOrders.topN();
+            long[][] toSellNow = sellOrders.topN();
 
 
             DataPoint toPush = new DataPoint(ticker, toBuyNow, toSellNow, timeStamp, seqNum);
@@ -239,7 +239,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
     }
 
 
-    int makePrice(String priceString) {
+    Long makePrice(String priceString) {
         String[] parts = priceString.split("\\.");
         int floatPart;
         int intPart;
@@ -259,7 +259,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
         } else {
             floatPart = 0;
         }
-        int toRet = intPart * PRICE_INTEGER_OFFSET + (int) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
+        Long toRet =
+                intPart * PRICE_INTEGER_OFFSET + (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
 
         // System.out.printf("int part: %d, float part: %d\n", intPart, floatPart);
         // System.out.printf("toRet: %d\n", toRet);
@@ -294,7 +295,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
             long refNum;        // need 20, but just taking last 19
             OrderType ordType;
             int qty;        // need 9 digits
-            int price;
+            Long price;
             int timeStamp;            // 8 digits
             RecordType recType = RecordType.Add;
 
@@ -347,7 +348,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
             long refNum;        // need 20, but just taking last 19
             OrderType ordType;
             int qty;        // need 9 digits
-            int price;
+            Long price;
             int timeStamp;            // 8 digits
             RecordType recType = RecordType.Modify;
 

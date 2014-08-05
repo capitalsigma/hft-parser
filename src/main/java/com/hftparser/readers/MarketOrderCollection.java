@@ -1,12 +1,11 @@
 package com.hftparser.readers;
 
 import java.util.HashMap;
-import java.util.SortedMap;
 import java.util.TreeSet;
 
 
-abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
-	protected TreeSet<Integer> sortedKeys;
+abstract class MarketOrderCollection extends HashMap<Long,Long> {
+	protected TreeSet<Long> sortedKeys;
     protected int keyCount;
     protected int maxKeyCount;
 
@@ -30,14 +29,14 @@ abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
         return true;
     }
 
-	public int[][] topN(int topN) {
+	public long[][] topN(int topN) {
 		// can't zip lists in Java
 
-		int[][] ret = new int[Math.min(keyCount, topN)][2];
+		long[][] ret = new long[Math.min(keyCount, topN)][2];
 
 		// for(Integer i = 0; i < topN; i++) {
 		int i = 0;
-		for (Integer price : sortedKeys){
+		for (Long price : sortedKeys){
 
 			ret[i][0] = price;
 			ret[i][1] = get(price);
@@ -53,13 +52,13 @@ abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
 		return ret;
 	}
 
-    public int[][] topN() {
+    public long[][] topN() {
         return topN(maxKeyCount);
     }
 
 	@Override
-	public Integer put(Integer price, Integer quantity) {
-		Integer ret;
+	public Long put(Long price, Long quantity) {
+		Long ret;
 
 		ret = super.put(price, quantity);
 

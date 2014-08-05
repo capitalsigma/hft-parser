@@ -24,8 +24,8 @@ public class HDF5CompoundDSBridgeTest {
         try {
             File file = new File(TEST_PATH);
 
-            testPoint1 = new WritableDataPoint(new int[][]{{1, 2}}, new int[][] {{3, 4}}, 6, 10l);
-            testPoint2 = new WritableDataPoint(new int[][]{{4, 5}}, new int[][] {{6, 7}}, 7, 101l);
+            testPoint1 = new WritableDataPoint(new long[][]{{1, 2}}, new long[][] {{3, 4}}, 6, 10l);
+            testPoint2 = new WritableDataPoint(new long[][]{{4, 5}}, new long[][] {{6, 7}}, 7, 101l);
 
             writer = HDF5Writer.getWriter(file);
             HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer);

@@ -6,10 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.hftparser.readers.BuyOrders;
-import com.hftparser.readers.MarketOrderCollection;
-import com.hftparser.readers.SellOrders;
-
 @SuppressWarnings("UnusedAssignment")
 @RunWith(JUnit4.class)
 public class MarketOrderCollectionTest {
@@ -80,7 +76,7 @@ public class MarketOrderCollectionTest {
 //	}
 // --Commented out by Inspection STOP (7/31/14 6:09 PM)
 
-	void checkArraysEqual(int[][] expected, int[][] actual) {
+	void checkArraysEqual(int[][] expected, long[][] actual) {
 		// System.out.println("Checking array: ");
 		// printArray(actual);
 

@@ -30,8 +30,8 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
         try {
             File file = new File(TEST_PATH);
 
-            testPoint1 = new WritableDataPoint(new int[][]{{1, 2}}, new int[][]{{3, 4}}, 6, 10l);
-            emptyPoint = new WritableDataPoint(new int[][]{}, new int[][]{}, 0, 0l);
+            testPoint1 = new WritableDataPoint(new long[][]{{1, 2}}, new long[][]{{3, 4}}, 6, 10l);
+            emptyPoint = new WritableDataPoint(new long[][]{}, new long[][]{}, 0, 0l);
 
             emptyPoints = new WritableDataPoint[]{emptyPoint, emptyPoint, emptyPoint, emptyPoint, emptyPoint,};
             fullPoints = new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1, testPoint1,};
