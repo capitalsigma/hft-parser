@@ -12,13 +12,34 @@ enum RecordType {
 }
 
 class Order {
-	final int price;
-	final int quantity;
+	final long price;
+	final long quantity;
 
 	public Order(int _price, int _quantity) {
 		price = _price;
 		quantity = _quantity;
 	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Order order = (Order) o;
+
+        if (price != order.price) {
+            return false;
+        }
+        if (quantity != order.quantity) {
+            return false;
+        }
+
+        return true;
+    }
 }
 
 public class ArcaParser extends AbstractParser implements Runnable {
@@ -140,7 +161,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         Order changedOrder = new Order(price, qty);
 
-        Order toModify = orderHistory.put(refNum, changedOrder);
+        Order toModify = orderHistory.get(refNum);
+
+//        otherwise we write out too many records
+        if (changedOrder.equals(toModify)) {
+            return;
+        }
 
         // System.out.println("old price: " + toModify.price);
 

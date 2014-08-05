@@ -76,6 +76,28 @@ public class ArcaParserTest {
         assertTrue(outQ.deq().equals(deleteExpected));
     }
 
+    @Test
+    void testIdenticalModifies() throws Exception {
+        WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
+        WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
+
+        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_MODIFY_BUY1);
+        inQ.enq(TEST_MODIFY_BUY1);
+
+        ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+
+        Thread runThread = new Thread(parser);
+        runThread.start();
+        Thread.sleep(200);
+
+//        make sure we didn't emit an extra record for the duplicate modify
+        assertNotNull(outQ.deq());
+        assertNotNull(outQ.deq());
+        assertNull(outQ.deq());
+
+    }
+
 	@Test
 	public void testInstantiate() {
 		try {
