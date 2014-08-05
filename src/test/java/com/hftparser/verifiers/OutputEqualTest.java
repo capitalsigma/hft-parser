@@ -2,6 +2,7 @@ package com.hftparser.verifiers;
 
 import ch.systemsx.cisd.hdf5.HDF5Factory;
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
+import com.hftparser.readers.AbstractWritableDataPoint;
 import com.hftparser.readers.PythonWritableDataPoint;
 import com.hftparser.readers.WritableDataPoint;
 import com.hftparser.writers.HDF5CompoundDSBridgeBuilder;
@@ -28,16 +29,16 @@ public class OutputEqualTest {
 
         HDF5CompoundDSBridgeBuilder<PythonWritableDataPoint> expectedBuilder = new HDF5CompoundDSBridgeBuilder<>
                 (expectedWriter);
-        expectedBuilder.setTypeFromInferred(PythonWritableDataPoint.class);
+        expectedBuilder.setAnonTypeFromInferred(PythonWritableDataPoint.class);
 
-        HDF5CompoundDSBridgeBuilder<WritableDataPoint> actualBuilder = new HDF5CompoundDSBridgeBuilder<>(actualWriter);
-        actualBuilder.setTypeFromInferred(WritableDataPoint.class);
+        HDF5CompoundDSBridgeBuilder<AbstractWritableDataPoint> actualBuilder = new HDF5CompoundDSBridgeBuilder<>(actualWriter);
+        actualBuilder.setTypeFromInferred(AbstractWritableDataPoint.class);
 
 //        HDF5CompoundVerifier<WritableDataPoint> verifier = new HDF5CompoundVerifier<>(actualWriter, expectedWriter,
 //                                                                                      WritableDataPoint.class);
 
-        HDF5CompoundVerifier<PythonWritableDataPoint, WritableDataPoint> verifier = new HDF5CompoundVerifier<>
-                (expectedWriter, actualWriter, expectedBuilder, actualBuilder);
+        HDF5CompoundVerifier<PythonWritableDataPoint, AbstractWritableDataPoint> verifier = new
+                HDF5CompoundVerifier<>(expectedWriter, actualWriter, expectedBuilder, actualBuilder);
 
         String[] symbols = new String[]{
                 "SPY", "DIA", "QQQ",
@@ -53,10 +54,10 @@ public class OutputEqualTest {
 
         List<DiffElement> diffs = new ArrayList<>(symbols.length);
 
-        for (int i = 0; i < symbols.length; i++) {
-            System.out.println("Running for symbol: " + symbols[i]);
+        for (String symbol : symbols) {
+            System.out.println("Running for symbol: " + symbol);
 
-            DiffElement diff = verifier.diff(symbols[i]);
+            DiffElement diff = verifier.diff(symbol);
             System.out.println("Got diff: " + (diff != null ? diff.deepToString() : null));
             if (diff != null) {
                 diffs.add(diff);

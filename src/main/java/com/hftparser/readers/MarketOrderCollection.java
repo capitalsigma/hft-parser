@@ -1,22 +1,33 @@
 package com.hftparser.readers;
 
 import java.util.HashMap;
+import java.util.SortedMap;
 import java.util.TreeSet;
 
 
 abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
-	TreeSet<Integer> sortedKeys;
-    private int keyCount;
+	protected TreeSet<Integer> sortedKeys;
+    protected int keyCount;
+    protected int maxKeyCount;
 
 	// In case we want to do something special later
     MarketOrderCollection() {
 		// default size (can't define as a property)
-		this(10);
+//        TODO: make this bigger
+		this(10, 0);
 	}
 
-	MarketOrderCollection(int startCapacity) {
+	MarketOrderCollection(int startCapacity, int maxKeyCount) {
 		super(startCapacity);
         keyCount = 0;
+        this.maxKeyCount = maxKeyCount;
+//        this is always true
+
+    }
+
+//    this is up to the decorator to implement -- in the default, we treat it as if it's always true
+    public boolean isDirty() {
+        return true;
     }
 
 	public int[][] topN(int topN) {
@@ -41,6 +52,10 @@ abstract class MarketOrderCollection extends HashMap<Integer, Integer> {
 
 		return ret;
 	}
+
+    public int[][] topN() {
+        return topN(maxKeyCount);
+    }
 
 	@Override
 	public Integer put(Integer price, Integer quantity) {

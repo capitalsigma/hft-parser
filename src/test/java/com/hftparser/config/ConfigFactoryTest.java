@@ -73,4 +73,13 @@ public class ConfigFactoryTest {
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void testGetMarketOrderCollectionConfig() throws Exception {
+        MarketOrderCollectionConfig expected = new MarketOrderCollectionConfig(100, 10, true);
+        MarketOrderCollectionConfig actual = factory.getMarketOrderCollectionConfig();
+
+        assertEquals(expected, actual);
+
+    }
 }

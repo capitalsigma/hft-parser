@@ -13,20 +13,23 @@
 		"output_progress_every": 5000000
 	},
 	"HDF5Writer": {
-		"start_size": 100,
-		"chunk_size": 500000,
+		"start_size": 50000,
+		"chunk_size": 400164,
 		"sync_mode": "SYNC",
 		"overwrite": true,
 		"keep_datasets_if_they_exist": true,
 		"perform_numeric_conversions": false
 	},
 	"HDF5CompoundDSBridge" : {
-		"storage_layout": "COMPACT",
-		"deflate_level": "MAX_DEFLATION_LEVEL"
+		"default_storage_layout": false,
+		"storage_layout": "CHUNKED",
+		"deflate_level": 1,
+		"cache_size": 50000,
+		"cutoff": false
 	},
-    "MarketOrderCollection": {
-        "start_capacity": 100,
-        "max_key_count": 10,
-        "caching": true
-    }
+	"MarketOrderCollection": {
+	    "start_capacity": 100,
+	    "max_key_count": 10,
+	    "caching": true
+	}
 }

@@ -5,12 +5,14 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.hftparser.config.BadConfigFileError;
 import com.hftparser.config.ConfigFactory;
+import com.hftparser.config.MarketOrderCollectionConfig;
 import com.hftparser.config.ParseRunConfig;
 import com.hftparser.containers.Backoffable;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.ArcaParser;
 import com.hftparser.readers.DataPoint;
 import com.hftparser.readers.GzipReader;
+import com.hftparser.readers.MarketOrderCollectionFactory;
 import com.hftparser.writers.HDF5Writer;
 
 import java.io.*;
@@ -128,7 +130,15 @@ class ParseRun {
             printErrAndExit("Error opening book file for reading: " + e.toString());
         }
 
-        parser = new ArcaParser(symbols, linesReadQueue, dataPointQueue, configFactory.getArcaParserConfig());
+        MarketOrderCollectionConfig marketOrderCollectionConfig = configFactory.getMarketOrderCollectionConfig();
+        MarketOrderCollectionFactory orderCollectionFactory =
+                new MarketOrderCollectionFactory(marketOrderCollectionConfig);
+
+        parser = new ArcaParser(symbols,
+                                linesReadQueue,
+                                dataPointQueue,
+                                orderCollectionFactory,
+                                configFactory.getArcaParserConfig());
         writer = new HDF5Writer(dataPointQueue, outFile, configFactory.getHdf5WriterConfig(),
                 configFactory.getHdf5CompoundDSBridgeConfig());
 

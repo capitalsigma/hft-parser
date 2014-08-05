@@ -1,12 +1,9 @@
 package com.hftparser.writers;
 
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
-import ch.systemsx.cisd.hdf5.HDF5GenericStorageFeatures;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import com.hftparser.readers.WritableDataPoint;
-
-import java.util.Arrays;
 
 /**
  * Created by patrick on 7/31/14.

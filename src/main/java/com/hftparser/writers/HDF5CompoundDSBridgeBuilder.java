@@ -25,6 +25,14 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         type = writer.getInferredType(typeToInferClass);
     }
 
+    public void setTypeForDSPath(String dataSetPath, Class<T> typeToInferClass) {
+        type = writer.getInferredType(dataSetPath, typeToInferClass);
+    }
+
+    public void setAnonTypeFromInferred(Class<T> typeToInferClass) {
+        type = writer.getInferredAnonType(typeToInferClass);
+    }
+
     public long getStartSize() {
         return startSize;
     }

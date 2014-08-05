@@ -13,7 +13,6 @@ import org.junit.runners.JUnit4;
 
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.DataPoint;
-import com.hftparser.writers.HDF5Writer;
 
 import java.io.File;
 import java.util.HashMap;

@@ -2,9 +2,7 @@ package com.hftparser.readers;
 
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import com.hftparser.config.ArcaParserConfig;
 import com.hftparser.containers.WaitFreeQueue;
@@ -69,8 +67,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
     private static Map<String, RecordType> recordTypeLookup;
 
-    public ArcaParser(String[] _tickers, WaitFreeQueue<String> _inQueue, WaitFreeQueue<DataPoint> _outQueue,
+    public ArcaParser(String[] _tickers,
+                      WaitFreeQueue<String> _inQueue,
+                      WaitFreeQueue<DataPoint> _outQueue,
+                      MarketOrderCollectionFactory collectionFactory,
                       ArcaParserConfig config) {
+
         tickers = _tickers;
         inQueue = _inQueue;
         outQueue = _outQueue;
@@ -82,12 +84,11 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         orderHistory = new HashMap<>(INITIAL_ORDER_HISTORY_SIZE);
 
-
         // First we initialize with empty hashmaps
         for (String ticker : tickers) {
             Map<OrderType, MarketOrderCollection> toAdd = new HashMap<>();
-            toAdd.put(OrderType.Buy, new BuyOrders());
-            toAdd.put(OrderType.Sell, new SellOrders());
+            toAdd.put(OrderType.Buy, collectionFactory.buildBuy());
+            toAdd.put(OrderType.Sell, collectionFactory.buildSell());
             ordersNow.put(ticker, toAdd);
         }
 
@@ -102,8 +103,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 //        SPLITTER = Splitter.on(INPUT_SPLIT).trimResults().omitEmptyStrings();
     }
 
-    public ArcaParser(String[] _tickers, WaitFreeQueue<String> _inQueue, WaitFreeQueue<DataPoint> _outQueue) {
-        this(_tickers, _inQueue, _outQueue, ArcaParserConfig.getDefault());
+    public ArcaParser(String[] _tickers,
+                      WaitFreeQueue<String> _inQueue,
+                      WaitFreeQueue<DataPoint> _outQueue,
+                      MarketOrderCollectionFactory collectionFactory) {
+
+        this(_tickers, _inQueue, _outQueue, collectionFactory, ArcaParserConfig.getDefault());
     }
 
     void processAdd(int qty, int price, MarketOrderCollection toUpdate) {
@@ -178,18 +183,26 @@ public class ArcaParser extends AbstractParser implements Runnable {
                 break;
         }
 
-        int[][] toBuyNow = ordersNow.get(ticker).get(OrderType.Buy).topN(LEVELS);
-        int[][] toSellNow = ordersNow.get(ticker).get(OrderType.Sell).topN(LEVELS);
+        Map<OrderType, MarketOrderCollection> ordersForTicker = ordersNow.get(ticker);
+        MarketOrderCollection buyOrders = ordersForTicker.get(OrderType.Buy);
+        MarketOrderCollection sellOrders = ordersForTicker.get(OrderType.Sell);
+
+        if ((buyOrders.isDirty() || sellOrders.isDirty())) {
+            int[][] toBuyNow = buyOrders.topN();
+            int[][] toSellNow = sellOrders.topN();
 
 
-        DataPoint toPush = new DataPoint(ticker, toBuyNow, toSellNow, timeStamp, seqNum);
+            DataPoint toPush = new DataPoint(ticker, toBuyNow, toSellNow, timeStamp, seqNum);
 
-        // System.out.println("About to push a DataPoint.");
+            // System.out.println("About to push a DataPoint.");
 
-        // spin until we successfully push
-        //noinspection StatementWithEmptyBody
-        while (!outQueue.enq(toPush)) {
+            // spin until we successfully push
+            //noinspection StatementWithEmptyBody
+            while (!outQueue.enq(toPush)) {
+            }
         }
+
+//               if neither dataset has changed since the last time we wrote it, skip it
     }
 
 

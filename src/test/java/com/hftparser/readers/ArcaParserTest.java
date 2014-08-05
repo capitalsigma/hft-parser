@@ -2,6 +2,8 @@ package com.hftparser.readers;
 
 import static org.junit.Assert.*;
 
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -34,15 +36,24 @@ public class ArcaParserTest {
     private final String TEST_WHOLE =
         "A,1,12884901908,B,B,1000,FOO,275,28800,737,B,AARCA,";
 
+    MarketOrderCollectionFactory collectionFactory;
+
+
+    @Before
+    public void setUp() {
+        collectionFactory = new MarketOrderCollectionFactory();
+    }
 
 
 	@Test
 	public void testInstantiate() {
 		try {
-			ArcaParser parser = new ArcaParser(TEST_TICKERS,
-											   new WaitFreeQueue<String>(3),
-											   new WaitFreeQueue<DataPoint>(3));
-		} catch (Throwable t) {
+
+            ArcaParser parser = new ArcaParser(TEST_TICKERS,
+                                               new WaitFreeQueue<String>(3),
+                                               new WaitFreeQueue<DataPoint>(3),
+                                               collectionFactory);
+        } catch (Throwable t) {
 			fail("Exception thrown during instantiation: " +
 				 t.toString());
 		}
@@ -59,7 +70,8 @@ public class ArcaParserTest {
         WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
         WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
-        ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ);
+        ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+
         inQ.enq(TEST_WHOLE);
         Thread runThread = new Thread(parser);
         // parser.run();
@@ -82,7 +94,7 @@ public class ArcaParserTest {
 		WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
 		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
-		ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ);
+		ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
 
 		inQ.enq(TEST_ADD_BUY1);
 		inQ.enq(TEST_ADD_SELL1);
@@ -140,7 +152,7 @@ public class ArcaParserTest {
 		WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
 		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
-		ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ);
+		ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
 
 		inQ.enq(TEST_ADD_BUY1);
 		inQ.enq(TEST_ADD_BUY2);

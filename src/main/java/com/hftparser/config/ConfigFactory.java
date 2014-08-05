@@ -12,6 +12,7 @@ public class ConfigFactory {
     private final ArcaParserConfig arcaParserConfig;
     private final HDF5WriterConfig hdf5WriterConfig;
     private final HDF5CompoundDSBridgeConfig hdf5CompoundDSBridgeConfig;
+    private final MarketOrderCollectionConfig marketOrderCollectionConfig;
 
     public HDF5CompoundDSBridgeConfig getHdf5CompoundDSBridgeConfig() {
         return hdf5CompoundDSBridgeConfig;
@@ -29,6 +30,10 @@ public class ConfigFactory {
         return hdf5WriterConfig;
     }
 
+    public MarketOrderCollectionConfig getMarketOrderCollectionConfig() {
+        return marketOrderCollectionConfig;
+    }
+
     public static ConfigFactory fromPath(String path) throws BadConfigFileError, IOException {
         String jsonStr = new String(Files.readAllBytes(Paths.get(path)), "UTF8");
         return new ConfigFactory(jsonStr);
@@ -41,5 +46,13 @@ public class ConfigFactory {
         arcaParserConfig = new ArcaParserConfig(jsonObject.getJSONObject("ArcaParser"));
         hdf5WriterConfig = new HDF5WriterConfig(jsonObject.getJSONObject("HDF5Writer"));
         hdf5CompoundDSBridgeConfig = new HDF5CompoundDSBridgeConfig(jsonObject.getJSONObject("HDF5CompoundDSBridge"));
+
+        if (jsonObject.has("MarketOrderCollection")) {
+            marketOrderCollectionConfig =
+                    new MarketOrderCollectionConfig(jsonObject.getJSONObject("MarketOrderCollection"));
+        } else {
+            marketOrderCollectionConfig = null;
+        }
+
     }
 }

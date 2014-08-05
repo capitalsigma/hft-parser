@@ -1,9 +1,6 @@
 package com.hftparser.writers;
 
-import ch.systemsx.cisd.hdf5.HDF5CompoundType;
-import ch.systemsx.cisd.hdf5.HDF5DataBlock;
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
-import com.hftparser.config.HDF5WriterConfig;
 import com.hftparser.readers.WritableDataPoint;
 import org.junit.After;
 import org.junit.Before;

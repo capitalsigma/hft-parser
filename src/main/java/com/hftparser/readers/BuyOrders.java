@@ -5,12 +5,12 @@ import java.util.TreeSet;
 
 class BuyOrders extends MarketOrderCollection {
 	// descending sort for prices, following utils.py
-    private BuyOrders(int startCapacity){
-		super(startCapacity);
+    public BuyOrders(int startCapacity, int topN) {
+		super(startCapacity, topN);
 		sortedKeys = new TreeSet<>(Collections.reverseOrder());
 	}
 
 	public BuyOrders() {
-		this(10);
-	}
+        this(100, 10);
+    }
 }
