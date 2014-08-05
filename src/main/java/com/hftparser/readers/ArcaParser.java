@@ -138,7 +138,9 @@ public class ArcaParser extends AbstractParser implements Runnable {
         // we're doing is O(1) it shouldn't be a big deal.
         assert orderHistory.containsKey(refNum);
 
-        Order toModify = orderHistory.get(refNum);
+        Order changedOrder = new Order(price, qty);
+
+        Order toModify = orderHistory.put(refNum, changedOrder);
 
         // System.out.println("old price: " + toModify.price);
 
@@ -153,6 +155,9 @@ public class ArcaParser extends AbstractParser implements Runnable {
         // can grab the wrong value
         Integer currentQtyOfNewPrice = toUpdate.get(price);
         int qtyOfNewPriceToAdd = currentQtyOfNewPrice == null ? 0 : currentQtyOfNewPrice;
+
+
+        orderHistory.put(refNum, changedOrder);
 
         toUpdate.put(price, qty + qtyOfNewPriceToAdd);
 
@@ -170,7 +175,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         MarketOrderCollection toUpdate = ordersNow.get(ticker).get(ordType);
 
-        System.out.println("parsing for refnum: " + refNum);
+//        System.out.println("parsing for refnum: " + refNum);
 
 
         switch (recType) {
@@ -279,7 +284,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
             timeStamp = makeTimestamp(asSplit[8], asSplit[9]);
 
-            System.out.println("Adding refnum: " + refNum);
+//            System.out.println("Adding refnum: " + refNum);
             orderHistory.put(refNum, new Order(price, qty));
 
             processRecord(recType, seqNum, refNum, ordType, qty, ticker, price, timeStamp);

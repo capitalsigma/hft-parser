@@ -10,6 +10,7 @@ import org.junit.runners.JUnit4;
 
 import com.hftparser.containers.WaitFreeQueue;
 
+// TODO: add a test to check a modify followed by a delete
 @SuppressWarnings("UnusedAssignment")
 @RunWith(JUnit4.class)
 public class ArcaParserTest {
@@ -44,6 +45,36 @@ public class ArcaParserTest {
         collectionFactory = new MarketOrderCollectionFactory();
     }
 
+
+    @Test
+    public void testModifyThenDelete() throws Exception {
+        WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
+        WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
+
+        ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+
+        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_MODIFY_BUY1);
+        inQ.enq(TEST_DELETE_BUY1);
+
+        Thread runThread = new Thread(parser);
+        runThread.start();
+        Thread.sleep(200);
+
+        int[][] expectedOneBuy = {{2750000, 1000}};
+
+        int[][] expectedTwoBuy = {{382500, 900}};
+
+        DataPoint buyExpected = new DataPoint("FOO", expectedOneBuy, new int[][] {}, 28800737, 1);
+
+        DataPoint modifyExpected = new DataPoint("FOO", expectedTwoBuy, new int[][] {}, 29909390, 43);
+
+        DataPoint deleteExpected = new DataPoint("FOO", new int[][]{}, new int[][]{}, 28800857, 2);
+
+        assertTrue(outQ.deq().equals(buyExpected));
+        assertTrue(outQ.deq().equals(modifyExpected));
+        assertTrue(outQ.deq().equals(deleteExpected));
+    }
 
 	@Test
 	public void testInstantiate() {
@@ -148,7 +179,7 @@ public class ArcaParserTest {
 	}
 
 	@Test
-	public void testDelete() throws Exception {
+	public void testModify() throws Exception {
 		WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
 		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 

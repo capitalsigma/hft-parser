@@ -18,11 +18,13 @@ import com.hftparser.writers.HDF5Writer;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // WARNING: TURNING ON ASSERTIONS BREAKS SOMETHING INSIDE OF THE CISD CODE
 // NEVER, EVER, EVER TURN ON ASSERTIONS
 
-// NOTE: CHUNKED data layout is not extensible.
+// NOTE: COMPACT data layout is not extensible.
 class ParseRun {
     private static int LINE_QUEUE_SIZE;
     private static int POINT_QUEUE_SIZE;
@@ -178,6 +180,22 @@ class ParseRun {
         System.out.println("Information for Datapoint queue:");
         dataPointQueue.printUsage();
     }
+
+//    private int startTimestampFromFilename(String bookPath) {
+//        String filenamePattern = "\\D+(\\d)+\\.csv\\.gz";
+//        Pattern filenameRe = Pattern.compile(filenamePattern);
+//        Matcher matcher = filenameRe.matcher(bookPath);
+//        if (matcher.groupCount() == 1) {
+//            String date = matcher.group(1);
+//            return timestampFromDateString(date);
+//        }
+//
+//        return 0;
+//    }
+//
+//    private int timestampFromDateString(String date) {
+//
+//    }
 
     private static void printRunTime(long startMs, long endMs) {
         double diff = endMs - startMs;
