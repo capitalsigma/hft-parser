@@ -7,14 +7,24 @@ import java.util.Arrays;
 /**
  * Created by patrick on 7/29/14.
  */
-public class WritableDataPoint extends AbstractWritableDataPoint {
+public class WritableDataPoint {
 
 //    NOTE: this is ugly, but this way it doesn't get written out to the output.
 //    TODO: refactor this as an inner class of something to avoid this
 //    private final int LEVELS = ArcaParser.LEVELS;
 //NOTE: 172 bytes per record
+
+    @CompoundElement(memberName = "bid", dimensions = {ArcaParser.LEVELS, 2})
+    protected int[][] buy;
+
+    @CompoundElement(memberName =  "ask", dimensions = {ArcaParser.LEVELS, 2})
+    protected int[][] sell;
+
     @CompoundElement(memberName = "timestamp")
     private int timeStamp;
+
+    @CompoundElement(memberName = "seqnum")
+    protected long seqNum;
 
     public WritableDataPoint(int[][] buy, int[][] sell, int timeStamp, long seqNum) {
         this.buy = padArray(buy);
