@@ -1,5 +1,5 @@
 JAVA="java"
-MAX_MEM="3g"
+MAX_MEM="4g"
 JAVA_FLAGS="-d64"
 LOGS_DIR="logs/"
 

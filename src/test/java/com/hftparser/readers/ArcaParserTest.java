@@ -36,19 +36,41 @@ public class ArcaParserTest {
     private final String TEST_WHOLE =
         "A,1,12884901908,B,B,1000,FOO,275,28800,737,B,AARCA,";
 
+    private final String TEST_OVERFLOW = "A,24,4503612512341875,P,S,100,FOO,99999.9844,31830,137,E,AARCA,";
+
     MarketOrderCollectionFactory collectionFactory;
+    private WaitFreeQueue<String> inQ;
+    private WaitFreeQueue<DataPoint> outQ;
 
 
     @Before
     public void setUp() {
         collectionFactory = new MarketOrderCollectionFactory();
+        inQ = new WaitFreeQueue<>(5);
+        outQ = new WaitFreeQueue<>(5);
+    }
+
+    @Test
+    public void testOverflow() throws Exception {
+        inQ.enq(TEST_OVERFLOW);
+        ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+
+        runParserThread(parser);
+
+        long[][] expectedSells = new long[][]{{99999984400l, 100l}};
+
+        DataPoint expected = new DataPoint("FOO", new long[][]{}, expectedSells, 31830137, 24);
+        DataPoint actual = outQ.deq();
+
+        System.out.println("Got actual: " + actual.toString());
+
+        assertTrue(actual.equals(expected));
+
     }
 
 
     @Test
     public void testModifyThenDelete() throws Exception {
-        WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
-        WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
         ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
 
@@ -56,9 +78,7 @@ public class ArcaParserTest {
         inQ.enq(TEST_MODIFY_BUY1);
         inQ.enq(TEST_DELETE_BUY1);
 
-        Thread runThread = new Thread(parser);
-        runThread.start();
-        Thread.sleep(200);
+        runParserThread(parser);
 
         long[][] expectedOneBuy = {{2750000, 1000}};
 
@@ -75,6 +95,12 @@ public class ArcaParserTest {
         assertTrue(outQ.deq().equals(deleteExpected));
     }
 
+    private void runParserThread(ArcaParser parser) throws InterruptedException {
+        Thread runThread = new Thread(parser);
+        runThread.start();
+        Thread.sleep(100);
+    }
+
     @Test
     public void testIdenticalModifiesCaching() throws Exception {
         collectionFactory.setDoCaching(true);
@@ -88,9 +114,7 @@ public class ArcaParserTest {
 
         ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
 
-        Thread runThread = new Thread(parser);
-        runThread.start();
-        Thread.sleep(200);
+        runParserThread(parser);
 
         //        make sure we didn't emit an extra record for the duplicate modify
         DataPoint one = outQ.deq();
@@ -135,10 +159,7 @@ public class ArcaParserTest {
         ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
 
         inQ.enq(TEST_WHOLE);
-        Thread runThread = new Thread(parser);
-        // parser.run();
-        runThread.start();
-        Thread.sleep(200);
+        runParserThread(parser);
 
         long[][] expectedOneBuy = {
                 {275000000, 1000}
@@ -153,8 +174,8 @@ public class ArcaParserTest {
 
 	@Test
 	public void testAdd() throws Exception {
-		WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
-		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
+//		WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
+//		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
 		ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
 
@@ -163,13 +184,7 @@ public class ArcaParserTest {
 		inQ.enq(TEST_ADD_BUY2);
 
 
-		Thread runThread = new Thread(parser);
-		// parser.run();
-		runThread.start();
-
-
-		// sleep 200ms
-        Thread.sleep(200);
+        runParserThread(parser);
 
 
         long[][] expectedOneBuy = {
@@ -221,13 +236,7 @@ public class ArcaParserTest {
 		inQ.enq(TEST_MODIFY_BUY1);
 		inQ.enq(TEST_MODIFY_BUY2);
 
-		Thread runThread = new Thread(parser);
-		// parser.run();
-		runThread.start();
-
-
-		// sleep 200ms
-		Thread.sleep(200);
+        runParserThread(parser);
 
 		// throw away the first two, we don't care (add is tested elsewhere)
 		outQ.deq();

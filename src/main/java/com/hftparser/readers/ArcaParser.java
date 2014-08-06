@@ -170,9 +170,9 @@ public class ArcaParser extends AbstractParser implements Runnable {
         Order changedOrder = new Order(price, qty);
         Order toModify = orderHistory.get(refNum);
 
-        System.out.println("toModify: " + toModify.toString());
-        System.out.println("changedOrder: " + changedOrder.toString());
-        System.out.println("Equal? " + changedOrder.equals(toModify));
+//        System.out.println("toModify: " + toModify.toString());
+//        System.out.println("changedOrder: " + changedOrder.toString());
+//        System.out.println("Equal? " + changedOrder.equals(toModify));
 
 //        otherwise we write out too many records
         if (changedOrder.equals(toModify)) {
@@ -255,8 +255,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
     Long makePrice(String priceString) {
         String[] parts = priceString.split("\\.");
-        int floatPart;
-        int intPart;
+        long floatPart;
+        long intPart;
         int sizeOfFloatPart = 0;
 
         // System.out.println("got price: " + priceString);
@@ -265,10 +265,10 @@ public class ArcaParser extends AbstractParser implements Runnable {
         assert parts.length == 1 || (parts.length == 2 && parts[1].length() <= 6);
 
 
-        intPart = Integer.parseInt(parts[0]);
+        intPart = Long.parseLong(parts[0]);
 
         if (parts.length == 2) {
-            floatPart = Integer.parseInt(parts[1]);
+            floatPart = Long.parseLong(parts[1]);
             sizeOfFloatPart = parts[1].length();
         } else {
             floatPart = 0;
