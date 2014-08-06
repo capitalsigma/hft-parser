@@ -1,5 +1,6 @@
 JAVA="java"
-MAX_MEM="4g"
+MAX_MEM="3g"
+# 4g is faster, but means I need to shut everything down for a test run
 JAVA_FLAGS="-d64"
 LOGS_DIR="logs/"
 

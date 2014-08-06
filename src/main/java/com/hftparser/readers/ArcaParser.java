@@ -1,8 +1,10 @@
 package com.hftparser.readers;
 
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import com.hftparser.config.ArcaParserConfig;
 import com.hftparser.containers.WaitFreeQueue;
@@ -94,7 +96,10 @@ public class ArcaParser extends AbstractParser implements Runnable {
     private final int INITIAL_ORDER_HISTORY_SIZE;
     private final int OUTPUT_PROGRESS_EVERY;
 
-    private static Map<String, RecordType> recordTypeLookup;
+    private final Map<String, RecordType> recordTypeLookup;
+
+    private long startTimestamp;
+    private final TimeZone DEFAULT_TZ = TimeZone.getTimeZone("UTC");
 
     public ArcaParser(String[] _tickers,
                       WaitFreeQueue<String> _inQueue,
@@ -127,6 +132,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
         recordTypeLookup.put("M", RecordType.Modify);
         recordTypeLookup.put("D", RecordType.Delete);
 
+        startTimestamp = 0;
+
 //        SPLITTER = Pattern.compile(INPUT_SPLIT);
 
 //        SPLITTER = Splitter.on(INPUT_SPLIT).trimResults().omitEmptyStrings();
@@ -138,6 +145,16 @@ public class ArcaParser extends AbstractParser implements Runnable {
                       MarketOrderCollectionFactory collectionFactory) {
 
         this(_tickers, _inQueue, _outQueue, collectionFactory, ArcaParserConfig.getDefault());
+    }
+
+
+    public void setStartDate(Calendar startDate) {
+        startDate.setTimeZone(DEFAULT_TZ);
+        startTimestamp = startDate.getTimeInMillis() * 1000;
+    }
+
+    public long getStartTimestamp() {
+        return startTimestamp;
     }
 
     void processAdd(long qty, long price, MarketOrderCollection toUpdate) {
@@ -202,12 +219,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
     // default args, for delete's call
     // TODO: we can do this more cleanly
-    void processRecord(RecordType recType, long seqNum, long refNum, OrderType ordType, String ticker, int timeStamp) {
+    void processRecord(RecordType recType, long seqNum, long refNum, OrderType ordType, String ticker, long timeStamp) {
         processRecord(recType, seqNum, refNum, ordType, -1l, ticker, -1l, timeStamp);
     }
 
     void processRecord(RecordType recType, long seqNum, long refNum, OrderType ordType, long qty, String ticker,
-                       Long price, int timeStamp) {
+                       Long price, long timeStamp) {
         assert ordersNow.containsKey(ticker) && ordersNow.get(ticker).containsKey(ordType);
 
         MarketOrderCollection toUpdate = ordersNow.get(ticker).get(ordType);
@@ -283,8 +300,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
         return toRet;
     }
 
-    int makeTimestamp(String seconds, String ms) {
-        return Integer.parseInt(seconds) * 1000 + Integer.parseInt(ms);
+    long makeTimestamp(String seconds, String ms) {
+        return Long.parseLong(seconds) * 1000000l + Long.parseLong(ms) * 1000l + startTimestamp;
     }
 
     long makeRefNum(String refNumStr) {
@@ -310,7 +327,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
             OrderType ordType;
             int qty;        // need 9 digits
             Long price;
-            int timeStamp;            // 8 digits
+            long timeStamp;            // 8 digits
             RecordType recType = RecordType.Add;
 
             seqNum = Long.parseLong(asSplit[1]);
@@ -340,7 +357,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
             long seqNum;        // need 10 digits
             long refNum;        // need 20, but just taking last 19
             OrderType ordType;
-            int timeStamp;            // 8 digits
+            long timeStamp;            // 8 digits
             RecordType recType = RecordType.Delete;
 
             seqNum = Long.parseLong(asSplit[1]);
@@ -363,7 +380,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
             OrderType ordType;
             int qty;        // need 9 digits
             Long price;
-            int timeStamp;            // 8 digits
+            long timeStamp;            // 8 digits
             RecordType recType = RecordType.Modify;
 
             seqNum = Long.parseLong(asSplit[1]);

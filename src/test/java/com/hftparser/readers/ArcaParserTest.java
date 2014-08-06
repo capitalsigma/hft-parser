@@ -1,13 +1,13 @@
 package com.hftparser.readers;
 
 import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
 import com.hftparser.containers.WaitFreeQueue;
+import java.util.Calendar;
+import static org.hamcrest.CoreMatchers.*;
 
 // TODO: add a test to check a modify followed by a delete
 @SuppressWarnings("UnusedAssignment")
@@ -41,6 +41,7 @@ public class ArcaParserTest {
     MarketOrderCollectionFactory collectionFactory;
     private WaitFreeQueue<String> inQ;
     private WaitFreeQueue<DataPoint> outQ;
+    private ArcaParser parser;
 
 
     @Before
@@ -48,18 +49,53 @@ public class ArcaParserTest {
         collectionFactory = new MarketOrderCollectionFactory();
         inQ = new WaitFreeQueue<>(5);
         outQ = new WaitFreeQueue<>(5);
+        parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+    }
+
+
+    @Test
+    public void testSetStartDate() throws Exception {
+        Calendar toSet = Calendar.getInstance();
+        toSet.clear();
+        toSet.set(2014, Calendar.AUGUST, 5);
+
+        long expectedStart = 1407196800l * 1000000l;
+        long expectedForDay = 28800l * 1000000l + 737l * 1000l;
+        long expected = expectedStart + expectedForDay;
+        long actual;
+        DataPoint actualPoint;
+
+        parser.setStartDate(toSet);
+
+        assertThat(parser.getStartTimestamp(), is(expectedStart));
+
+        inQ.enq(TEST_ADD_BUY1);
+
+        runParserThread();
+
+        actualPoint = outQ.deq();
+
+        assertNotNull(actualPoint);
+
+        actual = actualPoint.getTimeStamp();
+
+        System.out.println("Difference from start: " + (actual - expectedStart));
+
+        assertThat(actual, is(expected));
+
+
     }
 
     @Test
     public void testOverflow() throws Exception {
         inQ.enq(TEST_OVERFLOW);
-        ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+        ArcaParser parser = this.parser;
 
         runParserThread(parser);
 
         long[][] expectedSells = new long[][]{{99999984400l, 100l}};
 
-        DataPoint expected = new DataPoint("FOO", new long[][]{}, expectedSells, 31830137, 24);
+        DataPoint expected = new DataPoint("FOO", new long[][]{}, expectedSells, 31830137000l, 24);
         DataPoint actual = outQ.deq();
 
         System.out.println("Got actual: " + actual.toString());
@@ -72,7 +108,7 @@ public class ArcaParserTest {
     @Test
     public void testModifyThenDelete() throws Exception {
 
-        ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+        ArcaParser parser = this.parser;
 
         inQ.enq(TEST_ADD_BUY1);
         inQ.enq(TEST_MODIFY_BUY1);
@@ -84,21 +120,33 @@ public class ArcaParserTest {
 
         long[][] expectedTwoBuy = {{382500, 900}};
 
-        DataPoint buyExpected = new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737, 1);
+        DataPoint buyExpected = new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737000l, 1);
 
-        DataPoint modifyExpected = new DataPoint("FOO", expectedTwoBuy, new long[][] {}, 29909390, 43);
+        DataPoint modifyExpected = new DataPoint("FOO", expectedTwoBuy, new long[][] {}, 29909390000l, 43);
 
-        DataPoint deleteExpected = new DataPoint("FOO", new long[][]{}, new long[][]{}, 28800857, 2);
+        DataPoint deleteExpected = new DataPoint("FOO", new long[][]{}, new long[][]{}, 28800857000l, 2);
 
-        assertTrue(outQ.deq().equals(buyExpected));
-        assertTrue(outQ.deq().equals(modifyExpected));
-        assertTrue(outQ.deq().equals(deleteExpected));
+        DataPoint one = outQ.deq();
+        DataPoint two = outQ.deq();
+        DataPoint three = outQ.deq();
+
+        System.out.println("Got one: " + one.toString());
+        System.out.println("Got two: " + two.toString());
+        System.out.println("Got three: " + three.toString());
+
+        assertTrue(one.equals(buyExpected));
+        assertTrue(two.equals(modifyExpected));
+        assertTrue(three.equals(deleteExpected));
     }
 
     private void runParserThread(ArcaParser parser) throws InterruptedException {
         Thread runThread = new Thread(parser);
         runThread.start();
         Thread.sleep(100);
+    }
+
+    private void runParserThread() throws  InterruptedException {
+        runParserThread(parser);
     }
 
     @Test
@@ -166,7 +214,7 @@ public class ArcaParserTest {
         };
 
         DataPoint buy1Expected =
-                new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737, 1);
+                new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737000l, 1);
 
         assertTrue(buy1Expected.equals(outQ.deq()));
 
@@ -177,7 +225,7 @@ public class ArcaParserTest {
 //		WaitFreeQueue<String> inQ = new WaitFreeQueue<>(5);
 //		WaitFreeQueue<DataPoint> outQ = new WaitFreeQueue<>(5);
 
-		ArcaParser parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+		ArcaParser parser = this.parser;
 
 		inQ.enq(TEST_ADD_BUY1);
 		inQ.enq(TEST_ADD_SELL1);
@@ -211,13 +259,13 @@ public class ArcaParserTest {
 
 
 		DataPoint buy1Expected =
-			new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737, 1);
+			new DataPoint("FOO", expectedOneBuy, new long[][] {}, 28800737000l, 1);
 
 		DataPoint sell1Expected =
-			new DataPoint("FOO", expectedTwoBuy, expectedTwoSell, 28800739, 8);
+			new DataPoint("FOO", expectedTwoBuy, expectedTwoSell, 28800739000l, 8);
 
 		DataPoint buy2Expected =
-			new DataPoint("FOO", expectedThreeBuy, expectedThreeSell, 28800737, 1);
+			new DataPoint("FOO", expectedThreeBuy, expectedThreeSell, 28800737000l, 1);
 
 		assertTrue(buy1Expected.equals(outQ.deq()));
 		assertTrue(sell1Expected.equals(outQ.deq()));
@@ -258,10 +306,10 @@ public class ArcaParserTest {
 			};
 
 		DataPoint expected1 = new DataPoint("FOO", expectedOrders1Buy, expectedEmptySell,
-											29909390, 43);
+											29909390000l, 43);
 
 		DataPoint expected2 = new DataPoint("FOO", expectedOrders2Buy, expectedEmptySell,
-											33643922, 2);
+											33643922000l, 2);
 
 		DataPoint toTest1 = outQ.deq();
 		DataPoint toTest2 = outQ.deq();

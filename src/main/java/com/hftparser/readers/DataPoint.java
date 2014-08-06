@@ -6,14 +6,14 @@ import java.util.Arrays;
 public class DataPoint {
     private final long[][] buy;
     private final long[][] sell;
-    private final int timeStamp;
+    private final long timeStamp;
     private final long seqNum;
     private final String ticker;
 
     public DataPoint(String _ticker,
                      long[][] _buy,
                      long[][] _sell,
-                     int _timeStamp,
+                     long _timeStamp,
                      long _seqNum) {
 		ticker = _ticker;
 		buy = _buy;
@@ -28,14 +28,11 @@ public class DataPoint {
     }
 
 
-    public void print() {
-        System.out.println("Information for hashcode: " + this.hashCode());
-		System.out.printf("my tick: %s\n", ticker);
-		System.out.printf("my seq: %d\n", seqNum);
-		System.out.printf("my ts: %d\n", timeStamp);
 
-		System.out.printf("my buy: %s\n", Arrays.deepToString(buy));
-        System.out.printf("my sell: %s\n", Arrays.deepToString(sell));
+
+
+    public void print() {
+        System.out.println(this.toString());
 	}
 
 
@@ -74,5 +71,9 @@ public class DataPoint {
                 ", seqNum=" + seqNum +
                 ", ticker='" + ticker + '\'' +
                 '}';
+    }
+
+    public long getTimeStamp() {
+        return timeStamp;
     }
 }

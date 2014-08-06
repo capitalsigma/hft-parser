@@ -17,6 +17,8 @@ import com.hftparser.writers.HDF5Writer;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -181,21 +183,32 @@ class ParseRun {
         dataPointQueue.printUsage();
     }
 
-//    private int startTimestampFromFilename(String bookPath) {
-//        String filenamePattern = "\\D+(\\d)+\\.csv\\.gz";
-//        Pattern filenameRe = Pattern.compile(filenamePattern);
-//        Matcher matcher = filenameRe.matcher(bookPath);
-//        if (matcher.groupCount() == 1) {
-//            String date = matcher.group(1);
-//            return timestampFromDateString(date);
-//        }
-//
-//        return 0;
-//    }
-//
-//    private int timestampFromDateString(String date) {
-//
-//    }
+    public static Calendar startCalendarFromFilename(String bookPath) {
+//        format is YYYYMMDD
+        String datePattern = "\\D+(\\d{4})(\\d{2})(\\d{2})\\.csv\\.gz";
+        Pattern dateRe = Pattern.compile(datePattern);
+        Matcher matcher = dateRe.matcher(bookPath);
+        Calendar startDate;
+        if (matcher.matches()) {
+            System.out.println("Got match on:" + matcher.toString());
+            System.out.println("Group 0:" + matcher.group(0));
+
+            startDate = Calendar.getInstance();
+
+//            clear, otherwise it holds on to the current hour, second, etc
+            startDate.clear();
+
+//            note that months are 0-based (i.e. january == 0)
+            startDate.set(Integer.valueOf(matcher.group(1)),
+                          Integer.valueOf(matcher.group(2)) - 1,
+                          Integer.valueOf(matcher.group(3)));
+
+            return startDate;
+        }
+
+        return null;
+    }
+
 
     private static void printRunTime(long startMs, long endMs) {
         double diff = endMs - startMs;
