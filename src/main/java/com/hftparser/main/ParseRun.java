@@ -197,7 +197,7 @@ public class ParseRun {
         Calendar startDate;
         System.out.println("Trying to match timestamp.");
         if (matcher.matches()) {
-            System.out.println("Got match on:" + matcher.group(0));
+            System.out.println("Got match on: " + matcher.group(0));
             //            System.out.println("Group 0:" + matcher.group(0));
 
             startDate = Calendar.getInstance();
