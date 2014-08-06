@@ -1,12 +1,16 @@
 package com.hftparser.readers;
 
 import static org.junit.Assert.*;
+
+import com.hftparser.main.ParseRun;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.hftparser.containers.WaitFreeQueue;
 import java.util.Calendar;
+import java.util.TimeZone;
+
 import static org.hamcrest.CoreMatchers.*;
 
 // TODO: add a test to check a modify followed by a delete
@@ -38,6 +42,8 @@ public class ArcaParserTest {
 
     private final String TEST_OVERFLOW = "A,24,4503612512341875,P,S,100,FOO,99999.9844,31830,137,E,AARCA,";
 
+    private final String TEST_TIMESTAMPS = "A,1,3940662558851079,P,B,100,FOO,116.5200,14400,566,E,AARCA";
+
     MarketOrderCollectionFactory collectionFactory;
     private WaitFreeQueue<String> inQ;
     private WaitFreeQueue<DataPoint> outQ;
@@ -58,14 +64,16 @@ public class ArcaParserTest {
         Calendar toSet = Calendar.getInstance();
         toSet.clear();
         toSet.set(2014, Calendar.AUGUST, 5);
+        toSet.setTimeZone(parser.getDefaultTz());
+//        toSet.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-        long expectedStart = 1407196800l * 1000000l;
+        long expectedStart = 1407211200l * 1000000l;
         long expectedForDay = 28800l * 1000000l + 737l * 1000l;
         long expected = expectedStart + expectedForDay;
         long actual;
         DataPoint actualPoint;
 
-        parser.setStartDate(toSet);
+        parser.setStartCalendar(toSet);
 
         assertThat(parser.getStartTimestamp(), is(expectedStart));
 
@@ -80,6 +88,25 @@ public class ArcaParserTest {
         actual = actualPoint.getTimeStamp();
 
         System.out.println("Difference from start: " + (actual - expectedStart));
+
+        assertThat(actual, is(expected));
+    }
+
+    @Test
+    public void testTimestamps() throws Exception {
+        Calendar toSet = ParseRun.startCalendarFromFilename("arcabookftp20101102.csv.gz");
+        long expected = 1288684800566000l;
+        long actual;
+
+        parser.setStartCalendar(toSet);
+
+        inQ.enq(TEST_TIMESTAMPS);
+
+        runParserThread();
+
+        actual = outQ.deq().getTimeStamp();
+
+        System.out.println("expected - actual = " + (expected - actual));
 
         assertThat(actual, is(expected));
 

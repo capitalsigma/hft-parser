@@ -99,7 +99,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
     private final Map<String, RecordType> recordTypeLookup;
 
     private long startTimestamp;
-    private final TimeZone DEFAULT_TZ = TimeZone.getTimeZone("UTC");
+    private final TimeZone DEFAULT_TZ = TimeZone.getTimeZone("America/New_York");
+
 
     public ArcaParser(String[] _tickers,
                       WaitFreeQueue<String> _inQueue,
@@ -148,9 +149,13 @@ public class ArcaParser extends AbstractParser implements Runnable {
     }
 
 
-    public void setStartDate(Calendar startDate) {
+    public void setStartCalendar(Calendar startDate) {
         startDate.setTimeZone(DEFAULT_TZ);
         startTimestamp = startDate.getTimeInMillis() * 1000;
+    }
+
+    public TimeZone getDefaultTz() {
+        return DEFAULT_TZ;
     }
 
     public long getStartTimestamp() {

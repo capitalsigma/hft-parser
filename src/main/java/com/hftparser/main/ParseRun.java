@@ -18,8 +18,8 @@ import com.hftparser.writers.HDF5Writer;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 // NEVER, EVER, EVER TURN ON ASSERTIONS
 
 // NOTE: COMPACT data layout is not extensible.
-class ParseRun {
+public class ParseRun {
     private static int LINE_QUEUE_SIZE;
     private static int POINT_QUEUE_SIZE;
 
@@ -69,6 +69,7 @@ class ParseRun {
         Thread writerThread;
         Thread[] allThreads;
         ConfigFactory configFactory = null;
+        Calendar startCalendar;
 
         long startTime = System.currentTimeMillis();
         long endTime;
@@ -79,16 +80,16 @@ class ParseRun {
         }
 
         if(args.symbolPath == null){
-            symbols = new String[]{
-            "SPY", "DIA", "QQQ",
-            "XLK", "XLF", "XLP", "XLE", "XLY", "XLV", "XLB",
-            "VCR", "VDC", "VHT", "VIS", "VAW", "VNQ", "VGT", "VOX", "VPU",
-            "XOM", "RDS", "BP",
-            "HD", "LOW", "XHB",
-            "MS", "GS", "BAC", "JPM", "C",
-            "CME", "NYX",
-            "AAPL", "MSFT", "GOOG", "CSCO",
-            "GE", "CVX", "JNJ", "IBM", "PG", "PFE",
+            symbols = new String[] {
+                "SPY", "DIA", "QQQ",
+                "XLK", "XLF", "XLP", "XLE", "XLY", "XLV", "XLB",
+                "VCR", "VDC", "VHT", "VIS", "VAW", "VNQ", "VGT", "VOX", "VPU",
+                "XOM", "RDS", "BP",
+                "HD", "LOW", "XHB",
+                "MS", "GS", "BAC", "JPM", "C",
+                "CME", "NYX",
+                "AAPL", "MSFT", "GOOG", "CSCO",
+                "GE", "CVX", "JNJ", "IBM", "PG", "PFE",
             };
         } else {
             File symbolFile = new File(args.symbolPath);
@@ -147,6 +148,11 @@ class ParseRun {
         writer = new HDF5Writer(dataPointQueue, outFile, configFactory.getHdf5WriterConfig(),
                 configFactory.getHdf5CompoundDSBridgeConfig());
 
+        if ((startCalendar = startCalendarFromFilename(args.bookPath)) != null) {
+            parser.setStartCalendar(startCalendar);
+
+        }
+
         readerThread = new Thread(gzipReader);
         parserThread = new Thread(parser);
         writerThread = new Thread(writer);
@@ -189,22 +195,25 @@ class ParseRun {
         Pattern dateRe = Pattern.compile(datePattern);
         Matcher matcher = dateRe.matcher(bookPath);
         Calendar startDate;
+        System.out.println("Trying to match timestamp.");
         if (matcher.matches()) {
-            System.out.println("Got match on:" + matcher.toString());
-            System.out.println("Group 0:" + matcher.group(0));
+            System.out.println("Got match on:" + matcher.group(0));
+            //            System.out.println("Group 0:" + matcher.group(0));
 
             startDate = Calendar.getInstance();
 
-//            clear, otherwise it holds on to the current hour, second, etc
+            //            clear, otherwise it holds on to the current hour, second, etc
             startDate.clear();
 
-//            note that months are 0-based (i.e. january == 0)
+
+            //            note that months are 0-based (i.e. january == 0)
             startDate.set(Integer.valueOf(matcher.group(1)),
                           Integer.valueOf(matcher.group(2)) - 1,
                           Integer.valueOf(matcher.group(3)));
 
             return startDate;
         }
+        System.out.println("No match.");
 
         return null;
     }

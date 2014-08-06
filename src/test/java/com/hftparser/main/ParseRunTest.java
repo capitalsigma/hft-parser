@@ -3,6 +3,7 @@ package com.hftparser.main;
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import static org.junit.Assert.*;
 import static org.junit.matchers.JUnitMatchers.*;
@@ -16,12 +17,14 @@ public class ParseRunTest {
         Calendar expected = Calendar.getInstance();
         expected.clear();
         expected.set(2010, Calendar.NOVEMBER, 2, 0, 0, 0);
+//        expected.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Calendar actual = ParseRun.startCalendarFromFilename(TEST_FILENAME);
 
         System.out.println("Got: " + actual.getTime().toString());
         System.out.println("Expected: " + expected.getTime().toString());
         System.out.println("Comparison? " + actual.compareTo(expected));
+
 
         assertThat(actual, equalTo(expected));
     }
