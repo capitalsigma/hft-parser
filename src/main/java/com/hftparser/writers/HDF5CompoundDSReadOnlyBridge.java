@@ -11,6 +11,12 @@ public class HDF5CompoundDSReadOnlyBridge<T> {
     protected final String fullPath;
     protected final HDF5CompoundType<T> type;
 
+    public HDF5CompoundDSReadOnlyBridge() {
+        writer = null;
+        fullPath = null;
+        type = null;
+    }
+
     public HDF5CompoundDSReadOnlyBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer) {
         fullPath = name.getFullPath();
         this.writer = writer;

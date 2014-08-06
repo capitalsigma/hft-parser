@@ -3,7 +3,6 @@ package com.hftparser.writers;
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
-import com.hftparser.readers.WritableDataPoint;
 
 /**
  * Created by patrick on 7/31/14.
@@ -15,10 +14,17 @@ public abstract class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridg
 //    private final static WritableDataPoint emptyPoint = new WritableDataPoint(new int[][]{}, new int[][]{}, 0, 0l);
 protected final T emptyPoint;
 
+    protected HDF5CompoundDSCachingBridge() {
+        cache = null;
+        cacheSize = -1;
+        emptyPoint = null;
+    }
+
     public HDF5CompoundDSCachingBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
                                 long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig){
         super(name, type, writer, startSize, chunkSize, bridgeConfig);
         cacheSize = bridgeConfig.getCache_size();
+        //noinspection unchecked
         cache = (T[])  new Object[cacheSize];
 
 //        grab the default value to use as out "blank out" later
@@ -32,12 +38,15 @@ protected final T emptyPoint;
         cache[currentCacheOffset++] = element;
 
         if (currentCacheOffset >= cacheSize) {
-            flush();
+            System.out.println("About to call doFlush");
+            doFlush();
         }
     }
 
-    @Override
-    public void flush() {
+//    split this off so we can override
+    protected void doFlush() {
+        System.out.println("Called doFlush");
+        //    template method
         T[] toWrite = fixUp();
 
         writer.writeArrayBlockWithOffset(fullPath, type, toWrite, currentOffset);
@@ -45,7 +54,10 @@ protected final T emptyPoint;
         currentCacheOffset = 0;
     }
 
+    @Override
+    public void flush() {
+        doFlush();
+    }
 
-//    template method
     abstract protected T[] fixUp();
 }

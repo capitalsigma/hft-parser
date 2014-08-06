@@ -8,7 +8,7 @@ import java.util.Set;
  * Created by patrick on 8/4/14.
  */
 public class MarketOrderCollectionCache extends MarketOrderCollection {
-    public MarketOrderCollection decoratedCollection;
+    private MarketOrderCollection decoratedCollection;
     long[][] cache;
     private boolean dirty;
 
@@ -96,16 +96,19 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
         return decoratedCollection.clone();
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public Set<Long> keySet() {
         return decoratedCollection.keySet();
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public Collection<Long> values() {
         return decoratedCollection.values();
     }
 
+    @SuppressWarnings("NullableProblems")
     @Override
     public Set<Map.Entry<Long, Long>> entrySet() {
         return decoratedCollection.entrySet();

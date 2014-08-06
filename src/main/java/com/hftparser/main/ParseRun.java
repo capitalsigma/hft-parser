@@ -19,7 +19,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,6 +112,7 @@ public class ParseRun {
         }
 
 
+        @SuppressWarnings("ConstantConditions")
         ParseRunConfig parseRunConfig = configFactory.getParseRunConfig();
         setProperties(parseRunConfig);
 
@@ -207,6 +207,7 @@ public class ParseRun {
 
 
             //            note that months are 0-based (i.e. january == 0)
+            //noinspection MagicConstant
             startDate.set(Integer.valueOf(matcher.group(1)),
                           Integer.valueOf(matcher.group(2)) - 1,
                           Integer.valueOf(matcher.group(3)));

@@ -3,10 +3,8 @@ package com.hftparser.main;
 import org.junit.Test;
 
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import static org.junit.Assert.*;
-import static org.junit.matchers.JUnitMatchers.*;
 import static org.hamcrest.CoreMatchers.*;
 
 public class ParseRunTest {

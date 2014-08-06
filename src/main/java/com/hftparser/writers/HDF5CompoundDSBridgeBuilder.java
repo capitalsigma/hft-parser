@@ -69,18 +69,22 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         } else {
             if (bridgeConfig.getCache_size() > 0) {
                 //                System.out.println("Building caching");
-                if (cutoff) {
-                    return new HDF5CompoundDSCutoffCachingBridge<>(name, type, writer, startSize, chunkSize,
-                                                                   bridgeConfig);
-                } else {
-                    return new HDF5CompoundDSZeroOutCachingBridge<>(name, type, writer, startSize, chunkSize,
-                                                                   bridgeConfig);
-                }
 
+                return buildCaching(name);
             } else {
 //                System.out.println("Building regular");
                 return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);
             }
+        }
+    }
+
+    public HDF5CompoundDSCachingBridge<T> buildCaching(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
+        if (cutoff) {
+            return new HDF5CompoundDSCutoffCachingBridge<>(name, type, writer, startSize, chunkSize,
+                                                           bridgeConfig);
+        } else {
+            return new HDF5CompoundDSZeroOutCachingBridge<>(name, type, writer, startSize, chunkSize,
+                                                            bridgeConfig);
         }
     }
 

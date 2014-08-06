@@ -28,7 +28,7 @@ public class HDF5CompoundDSBridgeConfig {
                 throw new BadConfigFileError();
         }
 
-        String fieldVal = json.optString("deflate_level", "NOSTR");
+//        String fieldVal = json.optString("deflate_level", "NOSTR");
 //        System.out.println("Got: " + fieldVal);
         switch (json.optString("deflate_level", "NOSTR")) {
             case "MAX_DEFLATION_LEVEL":

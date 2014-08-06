@@ -1,6 +1,5 @@
 package com.hftparser.config;
 
-import com.hftparser.readers.MarketOrderCollectionCache;
 import org.json.JSONObject;
 
 /**

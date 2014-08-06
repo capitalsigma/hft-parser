@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import com.hftparser.containers.WaitFreeQueue;
 import java.util.Calendar;
-import java.util.TimeZone;
 
 import static org.hamcrest.CoreMatchers.*;
 

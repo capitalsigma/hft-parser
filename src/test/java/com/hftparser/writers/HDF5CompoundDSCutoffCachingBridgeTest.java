@@ -15,18 +15,19 @@ import java.util.Arrays;
 import static org.junit.Assert.*;
 
 public class HDF5CompoundDSCutoffCachingBridgeTest {
-    private final String TEST_PATH = "test-out.h5";
-    private final DatasetName TEST_DS = new DatasetName("group", "foo");
-    private WritableDataPoint testPoint1;
-    private WritableDataPoint emptyPoint;
-    private WritableDataPoint[] emptyPoints;
-    private WritableDataPoint[] fullPoints;
-    private IHDF5Writer writer;
+    protected final String TEST_PATH = "test-out.h5";
+    protected final DatasetName TEST_DS = new DatasetName("group", "foo");
+    protected WritableDataPoint testPoint1;
+    protected WritableDataPoint emptyPoint;
+    protected WritableDataPoint[] emptyPoints;
+    protected WritableDataPoint[] fullPoints;
+    protected IHDF5Writer writer;
 
-    private HDF5CompoundDSBridge<WritableDataPoint> dtBridge;
+    protected HDF5CompoundDSCachingBridge<WritableDataPoint> dtBridge;
 
     @Before
     public void setUp() throws Exception {
+        System.out.println("Executing super setup.");
         try {
             File file = new File(TEST_PATH);
 
@@ -48,7 +49,7 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
             dtBuilder.setTypeFromInferred(WritableDataPoint.class);
             dtBuilder.setCutoff(true);
 
-            dtBridge = dtBuilder.build(TEST_DS);
+            dtBridge = dtBuilder.buildCaching(TEST_DS);
 
         } catch (StackOverflowError e) {
             fail("This library has a bug in HDF5GenericStorageFeatures.java line 425, " +

@@ -15,6 +15,10 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
     private final T[] elToWrite;
 //    protected final HDF5CompoundType<T> type;
 
+    protected HDF5CompoundDSBridge() {
+        elToWrite = null;
+    }
+
     public HDF5CompoundDSBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
                                 long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig) {
         super(name, type, writer);
