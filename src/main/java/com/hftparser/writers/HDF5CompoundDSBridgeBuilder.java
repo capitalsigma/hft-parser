@@ -6,6 +6,8 @@ import ch.systemsx.cisd.hdf5.IHDF5Writer;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.*;
+
 /**
  * Created by patrick on 7/28/14.
  */
@@ -16,6 +18,11 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     private int chunkSize;
     private boolean cutoff;
     private final HDF5CompoundDSBridgeConfig bridgeConfig;
+    private Executor executor;
+    private int corePoolSize = 3;
+    private int maxPoolSize = 3;
+    private long keepAliveSec = 30;
+    private boolean async;
 
     public HDF5CompoundType<T> getType() {
         return type;
@@ -53,6 +60,22 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         this.cutoff = cutoff;
     }
 
+    public void setCorePoolSize(int corePoolSize) {
+        this.corePoolSize = corePoolSize;
+    }
+
+    public void setMaxPoolSize(int maxPoolSize) {
+        this.maxPoolSize = maxPoolSize;
+    }
+
+    public void setKeepAliveSec(long keepAliveSec) {
+        this.keepAliveSec = keepAliveSec;
+    }
+
+    public void setAsync(boolean async) {
+        this.async = async;
+    }
+
     public HDF5CompoundDSBridgeBuilder(IHDF5Writer writer) {
         this(writer, HDF5CompoundDSBridgeConfig.getDefault());
     }
@@ -67,12 +90,14 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         } else {
-            if (bridgeConfig.getCache_size() > 0) {
+            if (async) {
+                return buildAsync(name);
+            } else if (bridgeConfig.getCache_size() > 0) {
                 //                System.out.println("Building caching");
 
                 return buildCaching(name);
             } else {
-//                System.out.println("Building regular");
+                //                System.out.println("Building regular");
                 return new HDF5CompoundDSBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig);
             }
         }
@@ -94,5 +119,32 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         }
 
         return new HDF5CompoundDSReadOnlyBridge<>(name, type, writer);
+    }
+
+    private void initExecutor() {
+        executor = new ThreadPoolExecutor(corePoolSize,
+                                          maxPoolSize,
+                                          keepAliveSec,
+                                          TimeUnit.SECONDS,
+                                          new ArrayBlockingQueue<Runnable>(200));
+    }
+
+    public HDF5CompoundDSAsyncBridge<T> buildAsync(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
+        if (executor == null) {
+            initExecutor();
+        }
+
+        if (cutoff) {
+            return new HDF5CompoundDSAsyncCutoffBridge<>(name,
+                                                         type,
+                                                         writer,
+                                                         startSize,
+                                                         chunkSize,
+                                                         bridgeConfig,
+                                                         executor);
+        } else {
+            throw new UnsupportedOperationException("Can't build a zero-out async bridge");
+        }
+
     }
 }

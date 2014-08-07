@@ -24,6 +24,9 @@ protected final T emptyPoint;
                                 long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig){
         super(name, type, writer, startSize, chunkSize, bridgeConfig);
         cacheSize = bridgeConfig.getCache_size();
+
+        System.out.println("Building cache of size:" + cacheSize);
+
         //noinspection unchecked
         cache = (T[])  new Object[cacheSize];
 
@@ -45,18 +48,18 @@ protected final T emptyPoint;
 
 //    split this off so we can override
     protected void doFlush() {
-        System.out.println("Called doFlush");
+        flush();
+    }
+
+    @Override
+    public void flush() {
+        System.out.println("Called flush");
         //    template method
         T[] toWrite = fixUp();
 
         writer.writeArrayBlockWithOffset(fullPath, type, toWrite, currentOffset);
         currentOffset += currentCacheOffset;
         currentCacheOffset = 0;
-    }
-
-    @Override
-    public void flush() {
-        doFlush();
     }
 
     abstract protected T[] fixUp();

@@ -22,13 +22,20 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
     protected WritableDataPoint[] emptyPoints;
     protected WritableDataPoint[] fullPoints;
     protected IHDF5Writer writer;
+    protected HDF5CompoundDSBridgeConfig config;
+
 
     protected HDF5CompoundDSCachingBridge<WritableDataPoint> dtBridge;
 
+
+    protected HDF5CompoundDSCachingBridge<WritableDataPoint> getDtBridge() {
+        return dtBridge;
+    }
+
     @Before
     public void setUp() throws Exception {
-        System.out.println("Executing super setup.");
         try {
+            System.out.println("Calling setUp");
             File file = new File(TEST_PATH);
 
             testPoint1 = new WritableDataPoint(new long[][]{{1, 2}}, new long[][]{{3, 4}}, 6, 10l);
@@ -38,18 +45,19 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
             fullPoints = new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1, testPoint1,};
 
 
-            HDF5CompoundDSBridgeConfig config = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
-                                                                               HDF5GenericStorageFeatures
-                                                                                       .MAX_DEFLATION_LEVEL, 5);
+            config = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
+                                                    HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL,
+                                                    5);
 
             writer = HDF5Writer.getWriter(file);
-            HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer, config);
+            HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder =
+                    new HDF5CompoundDSBridgeBuilder<>(writer, config);
             dtBuilder.setChunkSize(5);
             dtBuilder.setStartSize(5);
             dtBuilder.setTypeFromInferred(WritableDataPoint.class);
             dtBuilder.setCutoff(true);
 
-            dtBridge = dtBuilder.buildCaching(TEST_DS);
+            buildBridge(dtBuilder);
 
         } catch (StackOverflowError e) {
             fail("This library has a bug in HDF5GenericStorageFeatures.java line 425, " +
@@ -57,6 +65,10 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
                          "EVER CALL defaultStorageLayout.\n Failed with error: " + e.toString());
         }
 
+    }
+
+    protected void buildBridge(HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder) throws Exception {
+        setDtBridge(dtBuilder.buildCaching(TEST_DS));
     }
 
     @After
@@ -67,13 +79,13 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
     @Test
     public void testAppendElement() throws Exception {
         for (int i = 0; i < 4; i++) {
-            dtBridge.appendElement(testPoint1);
-            System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
-            assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 5), emptyPoints));
+            getDtBridge().appendElement(testPoint1);
+            System.out.println("Got: " + Arrays.deepToString(getDtBridge().readBlock(0, 5)));
+            assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 5), emptyPoints));
         }
-        dtBridge.appendElement(testPoint1);
+        getDtBridge().appendElement(testPoint1);
         //        System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
-        assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 5), fullPoints));
+        assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 5), fullPoints));
     }
 
     @Test
@@ -81,15 +93,15 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
         WritableDataPoint[] threeEmpty = new WritableDataPoint[]{emptyPoint, emptyPoint, emptyPoint};
         WritableDataPoint[] onePointBlock = new WritableDataPoint[]{testPoint1, emptyPoint, emptyPoint};
 
-        assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 3), threeEmpty));
+        assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 3), threeEmpty));
 
-        dtBridge.appendElement(testPoint1);
+        getDtBridge().appendElement(testPoint1);
 
-        assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 3), threeEmpty));
+        assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 3), threeEmpty));
 
-        dtBridge.flush();
+        getDtBridge().flush();
 
-        assertTrue(Arrays.deepEquals(dtBridge.readBlock(0, 3), onePointBlock));
+        assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 3), onePointBlock));
     }
 
     @Test
@@ -101,11 +113,11 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
         WritableDataPoint[] actual;
 
         for (int i = 0; i < 6; i++) {
-            dtBridge.appendElement(testPoint1);
+            getDtBridge().appendElement(testPoint1);
         }
-        dtBridge.flush();
+        getDtBridge().flush();
 
-        actual = dtBridge.readBlock(0, 10);
+        actual = getDtBridge().readBlock(0, 10);
 
         System.out.println("Got: (testZeroOutExtra) " + Arrays.deepToString(actual));
 
@@ -115,11 +127,15 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
     @Test
     public void testCuttofExtraCorrectLength() throws Exception {
         for (int i = 0; i < 6; i++) {
-            dtBridge.appendElement(testPoint1);
+            getDtBridge().appendElement(testPoint1);
         }
 
-        dtBridge.flush();
+        getDtBridge().flush();
 
-        assertEquals(6, dtBridge.readArray().length);
+        assertEquals(6, getDtBridge().readArray().length);
+    }
+
+    protected void setDtBridge(HDF5CompoundDSCachingBridge<WritableDataPoint> dtBridge) {
+        this.dtBridge = dtBridge;
     }
 }
