@@ -21,6 +21,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     private int corePoolSize = 3;
     private int maxPoolSize = 3;
     private long keepAliveSec = 30;
+    private int queueSize = 500;
     private boolean async;
     private ElementCacheFactory<T> cacheFactory;
 
@@ -84,6 +85,12 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         this.bridgeConfig = bridgeConfig;
         this.writer = writer.compound();
         this.cacheFactory = new ElementCacheFactory<>(bridgeConfig.getCache_size(), bridgeConfig.isCutoff());
+
+        corePoolSize = bridgeConfig.getCore_pool_size();
+        maxPoolSize = bridgeConfig.getMax_pool_size();
+        keepAliveSec = bridgeConfig.getKeep_alive_sec();
+        queueSize = bridgeConfig.getQueue_size();
+        async = bridgeConfig.isAsync();
     }
 
     public HDF5CompoundDSBridge<T> build(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
@@ -113,6 +120,24 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         }
 
         return new HDF5CompoundDSReadOnlyBridge<>(name, type, writer);
+    }
+
+    @Override
+    public String toString() {
+        return "HDF5CompoundDSBridgeBuilder{" +
+                "type=" + type +
+                ", writer=" + writer +
+                ", startSize=" + startSize +
+                ", chunkSize=" + chunkSize +
+                ", bridgeConfig=" + bridgeConfig +
+                ", executor=" + executor +
+                ", corePoolSize=" + corePoolSize +
+                ", maxPoolSize=" + maxPoolSize +
+                ", keepAliveSec=" + keepAliveSec +
+                ", queueSize=" + queueSize +
+                ", async=" + async +
+                ", cacheFactory=" + cacheFactory +
+                '}';
     }
 
     private void initExecutor() {

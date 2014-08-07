@@ -12,6 +12,11 @@ public class HDF5CompoundDSBridgeConfig {
     private final byte deflate_level;
     private int cache_size;
     private boolean cutoff;
+    private int core_pool_size = 2;
+    private int max_pool_size = core_pool_size;
+    private int keep_alive_sec = 30;
+    private int queue_size = 500;
+    private boolean async = false;
 
     HDF5CompoundDSBridgeConfig(JSONObject json) throws BadConfigFileError {
         switch (json.getString("storage_layout")) {
@@ -58,6 +63,27 @@ public class HDF5CompoundDSBridgeConfig {
         } else {
             cutoff = json.getBoolean("cutoff");
         }
+
+        if (json.has("core_pool_size")) {
+            core_pool_size = json.getInt("core_pool_size");
+        }
+
+        if (json.has("max_pool_size")) {
+            max_pool_size = json.getInt("max_pool_size");
+        }
+
+        if (json.has("keep_alive_sec")) {
+            keep_alive_sec = json.getInt("core_pool_size");
+        }
+
+        if (json.has("queue_size")) {
+            queue_size = json.getInt("queue_size");
+        }
+
+        if (json.has("async")) {
+            async = json.getBoolean("async");
+        }
+
    }
 
     public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level) {
@@ -117,6 +143,26 @@ public class HDF5CompoundDSBridgeConfig {
         return cutoff;
     }
 
+    public int getCore_pool_size() {
+        return core_pool_size;
+    }
+
+    public int getMax_pool_size() {
+        return max_pool_size;
+    }
+
+    public int getKeep_alive_sec() {
+        return keep_alive_sec;
+    }
+
+    public int getQueue_size() {
+        return queue_size;
+    }
+
+    public boolean isAsync() {
+        return async;
+    }
+
     @Override
     public int hashCode() {
         int result = storage_layout.hashCode();
@@ -134,6 +180,13 @@ public class HDF5CompoundDSBridgeConfig {
         return "HDF5CompoundDSBridgeConfig{" +
                 "storage_layout=" + storage_layout +
                 ", deflate_level=" + deflate_level +
+                ", cache_size=" + cache_size +
+                ", cutoff=" + cutoff +
+                ", core_pool_size=" + core_pool_size +
+                ", max_pool_size=" + max_pool_size +
+                ", keep_alive_sec=" + keep_alive_sec +
+                ", queue_size=" + queue_size +
+                ", async=" + async +
                 '}';
     }
 }

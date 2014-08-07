@@ -17,7 +17,7 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
     private ElementCache<T> cacheTwo;
 
     public class Writer implements Runnable {
-        boolean isDone = false;
+        volatile boolean isDone = false;
         ElementCache<T> cacheToWrite;
 
         public Writer(ElementCache<T> cacheToWrite) {

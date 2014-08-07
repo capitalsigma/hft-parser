@@ -1,20 +1,41 @@
 package com.hftparser.writers;
 
+import com.hftparser.config.ConfigFactory;
+import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import com.hftparser.readers.WritableDataPoint;
 import org.hamcrest.CoreMatchers;
+import org.json.JSONObject;
+import org.junit.Before;
 
+import java.io.BufferedReader;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
 
 public class HDF5CompoundDSAsyncBridgeTest extends HDF5CompoundDSCutoffCachingBridgeTest {
     protected HDF5CompoundDSAsyncBridge<WritableDataPoint> dtBridge;
+    String TEST_CONFIG = "src/test/resources/async-config.json";
 
 
+    @Before
+    @Override
+    public void setUp() throws Exception {
+        super.setUp();
+
+    }
+
+    @Override
+    protected  void setConfig() throws Exception {
+        ConfigFactory factory = ConfigFactory.fromPath(TEST_CONFIG);
+        config = factory.getHdf5CompoundDSBridgeConfig();
+
+        System.out.println("Got config:" + config.toString());
+    }
 
     @Override
     protected void buildBridge(HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder) throws Exception {
-        dtBuilder.setAsync(true);
+        System.out.println("Got builder: " + dtBuilder.toString());
+//        dtBuilder.setAsync(true);
         this.setDtBridge(dtBuilder.buildAsync(TEST_DS));
         assertNotNull(getDtBridge());
     }

@@ -24,17 +24,12 @@
 		"default_storage_layout": false,
 		"storage_layout": "CHUNKED",
 		"deflate_level": 1,
-		"cache_size": 25000,
+		"cache_size": 5,
 		"cutoff": true,
 		"async": true,
 		"core_pool_size": 2,
 		"max_pool_size": 2,
 		"keep_alive_sec": 30,
-		"queue_size": 500
-	},
-    "MarketOrderCollection": {
-        "start_capacity": 5000,
-        "max_key_count": 10,
-        "caching": true
-    }
+		"queue_size": 15
+	}
 }

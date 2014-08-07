@@ -45,10 +45,7 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
             fullPoints = new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1, testPoint1,};
 
 
-            config = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
-                                                    HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL,
-                                                    5);
-
+            setConfig();
             writer = HDF5Writer.getWriter(file);
             HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder =
                     new HDF5CompoundDSBridgeBuilder<>(writer, config);
@@ -65,6 +62,12 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
                          "EVER CALL defaultStorageLayout.\n Failed with error: " + e.toString());
         }
 
+    }
+
+    protected void setConfig() throws Exception {
+        config = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
+                                                HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL,
+                                                5);
     }
 
     protected void buildBridge(HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder) throws Exception {
