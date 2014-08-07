@@ -10,7 +10,7 @@ import java.util.concurrent.Executor;
 /**
  * Created by patrick on 8/6/14.
  */
-abstract public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T> {
+public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T> {
     private Executor executor;
     private Writer lastWriter;
 
@@ -36,8 +36,9 @@ abstract public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCaching
                                      long startSize,
                                      int chunkSize,
                                      HDF5CompoundDSBridgeConfig bridgeConfig,
+                                     ElementCacheFactory<T> cacheFactory,
                                      Executor executor) {
-        super(name, type, writer, startSize, chunkSize, bridgeConfig);
+        super(name, type, writer, startSize, chunkSize, bridgeConfig, cacheFactory);
         this.executor = executor;
     }
 

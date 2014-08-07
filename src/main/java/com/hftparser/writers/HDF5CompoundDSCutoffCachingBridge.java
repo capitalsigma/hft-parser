@@ -22,11 +22,7 @@ public class HDF5CompoundDSCutoffCachingBridge<T> extends HDF5CompoundDSCachingB
     }
 
     private T[] cutoffExtra() {
-        if (currentCacheOffset == cache.length) {
-            return cache;
-        } else {
-            return Arrays.copyOfRange(cache, 0, currentCacheOffset);
-        }
+
     }
 
 

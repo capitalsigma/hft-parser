@@ -16,13 +16,13 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     private final IHDF5CompoundWriter writer;
     private long startSize;
     private int chunkSize;
-    private boolean cutoff;
     private final HDF5CompoundDSBridgeConfig bridgeConfig;
     private Executor executor;
     private int corePoolSize = 3;
     private int maxPoolSize = 3;
     private long keepAliveSec = 30;
     private boolean async;
+    private ElementCacheFactory<T> cacheFactory;
 
     public HDF5CompoundType<T> getType() {
         return type;
@@ -57,7 +57,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     }
 
     public void setCutoff(boolean cutoff) {
-        this.cutoff = cutoff;
+        cacheFactory.setCutoff(cutoff);
     }
 
     public void setCorePoolSize(int corePoolSize) {
@@ -83,7 +83,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     HDF5CompoundDSBridgeBuilder(IHDF5Writer writer, HDF5CompoundDSBridgeConfig bridgeConfig) {
         this.bridgeConfig = bridgeConfig;
         this.writer = writer.compound();
-        this.cutoff = bridgeConfig.isCutoff();
+        this.cacheFactory = new ElementCacheFactory<>(bridgeConfig.getCache_size(), bridgeConfig.isCutoff());
     }
 
     public HDF5CompoundDSBridge<T> build(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
@@ -104,13 +104,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     }
 
     public HDF5CompoundDSCachingBridge<T> buildCaching(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
-        if (cutoff) {
-            return new HDF5CompoundDSCutoffCachingBridge<>(name, type, writer, startSize, chunkSize,
-                                                           bridgeConfig);
-        } else {
-            return new HDF5CompoundDSZeroOutCachingBridge<>(name, type, writer, startSize, chunkSize,
-                                                            bridgeConfig);
-        }
+        return new HDF5CompoundDSCachingBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig, cacheFactory);
     }
 
     public HDF5CompoundDSReadOnlyBridge<T> buildReadOnly(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
@@ -134,17 +128,14 @@ public class HDF5CompoundDSBridgeBuilder<T> {
             initExecutor();
         }
 
-        if (cutoff) {
-            return new HDF5CompoundDSAsyncCutoffBridge<>(name,
-                                                         type,
-                                                         writer,
-                                                         startSize,
-                                                         chunkSize,
-                                                         bridgeConfig,
-                                                         executor);
-        } else {
-            throw new UnsupportedOperationException("Can't build a zero-out async bridge");
-        }
+        return new HDF5CompoundDSAsyncBridge<>(name,
+                                               type,
+                                               writer,
+                                               startSize,
+                                               chunkSize,
+                                               bridgeConfig,
+                                               cacheFactory,
+                                               executor);
 
     }
 }
