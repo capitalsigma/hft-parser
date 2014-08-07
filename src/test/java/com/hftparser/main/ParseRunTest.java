@@ -2,6 +2,7 @@ package com.hftparser.main;
 
 import org.junit.Test;
 
+import java.io.File;
 import java.util.Calendar;
 
 import static org.junit.Assert.*;
@@ -9,6 +10,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 public class ParseRunTest {
     private final String TEST_FILENAME = "arcabookftp20101102.csv.gz";
+    private final String TEST_SYMBOLFILE = "src/test/resources/test-symbols.txt";
 
     @Test
     public void testStartCalendarFromFilename() throws Exception {
@@ -25,5 +27,15 @@ public class ParseRunTest {
 
 
         assertThat(actual, equalTo(expected));
+    }
+
+    @Test
+    public void testParseSymbolFile() throws Exception {
+        String[] expected = new String[]{"ABC", "DEF", "GHI", "JKL", "MNO"};
+        File testFile = new File(TEST_SYMBOLFILE);
+        String[] actual = ParseRun.parseSymbolFile(testFile);
+
+        assertThat(actual, equalTo(expected));
+
     }
 }

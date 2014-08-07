@@ -48,7 +48,7 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
     }
 
     public void flush(ElementCache<T> cacheToFlush) {
-        System.out.println("Called flush");
+//        System.out.println("Called flush");
 
 
         writer.writeArrayBlockWithOffset(fullPath, type, cacheToFlush.getElements(), currentOffset);

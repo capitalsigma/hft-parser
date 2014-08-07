@@ -14,9 +14,11 @@ import com.hftparser.readers.DataPoint;
 import com.hftparser.readers.GzipReader;
 import com.hftparser.readers.MarketOrderCollectionFactory;
 import com.hftparser.writers.HDF5Writer;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -98,6 +100,7 @@ public class ParseRun {
                 printErrAndExit("Got error opening symbol file:" + e.toString());
             }
         }
+        System.out.println("Running with symbols: " + Arrays.deepToString(symbols));
 
         try {
             GzipInstream = new FileInputStream(new File(args.bookPath));
@@ -239,7 +242,7 @@ public class ParseRun {
         System.exit(1);
     }
 
-    private static String[] parseSymbolFile(File symbolFile)
+    public static @NotNull String[] parseSymbolFile(File symbolFile)
             throws IOException {
         ArrayList<String> ret = new ArrayList<>();
         String line;

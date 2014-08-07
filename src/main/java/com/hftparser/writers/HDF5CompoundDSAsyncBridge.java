@@ -26,7 +26,7 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
 
         @Override
         public void run() {
-            System.out.println("Flushing.");
+//            System.out.println("Flushing.");
             flush(cacheToWrite);
             isDone = true;
         }
@@ -70,7 +70,7 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
 
     @Override
     protected void doFlush() {
-        System.out.println("Called async doFlush");
+//        System.out.println("Called async doFlush");
         waitForLastWriter();
         lastWriter = new Writer(cache);
 
