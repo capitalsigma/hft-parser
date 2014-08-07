@@ -8,10 +8,7 @@ import com.hftparser.config.HDF5CompoundDSBridgeConfig;
  * Created by patrick on 7/31/14.
  */
 public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
-//    protected final T[] cache;
-//    protected final int cacheSize;
-//    protected int currentCacheOffset;
-    ElementCache<T> cache;
+    protected ElementCache<T> cache;
 
 
     protected HDF5CompoundDSCachingBridge() {
@@ -47,11 +44,15 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
 
     @Override
     public void flush() {
-        System.out.println("Called flush");
-        //    template method
+        flush(cache);
+    }
 
-        writer.writeArrayBlockWithOffset(fullPath, type, cache.getElements(), currentOffset);
-        currentOffset += cache.getCurrentCacheOffset();
-        cache.resetCurrentCacheOffset();
+    public void flush(ElementCache<T> cacheToFlush) {
+        System.out.println("Called flush");
+
+
+        writer.writeArrayBlockWithOffset(fullPath, type, cacheToFlush.getElements(), currentOffset);
+        currentOffset += cacheToFlush.getCurrentCacheOffset();
+        cacheToFlush.resetCurrentCacheOffset();
     }
 }

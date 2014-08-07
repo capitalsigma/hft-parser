@@ -29,15 +29,7 @@ public class HDF5CompoundDSAsyncBridgeTest extends HDF5CompoundDSCutoffCachingBr
 
     @Override
     public void testAppendElement() throws Exception {
-        for (int i = 0; i < 4; i++) {
-            getDtBridge().appendElement(testPoint1);
-            System.out.println("Got: " + Arrays.deepToString(this.getDtBridge().readBlock(0, 5)));
-            assertTrue(Arrays.deepEquals(this.getDtBridge().readBlock(0, 5), emptyPoints));
-        }
-        this.getDtBridge().appendElement(testPoint1);
-        //        System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
-        assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 5), fullPoints));
-//        super.testAppendElement();
+        super.testAppendElement();
         testWriterWasSpawned();
     }
 

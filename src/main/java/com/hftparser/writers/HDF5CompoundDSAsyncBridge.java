@@ -13,14 +13,21 @@ import java.util.concurrent.Executor;
 public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T> {
     private Executor executor;
     private Writer lastWriter;
+    private ElementCache<T> cacheOne;
+    private ElementCache<T> cacheTwo;
 
     public class Writer implements Runnable {
         boolean isDone = false;
+        ElementCache<T> cacheToWrite;
+
+        public Writer(ElementCache<T> cacheToWrite) {
+            this.cacheToWrite = cacheToWrite;
+        }
 
         @Override
         public void run() {
             System.out.println("Flushing.");
-            flush();
+            flush(cacheToWrite);
             isDone = true;
         }
 
@@ -28,7 +35,6 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
             return isDone;
         }
     }
-
 
     public HDF5CompoundDSAsyncBridge(DatasetName name,
                                      HDF5CompoundType<T> type,
@@ -39,10 +45,19 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
                                      ElementCacheFactory<T> cacheFactory,
                                      Executor executor) {
         super(name, type, writer, startSize, chunkSize, bridgeConfig, cacheFactory);
+        cacheOne = cache;
+        cacheTwo = cacheFactory.getCache();
         this.executor = executor;
     }
 
 
+    private void swapCaches() {
+        if (cache == cacheOne) {
+            cache = cacheTwo;
+        } else {
+            cache = cacheOne;
+        }
+    }
 
     public Writer getLastWriter() {
         return lastWriter;
@@ -57,8 +72,15 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
     protected void doFlush() {
         System.out.println("Called async doFlush");
         waitForLastWriter();
-        lastWriter = new Writer();
+        lastWriter = new Writer(cache);
 
         executor.execute(lastWriter);
+        swapCaches();
+    }
+
+    @Override
+    public void flush() {
+        waitForLastWriter();
+        super.flush();
     }
 }

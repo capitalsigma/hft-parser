@@ -84,6 +84,7 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
             assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 5), emptyPoints));
         }
         getDtBridge().appendElement(testPoint1);
+        Thread.sleep(200);
         //        System.out.println("Got: " + Arrays.deepToString(dtBridge.readBlock(0, 5)));
         assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 5), fullPoints));
     }
@@ -100,6 +101,7 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
         assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 3), threeEmpty));
 
         getDtBridge().flush();
+        Thread.sleep(200);
 
         assertTrue(Arrays.deepEquals(getDtBridge().readBlock(0, 3), onePointBlock));
     }
@@ -117,6 +119,8 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
         }
         getDtBridge().flush();
 
+        Thread.sleep(200);
+
         actual = getDtBridge().readBlock(0, 10);
 
         System.out.println("Got: (testZeroOutExtra) " + Arrays.deepToString(actual));
@@ -131,6 +135,8 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
         }
 
         getDtBridge().flush();
+
+        Thread.sleep(200);
 
         assertEquals(6, getDtBridge().readArray().length);
     }
