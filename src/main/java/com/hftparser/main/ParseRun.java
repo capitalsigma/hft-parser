@@ -48,6 +48,7 @@ public class ParseRun {
     private static HDF5CompoundDSBridgeConfig hdf5CompoundDSBridgeConfig;
     private static Calendar startCalendar;
     private static InputStream gzipInstream;
+    private static String bookPath;
 
     //    private static int MIN_BACKOFF;
 //    private static int MAX_BACKOFF;
@@ -75,11 +76,6 @@ public class ParseRun {
         //        private String statsPath;
     }
 
-
-    public ParseRun() {
-//        for jmockit
-
-    }
 
     public static void main(String[] argv) {
         Args args = new Args();
@@ -123,11 +119,8 @@ public class ParseRun {
         }
         System.out.println("Running with symbols: " + Arrays.deepToString(symbols));
 
-        try {
-            gzipInstream = new FileInputStream(new File(args.bookPath));
-        } catch (FileNotFoundException e) {
-            printErrAndExit("Error opening book file.");
-        }
+        bookPath = args.bookPath;
+        outFile = new File(args.outPath);
 
         try {
             configFactory = ConfigFactory.fromPath(args.configPath);
@@ -146,10 +139,6 @@ public class ParseRun {
         dBackoffOne = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.DataPoint);
         dBackoffTwo = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.DataPoint);
 
-        outFile = new File(args.outPath);
-        linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE, sBackoffOne, sBackoffTwo);
-        dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE, dBackoffOne, dBackoffTwo);
-
         marketOrderCollectionConfig = configFactory.getMarketOrderCollectionConfig();
         orderCollectionFactory = new MarketOrderCollectionFactory(marketOrderCollectionConfig);
         arcaParserConfig = configFactory.getArcaParserConfig();
@@ -159,7 +148,7 @@ public class ParseRun {
 
 
         if (args.numPerRun == null) {
-            runForSymbols(symbols);
+            runLoop(symbols, symbols.length);
         } else {
             runLoop(symbols, args.numPerRun);
         }
@@ -168,6 +157,19 @@ public class ParseRun {
         endTime = System.currentTimeMillis();
         System.out.println("Successfully created " + args.outPath);
         printTotalTime(startTime, endTime);
+    }
+
+    private static void initQueues() {
+        linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE, sBackoffOne, sBackoffTwo);
+        dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE, dBackoffOne, dBackoffTwo);
+    }
+
+    private static void openGzipInstream() {
+        try {
+            gzipInstream = new FileInputStream(new File(bookPath));
+        } catch (FileNotFoundException e) {
+            printErrAndExit("Error opening book file.");
+        }
     }
 
     public static void runLoop(String[] allSymbols,
@@ -202,7 +204,6 @@ public class ParseRun {
 
     public static HDF5Writer runForSymbols(String[] symbols, boolean preserveForNextRun)
             throws InterruptedRunException {
-
         GzipReader gzipReader = null;
         ArcaParser parser;
         HDF5Writer writer;
@@ -211,8 +212,13 @@ public class ParseRun {
         Thread writerThread;
         Thread[] allThreads;
 
+        System.out.println("Running on symbol subset:" + Arrays.deepToString(symbols));
+
         long startTime = System.currentTimeMillis();
         long endTime;
+
+        openGzipInstream();
+        initQueues();
 
         try {
             gzipReader = new GzipReader(gzipInstream, linesReadQueue);
@@ -227,9 +233,7 @@ public class ParseRun {
         parser = new ArcaParser(symbols, linesReadQueue, dataPointQueue, orderCollectionFactory, arcaParserConfig);
         writer = new HDF5Writer(dataPointQueue, outFile, hdf5WriterConfig, hdf5CompoundDSBridgeConfig);
 
-        if (preserveForNextRun) {
-            writer.setCloseFileAtEnd(false);
-        }
+        writer.setCloseFileAtEnd(false);
 
 
         if (startCalendar != null) {
@@ -258,6 +262,8 @@ public class ParseRun {
             writer.closeFile();
             throw new InterruptedRunException();
         } finally {
+            endTime = System.currentTimeMillis();
+            printRunTime(startTime, endTime);
             printQueueUsage();
         }
         return writer;
