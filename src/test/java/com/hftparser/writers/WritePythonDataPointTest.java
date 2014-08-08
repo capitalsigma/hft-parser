@@ -48,7 +48,8 @@
 //                                                                                       .MAX_DEFLATION_LEVEL, 5);
 //
 //            writer = HDF5Writer.getWriter(file);
-//            HDF5CompoundDSBridgeBuilder<PythonWritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer, config);
+//            HDF5CompoundDSBridgeBuilder<PythonWritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>
+// (writer, config);
 //            dtBuilder.setChunkSize(5);
 //            dtBuilder.setStartSize(5);
 //            dtBuilder.setTypeFromInferred(PythonWritableDataPoint.class);

@@ -6,7 +6,10 @@ import ch.systemsx.cisd.hdf5.IHDF5Writer;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by patrick on 7/28/14.
@@ -93,7 +96,9 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         async = bridgeConfig.isAsync();
     }
 
-    public HDF5CompoundDSBridge<T> build(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
+    public HDF5CompoundDSBridge<T> build(
+            @NotNull
+            DatasetName name) throws HDF5FormatNotFoundException {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         } else {
@@ -110,11 +115,15 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         }
     }
 
-    public HDF5CompoundDSCachingBridge<T> buildCaching(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
+    public HDF5CompoundDSCachingBridge<T> buildCaching(
+            @NotNull
+            DatasetName name) throws HDF5FormatNotFoundException {
         return new HDF5CompoundDSCachingBridge<>(name, type, writer, startSize, chunkSize, bridgeConfig, cacheFactory);
     }
 
-    public HDF5CompoundDSReadOnlyBridge<T> buildReadOnly(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
+    public HDF5CompoundDSReadOnlyBridge<T> buildReadOnly(
+            @NotNull
+            DatasetName name) throws HDF5FormatNotFoundException {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         }
@@ -148,7 +157,9 @@ public class HDF5CompoundDSBridgeBuilder<T> {
                                           new ArrayBlockingQueue<Runnable>(200));
     }
 
-    public HDF5CompoundDSAsyncBridge<T> buildAsync(@NotNull DatasetName name) throws HDF5FormatNotFoundException {
+    public HDF5CompoundDSAsyncBridge<T> buildAsync(
+            @NotNull
+            DatasetName name) throws HDF5FormatNotFoundException {
         if (executor == null) {
             initExecutor();
         }

@@ -1,6 +1,5 @@
 package com.hftparser.config;
 
-import com.hftparser.config.*;
 import org.json.JSONObject;
 
 import java.io.IOException;

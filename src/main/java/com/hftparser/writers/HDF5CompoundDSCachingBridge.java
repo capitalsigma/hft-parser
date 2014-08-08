@@ -32,12 +32,12 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
     public void appendElement(T element) {
         cache.appendElement(element);
 
-        if (cache.isFull()){
+        if (cache.isFull()) {
             doFlush();
         }
     }
 
-//    split this off so we can override
+    //    split this off so we can override
     protected void doFlush() {
         flush();
     }
@@ -48,7 +48,7 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
     }
 
     public void flush(ElementCache<T> cacheToFlush) {
-//        System.out.println("Called flush");
+        //        System.out.println("Called flush");
 
 
         writer.writeArrayBlockWithOffset(fullPath, type, cacheToFlush.getElements(), currentOffset);

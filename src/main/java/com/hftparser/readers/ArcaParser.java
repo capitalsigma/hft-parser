@@ -1,26 +1,28 @@
 package com.hftparser.readers;
 
 
+import com.hftparser.config.ArcaParserConfig;
+import com.hftparser.containers.WaitFreeQueue;
+
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
-import com.hftparser.config.ArcaParserConfig;
-import com.hftparser.containers.WaitFreeQueue;
-
 enum RecordType {
-	Add, Modify, Delete
+    Add,
+    Modify,
+    Delete
 }
 
 class Order {
-	final long price;
-	final long quantity;
+    final long price;
+    final long quantity;
 
-	public Order(long _price, long _quantity) {
-		price = _price;
-		quantity = _quantity;
-	}
+    public Order(long _price, long _quantity) {
+        price = _price;
+        quantity = _quantity;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -73,9 +75,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
     // Split CSVs on commas
     private final String INPUT_SPLIT = ",";
-//    private final Pattern SPLITTER;
-//    private final Pattern ROW_NEEDED;
-
+    //    private final Pattern SPLITTER;
+    //    private final Pattern ROW_NEEDED;
 
 
     // For modify, we need to pull at most 12 things out of record
@@ -135,9 +136,9 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         startTimestamp = 0;
 
-//        SPLITTER = Pattern.compile(INPUT_SPLIT);
+        //        SPLITTER = Pattern.compile(INPUT_SPLIT);
 
-//        SPLITTER = Splitter.on(INPUT_SPLIT).trimResults().omitEmptyStrings();
+        //        SPLITTER = Splitter.on(INPUT_SPLIT).trimResults().omitEmptyStrings();
     }
 
     public ArcaParser(String[] _tickers,
@@ -192,11 +193,11 @@ public class ArcaParser extends AbstractParser implements Runnable {
         Order changedOrder = new Order(price, qty);
         Order toModify = orderHistory.get(refNum);
 
-//        System.out.println("toModify: " + toModify.toString());
-//        System.out.println("changedOrder: " + changedOrder.toString());
-//        System.out.println("Equal? " + changedOrder.equals(toModify));
+        //        System.out.println("toModify: " + toModify.toString());
+        //        System.out.println("changedOrder: " + changedOrder.toString());
+        //        System.out.println("Equal? " + changedOrder.equals(toModify));
 
-//        otherwise we write out too many records
+        //        otherwise we write out too many records
         if (changedOrder.equals(toModify)) {
             return;
         }
@@ -228,13 +229,19 @@ public class ArcaParser extends AbstractParser implements Runnable {
         processRecord(recType, seqNum, refNum, ordType, -1l, ticker, -1l, timeStamp);
     }
 
-    void processRecord(RecordType recType, long seqNum, long refNum, OrderType ordType, long qty, String ticker,
-                       Long price, long timeStamp) {
+    void processRecord(RecordType recType,
+                       long seqNum,
+                       long refNum,
+                       OrderType ordType,
+                       long qty,
+                       String ticker,
+                       Long price,
+                       long timeStamp) {
         assert ordersNow.containsKey(ticker) && ordersNow.get(ticker).containsKey(ordType);
 
         MarketOrderCollection toUpdate = ordersNow.get(ticker).get(ordType);
 
-//        System.out.println("parsing for refnum: " + refNum);
+        //        System.out.println("parsing for refnum: " + refNum);
 
 
         switch (recType) {
@@ -253,8 +260,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
         MarketOrderCollection buyOrders = ordersForTicker.get(OrderType.Buy);
         MarketOrderCollection sellOrders = ordersForTicker.get(OrderType.Sell);
 
-//        System.out.println("buy orders dirty? " + buyOrders.isDirty());
-//        System.out.println("sell orders dirty? " + sellOrders.isDirty());
+        //        System.out.println("buy orders dirty? " + buyOrders.isDirty());
+        //        System.out.println("sell orders dirty? " + sellOrders.isDirty());
 
         if ((buyOrders.isDirty() || sellOrders.isDirty())) {
             long[][] toBuyNow = buyOrders.topN();
@@ -271,7 +278,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
             }
         }
 
-//               if neither dataset has changed since the last time we wrote it, skip it
+        //               if neither dataset has changed since the last time we wrote it, skip it
     }
 
 
@@ -347,7 +354,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
             timeStamp = makeTimestamp(asSplit[8], asSplit[9]);
 
-//            System.out.println("Adding refnum: " + refNum);
+            //            System.out.println("Adding refnum: " + refNum);
             orderHistory.put(refNum, new Order(price, qty));
 
             processRecord(recType, seqNum, refNum, ordType, qty, ticker, price, timeStamp);

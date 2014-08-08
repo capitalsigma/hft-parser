@@ -12,7 +12,8 @@ import org.junit.Test;
 import java.io.File;
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class HDF5CompoundDSZeroOutCachingBridgeTest {
     private final String TEST_PATH = "test-out.h5";
@@ -39,10 +40,12 @@ public class HDF5CompoundDSZeroOutCachingBridgeTest {
 
             HDF5CompoundDSBridgeConfig config = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
                                                                                HDF5GenericStorageFeatures
-                                                                                       .MAX_DEFLATION_LEVEL, 5);
+                                                                                       .MAX_DEFLATION_LEVEL,
+                                                                               5);
 
             writer = HDF5Writer.getWriter(file);
-            HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer, config);
+            HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder =
+                    new HDF5CompoundDSBridgeBuilder<>(writer, config);
             dtBuilder.setChunkSize(5);
             dtBuilder.setStartSize(5);
             dtBuilder.setTypeFromInferred(WritableDataPoint.class);
@@ -67,8 +70,9 @@ public class HDF5CompoundDSZeroOutCachingBridgeTest {
     public void testZeroOut() throws Exception {
         //        Note that we don't do this anymore, but it looks like readBlock just gives us zero-value elements
         // if the requested element doesn't exist. So we'll leave this test.
-        WritableDataPoint[] expected = new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1,
-                testPoint1, testPoint1, emptyPoint, emptyPoint, emptyPoint, emptyPoint};
+        WritableDataPoint[] expected =
+                new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1, testPoint1, testPoint1,
+                        emptyPoint, emptyPoint, emptyPoint, emptyPoint};
         WritableDataPoint[] actual;
 
         for (int i = 0; i < 6; i++) {

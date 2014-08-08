@@ -1,9 +1,7 @@
 package com.hftparser.writers;
 
-import static org.junit.Assert.*;
-
-//import ncsa.hdf.object.FileFormat;
-
+import com.hftparser.containers.WaitFreeQueue;
+import com.hftparser.readers.DataPoint;
 import com.hftparser.readers.WritableDataPoint;
 import org.junit.After;
 import org.junit.Before;
@@ -11,11 +9,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import com.hftparser.containers.WaitFreeQueue;
-import com.hftparser.readers.DataPoint;
-
 import java.io.File;
 import java.util.HashMap;
+
+import static org.junit.Assert.assertTrue;
+
+//import ncsa.hdf.object.FileFormat;
 
 @RunWith(JUnit4.class)
 public class HDF5WriterTest {
@@ -31,8 +30,8 @@ public class HDF5WriterTest {
 
     @Test
     public void testRun() throws Exception {
-        DataPoint testPoint1 = new DataPoint("FOO", new long[][]{{1, 2}}, new long[][] {{3, 4}}, 6, 10l);
-        DataPoint testPoint2 = new DataPoint("FOO", new long[][]{{4, 5}}, new long[][] {{6, 7}}, 7, 101l);
+        DataPoint testPoint1 = new DataPoint("FOO", new long[][]{{1, 2}}, new long[][]{{3, 4}}, 6, 10l);
+        DataPoint testPoint2 = new DataPoint("FOO", new long[][]{{4, 5}}, new long[][]{{6, 7}}, 7, 101l);
 
         WritableDataPoint expected1 = testPoint1.getWritable();
         WritableDataPoint expected2 = testPoint2.getWritable();
@@ -47,9 +46,9 @@ public class HDF5WriterTest {
 
         Thread.sleep(100);
 
-//        inQ.acceptingOrders = false;
-//
-//        runThread.join();
+        //        inQ.acceptingOrders = false;
+        //
+        //        runThread.join();
 
 
         HDF5CompoundDSBridge<WritableDataPoint> dsBridge = tickerMap.get("FOO");

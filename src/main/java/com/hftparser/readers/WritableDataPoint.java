@@ -9,15 +9,15 @@ import java.util.Arrays;
  */
 public class WritableDataPoint {
 
-//    NOTE: this is ugly, but this way it doesn't get written out to the output.
-//    TODO: refactor this as an inner class of something to avoid this
-//    private final int LEVELS = ArcaParser.LEVELS;
-//NOTE: 336 bytes per record
+    //    NOTE: this is ugly, but this way it doesn't get written out to the output.
+    //    TODO: refactor this as an inner class of something to avoid this
+    //    private final int LEVELS = ArcaParser.LEVELS;
+    //NOTE: 336 bytes per record
 
     @CompoundElement(memberName = "bid", dimensions = {ArcaParser.LEVELS, 2})
     protected long[][] buy;
 
-    @CompoundElement(memberName =  "ask", dimensions = {ArcaParser.LEVELS, 2})
+    @CompoundElement(memberName = "ask", dimensions = {ArcaParser.LEVELS, 2})
     protected long[][] sell;
 
     @CompoundElement(memberName = "timestamp")
@@ -33,20 +33,20 @@ public class WritableDataPoint {
         this.seqNum = seqNum;
     }
 
-    private long[][] padArray(long[][] toPad){
+    private long[][] padArray(long[][] toPad) {
         if (toPad.length != ArcaParser.LEVELS) {
             return buildNew(toPad);
         }
         return toPad;
     }
 
-    private long[][] buildNew(long[][] toPad){
+    private long[][] buildNew(long[][] toPad) {
         long[][] ret = new long[ArcaParser.LEVELS][2];
 
-        for(int i = 0; i < ArcaParser.LEVELS; i++){
-//            System.out.println("Checking for line:" + i + ", in.len = " + toPad.length);
-            if((toPad.length <= i) || (toPad[i] == null)) {
-                ret[i] = new long[] {0, 0};
+        for (int i = 0; i < ArcaParser.LEVELS; i++) {
+            //            System.out.println("Checking for line:" + i + ", in.len = " + toPad.length);
+            if ((toPad.length <= i) || (toPad[i] == null)) {
+                ret[i] = new long[]{0, 0};
             } else {
                 ret[i] = toPad[i];
             }
@@ -67,17 +67,17 @@ public class WritableDataPoint {
 
         return equals(that);
 
-//        if (seqNum != that.seqNum) {
-//            return false;
-//        }
-//        if (timeStamp != that.timeStamp) {
-//            return false;
-//        }
-//
-//        return true;
+        //        if (seqNum != that.seqNum) {
+        //            return false;
+        //        }
+        //        if (timeStamp != that.timeStamp) {
+        //            return false;
+        //        }
+        //
+        //        return true;
     }
 
-    public boolean equals(WritableDataPoint other){
+    public boolean equals(WritableDataPoint other) {
         return (other != null) &&
                 other.timeStamp == timeStamp &&
                 other.seqNum == seqNum &&
@@ -86,7 +86,7 @@ public class WritableDataPoint {
     }
 
     //    needed for the HDF5 business
-    public WritableDataPoint(){
+    public WritableDataPoint() {
 
     }
 

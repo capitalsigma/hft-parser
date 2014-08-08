@@ -51,7 +51,7 @@ public class ParseRun {
     private static String bookPath;
 
     //    private static int MIN_BACKOFF;
-//    private static int MAX_BACKOFF;
+    //    private static int MAX_BACKOFF;
 
     private static class Args {
         @Parameter
@@ -92,23 +92,17 @@ public class ParseRun {
         long startTime = System.currentTimeMillis();
         long endTime;
 
-        if(args.bookPath == null || args.outPath == null || args.configPath == null) {
+        if (args.bookPath == null || args.outPath == null || args.configPath == null) {
             System.out.println("Book path and output path must be specified.");
             return;
         }
 
-        if(args.symbolPath == null){
-            symbols = new String[] {
-                "SPY", "DIA", "QQQ",
-                "XLK", "XLF", "XLP", "XLE", "XLY", "XLV", "XLB",
-                "VCR", "VDC", "VHT", "VIS", "VAW", "VNQ", "VGT", "VOX", "VPU",
-                "XOM", "RDS", "BP",
-                "HD", "LOW", "XHB",
-                "MS", "GS", "BAC", "JPM", "C",
-                "CME", "NYX",
-                "AAPL", "MSFT", "GOOG", "CSCO",
-                "GE", "CVX", "JNJ", "IBM", "PG", "PFE",
-            };
+        if (args.symbolPath == null) {
+            symbols =
+                    new String[]{"SPY", "DIA", "QQQ", "XLK", "XLF", "XLP", "XLE", "XLY", "XLV", "XLB", "VCR", "VDC",
+                            "VHT", "VIS", "VAW", "VNQ", "VGT", "VOX", "VPU", "XOM", "RDS", "BP", "HD", "LOW", "XHB",
+                            "MS", "GS", "BAC", "JPM", "C", "CME", "NYX", "AAPL", "MSFT", "GOOG", "CSCO", "GE", "CVX",
+                            "JNJ", "IBM", "PG", "PFE",};
         } else {
             File symbolFile = new File(args.symbolPath);
             try {
@@ -183,7 +177,7 @@ public class ParseRun {
                 previousWriter = runForSymbols(symbolsForThisRun, i != 0);
             }
 
-            if(previousWriter != null) {
+            if (previousWriter != null) {
                 previousWriter.closeFile();
             }
 
@@ -197,7 +191,7 @@ public class ParseRun {
             return runForSymbols(symbols, false);
         } catch (InterruptedRunException e) {
             System.out.println("Run was interrupted early. Quitting.");
-//            we've already done all the error handling we can do, just fail
+            //            we've already done all the error handling we can do, just fail
             return null;
         }
     }
@@ -278,7 +272,7 @@ public class ParseRun {
 
 
     public static Calendar startCalendarFromFilename(String bookPath) {
-//        format is YYYYMMDD
+        //        format is YYYYMMDD
         String datePattern = "\\D+(\\d{4})(\\d{2})(\\d{2})\\.csv\\.gz";
         Pattern dateRe = Pattern.compile(datePattern);
         Matcher matcher = dateRe.matcher(bookPath);
@@ -334,13 +328,14 @@ public class ParseRun {
         System.exit(1);
     }
 
-    public static @NotNull String[] parseSymbolFile(File symbolFile)
-            throws IOException {
+    public static
+    @NotNull
+    String[] parseSymbolFile(File symbolFile) throws IOException {
         ArrayList<String> ret = new ArrayList<>();
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(symbolFile));
 
-        while((line = reader.readLine()) != null) {
+        while ((line = reader.readLine()) != null) {
             ret.add(line.trim());
         }
         reader.close();

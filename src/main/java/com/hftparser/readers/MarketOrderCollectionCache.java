@@ -32,7 +32,7 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
         if (isDirty()) {
             cache = decoratedCollection.topN();
             dirty = false;
-//            System.out.println("Setting dirty false");
+            //            System.out.println("Setting dirty false");
         }
 
         return cache;
@@ -41,8 +41,8 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
 
     @Override
     public Long put(Long price, Long quantity) {
-//        System.out.println("decoratedCollection.sortedKeys.headSet(price).size(): " +
-//                                   decoratedCollection.sortedKeys.headSet(price).size());
+        //        System.out.println("decoratedCollection.sortedKeys.headSet(price).size(): " +
+        //                                   decoratedCollection.sortedKeys.headSet(price).size());
 
         if (decoratedCollection.sortedKeys.headSet(price).size() < decoratedCollection.maxKeyCount) {
             dirty = true;

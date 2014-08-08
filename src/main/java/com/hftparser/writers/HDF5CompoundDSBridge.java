@@ -10,17 +10,21 @@ import com.hftparser.config.HDF5CompoundDSBridgeConfig;
  */
 class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
     protected long currentOffset;
-//    protected final IHDF5CompoundWriter writer;
-//    protected final String fullPath;
+    //    protected final IHDF5CompoundWriter writer;
+    //    protected final String fullPath;
     private final T[] elToWrite;
-//    protected final HDF5CompoundType<T> type;
+    //    protected final HDF5CompoundType<T> type;
 
     protected HDF5CompoundDSBridge() {
         elToWrite = null;
     }
 
-    public HDF5CompoundDSBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer,
-                                long startSize, int chunkSize, HDF5CompoundDSBridgeConfig bridgeConfig) {
+    public HDF5CompoundDSBridge(DatasetName name,
+                                HDF5CompoundType<T> type,
+                                IHDF5CompoundWriter writer,
+                                long startSize,
+                                int chunkSize,
+                                HDF5CompoundDSBridgeConfig bridgeConfig) {
         super(name, type, writer);
 
         HDF5GenericStorageFeatures features = initFeatures(bridgeConfig);
@@ -33,8 +37,7 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
 
     protected HDF5GenericStorageFeatures initFeatures(HDF5CompoundDSBridgeConfig bridgeConfig) {
         //            System.out.println("Initialized with: " + bridgeConfig.toString());
-        HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder = HDF5GenericStorageFeatures
-                .build();
+        HDF5GenericStorageFeatures.HDF5GenericStorageFeatureBuilder featureBuilder = HDF5GenericStorageFeatures.build();
 
         //            if(bridgeConfig.isDefault_storage_layout()) {
         //                featureBuilder.defaultStorageLayout();

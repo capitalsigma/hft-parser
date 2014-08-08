@@ -28,7 +28,7 @@ public class HDF5CompoundDSReadOnlyBridge<T> {
         return writer.readArrayBlockWithOffset(fullPath, type, blocksize, offset);
     }
 
-    public T[] readBlock(long offset){
+    public T[] readBlock(long offset) {
         return readBlock(offset, 1);
     }
 

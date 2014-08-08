@@ -34,6 +34,7 @@ abstract public class ElementCache<T> {
 
 
     abstract public void setEmptyElement(T element);
+
     abstract protected T[] fixUp();
 }
 

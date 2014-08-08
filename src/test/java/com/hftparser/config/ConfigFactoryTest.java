@@ -6,7 +6,7 @@ import ch.systemsx.cisd.hdf5.IHDF5WriterConfigurator;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 // TODO: we really want to catch all these JSONExceptions and rethrow a BadConfigFileError
 public class ConfigFactoryTest {
@@ -22,7 +22,8 @@ public class ConfigFactoryTest {
     @Test
     public void testGetHdf5CompoundDSBridgeConfig() throws Exception {
         HDF5CompoundDSBridgeConfig expected = new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.COMPACT,
-                HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL);
+                                                                             HDF5GenericStorageFeatures
+                                                                                     .MAX_DEFLATION_LEVEL);
         HDF5CompoundDSBridgeConfig actual = factory.getHdf5CompoundDSBridgeConfig();
 
         assertEquals(expected, actual);
@@ -50,8 +51,8 @@ public class ConfigFactoryTest {
 
     @Test
     public void testGetHdf5WriterConfig() throws Exception {
-        HDF5WriterConfig expected = new HDF5WriterConfig(false, true, true,
-                IHDF5WriterConfigurator.SyncMode.SYNC, 500000, 100);
+        HDF5WriterConfig expected =
+                new HDF5WriterConfig(false, true, true, IHDF5WriterConfigurator.SyncMode.SYNC, 500000, 100);
         HDF5WriterConfig actual = factory.getHdf5WriterConfig();
 
         System.out.println("Expected: " + expected.toString());

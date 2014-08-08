@@ -1,10 +1,8 @@
 package com.hftparser.main;
 
 import com.hftparser.writers.HDF5Writer;
-import mockit.Expectations;
 import mockit.Mock;
 import mockit.MockUp;
-import mockit.Mocked;
 import mockit.integration.junit4.JMockit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,8 +11,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Calendar;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 class MockParseRun extends MockUp<ParseRun> {
     static int invocationCount = 0;
@@ -45,9 +43,9 @@ class MockParseRun extends MockUp<ParseRun> {
         return null;
     }
 
-//    public static void runLoop(String[] symbols, Integer numPerRun) {
-//        ParseRun.
-//    }
+    //    public static void runLoop(String[] symbols, Integer numPerRun) {
+    //        ParseRun.
+    //    }
 }
 
 @RunWith(JMockit.class)
@@ -60,7 +58,7 @@ public class ParseRunTest {
         Calendar expected = Calendar.getInstance();
         expected.clear();
         expected.set(2010, Calendar.NOVEMBER, 2, 0, 0, 0);
-//        expected.setTimeZone(TimeZone.getTimeZone("UTC"));
+        //        expected.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         Calendar actual = ParseRun.startCalendarFromFilename(TEST_FILENAME);
 

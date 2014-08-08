@@ -1,7 +1,6 @@
 package com.hftparser.writers;
 
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
-import ch.systemsx.cisd.hdf5.HDF5GenericStorageFeatures;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 
@@ -26,7 +25,7 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
 
         @Override
         public void run() {
-//            System.out.println("Flushing.");
+            //            System.out.println("Flushing.");
             flush(cacheToWrite);
             isDone = true;
         }
@@ -65,12 +64,13 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
 
     private void waitForLastWriter() {
         //noinspection StatementWithEmptyBody
-        while ((lastWriter != null) && (!lastWriter.isDone())) { }
+        while ((lastWriter != null) && (!lastWriter.isDone())) {
+        }
     }
 
     @Override
     protected void doFlush() {
-//        System.out.println("Called async doFlush");
+        //        System.out.println("Called async doFlush");
         waitForLastWriter();
         lastWriter = new Writer(cache);
 

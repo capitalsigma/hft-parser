@@ -10,17 +10,13 @@ public class DataPoint {
     private final long seqNum;
     private final String ticker;
 
-    public DataPoint(String _ticker,
-                     long[][] _buy,
-                     long[][] _sell,
-                     long _timeStamp,
-                     long _seqNum) {
-		ticker = _ticker;
-		buy = _buy;
+    public DataPoint(String _ticker, long[][] _buy, long[][] _sell, long _timeStamp, long _seqNum) {
+        ticker = _ticker;
+        buy = _buy;
         sell = _sell;
-		timeStamp = _timeStamp;
-		seqNum = _seqNum;
-	}
+        timeStamp = _timeStamp;
+        seqNum = _seqNum;
+    }
 
 
     public String getTicker() {
@@ -28,18 +24,15 @@ public class DataPoint {
     }
 
 
-
-
-
     public void print() {
         System.out.println(this.toString());
-	}
+    }
 
 
-	public boolean equals(DataPoint other) {
-		if(other == null) {
-			return false;
-		}
+    public boolean equals(DataPoint other) {
+        if (other == null) {
+            return false;
+        }
 
         boolean res = other.ticker.equals(ticker) &&
                 (other.seqNum == seqNum) &&
@@ -47,17 +40,17 @@ public class DataPoint {
                 Arrays.deepEquals(other.buy, buy) &&
                 Arrays.deepEquals(other.sell, sell);
 
-//        System.out.println("Testing pair:");
-//
-//        print();
-//        other.print();
-//
-//        System.out.println("Equal?" + res);
+        //        System.out.println("Testing pair:");
+        //
+        //        print();
+        //        other.print();
+        //
+        //        System.out.println("Equal?" + res);
 
-		return res;
-	}
+        return res;
+    }
 
-    public WritableDataPoint getWritable(){
+    public WritableDataPoint getWritable() {
         return new WritableDataPoint(buy, sell, timeStamp, seqNum);
 
     }

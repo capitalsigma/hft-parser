@@ -1,14 +1,16 @@
 package com.hftparser.writers;
 
-import java.io.File;
-import java.util.HashMap;
-
-import ch.systemsx.cisd.hdf5.*;
+import ch.systemsx.cisd.hdf5.HDF5Factory;
+import ch.systemsx.cisd.hdf5.IHDF5Writer;
+import ch.systemsx.cisd.hdf5.IHDF5WriterConfigurator;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import com.hftparser.config.HDF5WriterConfig;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.DataPoint;
 import com.hftparser.readers.WritableDataPoint;
+
+import java.io.File;
+import java.util.HashMap;
 
 
 public class HDF5Writer implements Runnable {
@@ -28,8 +30,10 @@ public class HDF5Writer implements Runnable {
     // Here we try to open up a new HDF5 file in the path we've been
     // given, and raise abstraction-appropriate exceptions if
     // something goes wrong.
-    public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue, File outFile, HDF5WriterConfig writerConfig,
-                       HDF5CompoundDSBridgeConfig bridgeConfig) {
+    public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue,
+                      File outFile,
+                      HDF5WriterConfig writerConfig,
+                      HDF5CompoundDSBridgeConfig bridgeConfig) {
 
         fileWriter = getWriter(outFile, writerConfig);
         START_SIZE = writerConfig.getStart_size();
@@ -47,8 +51,6 @@ public class HDF5Writer implements Runnable {
         inQueue = _inQueue;
         closeFileAtEnd = false;
     }
-
-
 
 
     public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue, File outFile) {
@@ -106,10 +108,10 @@ public class HDF5Writer implements Runnable {
 
     private static IHDF5Writer getWriter(File file, HDF5WriterConfig writerConfig) {
         IHDF5WriterConfigurator config = HDF5Factory.configure(file);
-        if(writerConfig.isKeep_datasets_if_they_exist()) {
+        if (writerConfig.isKeep_datasets_if_they_exist()) {
             config.keepDataSetsIfTheyExist();
         }
-        if(writerConfig.isOverwrite()) {
+        if (writerConfig.isOverwrite()) {
             config.overwrite();
         }
 

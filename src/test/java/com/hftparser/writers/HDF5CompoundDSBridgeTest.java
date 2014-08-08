@@ -8,7 +8,8 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class HDF5CompoundDSBridgeTest {
     private final String TEST_PATH = "test-out.h5";
@@ -20,12 +21,12 @@ public class HDF5CompoundDSBridgeTest {
     private HDF5CompoundDSBridge<WritableDataPoint> dtBridge;
 
     @Before
-    public void setUp() throws  Exception {
+    public void setUp() throws Exception {
         try {
             File file = new File(TEST_PATH);
 
-            testPoint1 = new WritableDataPoint(new long[][]{{1, 2}}, new long[][] {{3, 4}}, 6, 10l);
-            testPoint2 = new WritableDataPoint(new long[][]{{4, 5}}, new long[][] {{6, 7}}, 7, 101l);
+            testPoint1 = new WritableDataPoint(new long[][]{{1, 2}}, new long[][]{{3, 4}}, 6, 10l);
+            testPoint2 = new WritableDataPoint(new long[][]{{4, 5}}, new long[][]{{6, 7}}, 7, 101l);
 
             writer = HDF5Writer.getWriter(file);
             HDF5CompoundDSBridgeBuilder<WritableDataPoint> dtBuilder = new HDF5CompoundDSBridgeBuilder<>(writer);
@@ -33,12 +34,12 @@ public class HDF5CompoundDSBridgeTest {
             dtBuilder.setStartSize(10);
             dtBuilder.setTypeFromInferred(WritableDataPoint.class);
 
-            dtBridge =  dtBuilder.build(TEST_DS);
+            dtBridge = dtBuilder.build(TEST_DS);
 
         } catch (StackOverflowError e) {
             fail("This library has a bug in HDF5GenericStorageFeatures.java line 425, " +
-                    "that throws it into an infinite loop if .defaultStorageLayout is called. NEVER, " +
-                    "EVER CALL defaultStorageLayout.\n Failed with error: " + e.toString());
+                         "that throws it into an infinite loop if .defaultStorageLayout is called. NEVER, " +
+                         "EVER CALL defaultStorageLayout.\n Failed with error: " + e.toString());
         }
     }
 

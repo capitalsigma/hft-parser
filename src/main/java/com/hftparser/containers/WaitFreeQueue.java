@@ -10,23 +10,22 @@ import java.util.concurrent.atomic.AtomicLong;
 //TODO: remove this tracking stuff after profiling
 // Source: The Art of Multiprocessor Programming, p. 69
 public class WaitFreeQueue<T> {
-	private volatile int head = 0;
+    private volatile int head = 0;
     private volatile int tail = 0;
     private final Backoffable inBackoff;
     private final Backoffable outBackoff;
-	private final T[] items;
-	volatile public boolean acceptingOrders;
-    private final AtomicLong fullHits ;
+    private final T[] items;
+    volatile public boolean acceptingOrders;
+    private final AtomicLong fullHits;
     private final AtomicLong emptyHits;
 
 
-
-	public WaitFreeQueue(int capacity, Backoffable inBackoff, Backoffable outBackoff) {
+    public WaitFreeQueue(int capacity, Backoffable inBackoff, Backoffable outBackoff) {
         //noinspection unchecked
-        items = (T[])new Object[capacity];
-		head = 0;
-		tail = 0;
-		acceptingOrders = true;
+        items = (T[]) new Object[capacity];
+        head = 0;
+        tail = 0;
+        acceptingOrders = true;
 
         fullHits = new AtomicLong();
         emptyHits = new AtomicLong();
@@ -39,35 +38,35 @@ public class WaitFreeQueue<T> {
         this(capacity, new NoOpBackoff(), new NoOpBackoff());
     }
 
-	public boolean enq(T x) {
-		if(tail - head == items.length) {
-			// throw new FullException();
+    public boolean enq(T x) {
+        if (tail - head == items.length) {
+            // throw new FullException();
             fullHits.incrementAndGet();
             inBackoff.backoff();
-			return false;
-		} else {
-			items[tail % items.length] = x;
-			tail++;
-			return true;
-		}
-	}
+            return false;
+        } else {
+            items[tail % items.length] = x;
+            tail++;
+            return true;
+        }
+    }
 
-	public T deq() {
-		if (isEmpty()) {
+    public T deq() {
+        if (isEmpty()) {
             // throw new EmptyException();
             emptyHits.incrementAndGet();
             outBackoff.backoff();
             return null;
         } else {
-			T x = items[head % items.length];
-			head++;
-			return x;
-		}
-	}
+            T x = items[head % items.length];
+            head++;
+            return x;
+        }
+    }
 
-	public boolean isEmpty() {
-		return tail - head == 0;
-	}
+    public boolean isEmpty() {
+        return tail - head == 0;
+    }
 
     public void printUsage() {
         System.out.printf("Full hits: %s\nEmpty hits: %s\n", fullHits.toString(), emptyHits.toString());

@@ -17,7 +17,8 @@ public class ParseRunConfig {
     private final int min_backoff_d;
 
     public static enum BackoffType {
-        String, DataPoint
+        String,
+        DataPoint
     }
 
     public int getLine_queue_size() {
@@ -60,8 +61,13 @@ public class ParseRunConfig {
         max_backoff_d = json.getInt("max_backoff_d");
     }
 
-    public ParseRunConfig(int line_queue_size, int point_queue_size, boolean backoff, int min_backoff_s,
-                          int max_backoff_s, int min_backoff_d, int max_backoff_d) {
+    public ParseRunConfig(int line_queue_size,
+                          int point_queue_size,
+                          boolean backoff,
+                          int min_backoff_s,
+                          int max_backoff_s,
+                          int min_backoff_d,
+                          int max_backoff_d) {
         this.line_queue_size = line_queue_size;
         this.point_queue_size = point_queue_size;
         this.backoff = backoff;
@@ -86,15 +92,24 @@ public class ParseRunConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ParseRunConfig that = (ParseRunConfig) o;
 
-        if (backoff != that.backoff) return false;
-        if (line_queue_size != that.line_queue_size) return false;
-        return max_backoff_d == that.max_backoff_d && max_backoff_s == that.max_backoff_s && min_backoff_d == that
-                .min_backoff_d && min_backoff_s == that.min_backoff_s && point_queue_size == that.point_queue_size;
+        if (backoff != that.backoff) {
+            return false;
+        }
+        if (line_queue_size != that.line_queue_size) {
+            return false;
+        }
+        return max_backoff_d == that.max_backoff_d && max_backoff_s == that.max_backoff_s &&
+                min_backoff_d == that.min_backoff_d && min_backoff_s == that.min_backoff_s &&
+                point_queue_size == that.point_queue_size;
 
     }
 

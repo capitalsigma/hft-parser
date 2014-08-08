@@ -113,8 +113,8 @@ public class HDF5CompoundDSCutoffCachingBridgeTest {
     public void testCutoffExtraEqual() throws Exception {
         //        Note that we don't do this anymore, but it looks like readBlock just gives us zero-value elements
         // if the requested element doesn't exist. So we'll leave this test.
-        WritableDataPoint[] expected = new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1,
-                testPoint1, testPoint1};
+        WritableDataPoint[] expected =
+                new WritableDataPoint[]{testPoint1, testPoint1, testPoint1, testPoint1, testPoint1, testPoint1};
         WritableDataPoint[] actual;
 
         for (int i = 0; i < 6; i++) {

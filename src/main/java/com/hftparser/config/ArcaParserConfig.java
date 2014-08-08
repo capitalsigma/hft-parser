@@ -29,13 +29,17 @@ public class ArcaParserConfig {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         ArcaParserConfig that = (ArcaParserConfig) o;
 
-        return initial_order_history_size == that.initial_order_history_size && output_progress_every == that
-                .output_progress_every;
+        return initial_order_history_size == that.initial_order_history_size &&
+                output_progress_every == that.output_progress_every;
 
     }
 

@@ -31,7 +31,7 @@ public class DiffElement {
 
     public String deepToString() {
         return "DiffElement{" +
-                "expected=" + (expected != null ? expected.getPath(): null) +
+                "expected=" + (expected != null ? expected.getPath() : null) +
                 ", actual=" + (actual != null ? actual.getPath() : null) +
                 ", index=" + index +
                 '}';
@@ -63,13 +63,13 @@ public class DiffElement {
         if (index != that.index) {
             return false;
         }
-//        we compare on paths
-//        if (actual != null ? !actual.equals(that.actual) : that.actual != null) {
-//            return false;
-//        }
-//        if (expected != null ? !expected.equals(that.expected) : that.expected != null) {
-//            return false;
-//        }
+        //        we compare on paths
+        //        if (actual != null ? !actual.equals(that.actual) : that.actual != null) {
+        //            return false;
+        //        }
+        //        if (expected != null ? !expected.equals(that.expected) : that.expected != null) {
+        //            return false;
+        //        }
 
         return compareLinkInformation(this.expected, that.expected) && compareLinkInformation(this.actual, that.actual);
     }

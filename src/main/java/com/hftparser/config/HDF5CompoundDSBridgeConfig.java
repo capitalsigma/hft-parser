@@ -33,8 +33,8 @@ public class HDF5CompoundDSBridgeConfig {
                 throw new BadConfigFileError();
         }
 
-//        String fieldVal = json.optString("deflate_level", "NOSTR");
-//        System.out.println("Got: " + fieldVal);
+        //        String fieldVal = json.optString("deflate_level", "NOSTR");
+        //        System.out.println("Got: " + fieldVal);
         switch (json.optString("deflate_level", "NOSTR")) {
             case "MAX_DEFLATION_LEVEL":
                 deflate_level = HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL;
@@ -54,7 +54,7 @@ public class HDF5CompoundDSBridgeConfig {
 
         if (!json.has("cache_size")) {
             cache_size = -1;
-        }  else {
+        } else {
             cache_size = json.getInt("cache_size");
         }
 
@@ -84,21 +84,23 @@ public class HDF5CompoundDSBridgeConfig {
             async = json.getBoolean("async");
         }
 
-   }
+    }
 
     public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level) {
         //        this.default_storage_layout = default_storage_layout;
         this(storage_layout, deflate_level, -1);
     }
 
-    public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level,  int cache_size) {
+    public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level, int cache_size) {
         this.cache_size = cache_size;
         this.deflate_level = deflate_level;
         this.storage_layout = storage_layout;
         cutoff = false;
     }
 
-    public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level, int cache_size,
+    public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout,
+                                      byte deflate_level,
+                                      int cache_size,
                                       boolean cutoff) {
         this.storage_layout = storage_layout;
         this.deflate_level = deflate_level;
@@ -172,7 +174,7 @@ public class HDF5CompoundDSBridgeConfig {
 
     public static HDF5CompoundDSBridgeConfig getDefault() {
         return new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
-                HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL);
+                                              HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL);
     }
 
     @Override

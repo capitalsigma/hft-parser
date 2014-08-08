@@ -31,7 +31,8 @@
 //                (expectedWriter);
 //        expectedBuilder.setAnonTypeFromInferred(PythonWritableDataPoint.class);
 //
-//        HDF5CompoundDSBridgeBuilder<AbstractWritableDataPoint> actualBuilder = new HDF5CompoundDSBridgeBuilder<>(actualWriter);
+//        HDF5CompoundDSBridgeBuilder<AbstractWritableDataPoint> actualBuilder = new HDF5CompoundDSBridgeBuilder<>
+// (actualWriter);
 //        actualBuilder.setTypeFromInferred(AbstractWritableDataPoint.class);
 //
 ////        HDF5CompoundVerifier<WritableDataPoint> verifier = new HDF5CompoundVerifier<>(actualWriter, expectedWriter,

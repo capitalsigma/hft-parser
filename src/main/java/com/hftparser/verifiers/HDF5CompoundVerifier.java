@@ -22,9 +22,11 @@ public class HDF5CompoundVerifier<S extends T, T> {
     private final HDF5CompoundDSBridgeBuilder<T> actualBridgeBuilder;
     private final String ROOT;
 
-    public HDF5CompoundVerifier(IHDF5Reader expectedReader, IHDF5Reader actualReader,
+    public HDF5CompoundVerifier(IHDF5Reader expectedReader,
+                                IHDF5Reader actualReader,
                                 HDF5CompoundDSBridgeBuilder<S> expectedBridgeBuilder,
-                                HDF5CompoundDSBridgeBuilder<T> actualBridgeBuilder, String root) {
+                                HDF5CompoundDSBridgeBuilder<T> actualBridgeBuilder,
+                                String root) {
         this.actualBridgeBuilder = actualBridgeBuilder;
         this.expectedBridgeBuilder = expectedBridgeBuilder;
         this.actualReader = actualReader;
@@ -32,14 +34,16 @@ public class HDF5CompoundVerifier<S extends T, T> {
         ROOT = root;
     }
 
-    public HDF5CompoundVerifier(IHDF5Writer expectedWriter, IHDF5Writer actualWriter,
-                                                 Class<S> typeForBridge, String root) {
+    public HDF5CompoundVerifier(IHDF5Writer expectedWriter,
+                                IHDF5Writer actualWriter,
+                                Class<S> typeForBridge,
+                                String root) {
 
         actualBridgeBuilder = new HDF5CompoundDSBridgeBuilder<>(actualWriter);
         expectedBridgeBuilder = new HDF5CompoundDSBridgeBuilder<>(expectedWriter);
 
         Class<T> actualTypeForBridge = (Class<T>) typeForBridge;
-//        Class<S> expectedTypeForBridge = (Class<S>) typeForBridge;
+        //        Class<S> expectedTypeForBridge = (Class<S>) typeForBridge;
 
         actualBridgeBuilder.setTypeFromInferred(actualTypeForBridge);
         expectedBridgeBuilder.setTypeFromInferred(typeForBridge);
@@ -53,9 +57,10 @@ public class HDF5CompoundVerifier<S extends T, T> {
         this(expectedWriter, actualWriter, typeForBridge, "/");
     }
 
-    public HDF5CompoundVerifier(IHDF5Reader expectedReader, IHDF5Reader actualReader,
-                               HDF5CompoundDSBridgeBuilder<S> expectedBridgeBuilder,
-                               HDF5CompoundDSBridgeBuilder<T> actualBridgeBuilder) {
+    public HDF5CompoundVerifier(IHDF5Reader expectedReader,
+                                IHDF5Reader actualReader,
+                                HDF5CompoundDSBridgeBuilder<S> expectedBridgeBuilder,
+                                HDF5CompoundDSBridgeBuilder<T> actualBridgeBuilder) {
         this(expectedReader, actualReader, expectedBridgeBuilder, actualBridgeBuilder, "/");
     }
 
@@ -142,7 +147,8 @@ public class HDF5CompoundVerifier<S extends T, T> {
         return null;
     }
 
-    private <R extends T> R[] getArrayForBridgeBuilder(HDF5CompoundDSBridgeBuilder<R> builder, HDF5LinkInformation linkInformation) {
+    private <R extends T> R[] getArrayForBridgeBuilder(HDF5CompoundDSBridgeBuilder<R> builder,
+                                                       HDF5LinkInformation linkInformation) {
         return getArrayForBridgeBuilder(builder, DatasetName.fromHDF5LinkInformation(linkInformation));
     }
 
@@ -171,8 +177,7 @@ public class HDF5CompoundVerifier<S extends T, T> {
         return null;
     }
 
-    private DiffElement findExtraElement(List<HDF5LinkInformation> expectedInfo,
-                                            List<HDF5LinkInformation> actualInfo) {
+    private DiffElement findExtraElement(List<HDF5LinkInformation> expectedInfo, List<HDF5LinkInformation> actualInfo) {
         List<HDF5LinkInformation> expectedNotInActual = new ArrayList<>(expectedInfo);
         expectedNotInActual.removeAll(actualInfo);
 

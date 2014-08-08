@@ -77,8 +77,11 @@ public class HDF5WriterConfig {
         perform_numeric_conversions = json.getBoolean("perform_numeric_conversions");
     }
 
-    public HDF5WriterConfig(boolean perform_numeric_conversions, boolean keep_datasets_if_they_exist,
-                            boolean overwrite, IHDF5WriterConfigurator.SyncMode sync_mode, int chunk_size,
+    public HDF5WriterConfig(boolean perform_numeric_conversions,
+                            boolean keep_datasets_if_they_exist,
+                            boolean overwrite,
+                            IHDF5WriterConfigurator.SyncMode sync_mode,
+                            int chunk_size,
                             int start_size) {
         this.perform_numeric_conversions = perform_numeric_conversions;
         this.keep_datasets_if_they_exist = keep_datasets_if_they_exist;
