@@ -3,10 +3,7 @@ package com.hftparser.main;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
-import com.hftparser.config.BadConfigFileError;
-import com.hftparser.config.ConfigFactory;
-import com.hftparser.config.MarketOrderCollectionConfig;
-import com.hftparser.config.ParseRunConfig;
+import com.hftparser.config.*;
 import com.hftparser.containers.Backoffable;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.ArcaParser;
@@ -24,6 +21,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
+class InterruptedRunException extends Exception {
+    public InterruptedRunException() {
+    }
+}
+
 // WARNING: TURNING ON ASSERTIONS BREAKS SOMETHING INSIDE OF THE CISD CODE
 // NEVER, EVER, EVER TURN ON ASSERTIONS
 
@@ -31,8 +34,22 @@ import java.util.regex.Pattern;
 public class ParseRun {
     private static int LINE_QUEUE_SIZE;
     private static int POINT_QUEUE_SIZE;
+    private static WaitFreeQueue<String> linesReadQueue;
+    private static WaitFreeQueue<DataPoint> dataPointQueue;
+    private static Backoffable sBackoffOne;
+    private static Backoffable sBackoffTwo;
+    private static Backoffable dBackoffOne;
+    private static Backoffable dBackoffTwo;
+    private static MarketOrderCollectionConfig marketOrderCollectionConfig;
+    private static MarketOrderCollectionFactory orderCollectionFactory;
+    private static ArcaParserConfig arcaParserConfig;
+    private static File outFile;
+    private static HDF5WriterConfig hdf5WriterConfig;
+    private static HDF5CompoundDSBridgeConfig hdf5CompoundDSBridgeConfig;
+    private static Calendar startCalendar;
+    private static InputStream gzipInstream;
 
-//    private static int MIN_BACKOFF;
+    //    private static int MIN_BACKOFF;
 //    private static int MAX_BACKOFF;
 
     private static class Args {
@@ -51,26 +68,30 @@ public class ParseRun {
         @Parameter(names = {"-config", "-c"}, description = "JSON-formatted config file")
         private String configPath;
 
-//        @Parameter(names = {"-stats", "-s"}, description = "Output file for run statistics")
-//        private String statsPath;
+        @Parameter(names = {"-num", "-n"}, description = "Number of lines per run")
+        private Integer numPerRun;
+
+        //        @Parameter(names = {"-stats", "-s"}, description = "Output file for run statistics")
+        //        private String statsPath;
     }
 
+
+    public ParseRun() {
+//        for jmockit
+
+    }
 
     public static void main(String[] argv) {
         Args args = new Args();
         new JCommander(args, argv);
         String[] symbols = null;
-        InputStream GzipInstream = null;
-        GzipReader gzipReader = null;
         ArcaParser parser;
         HDF5Writer writer;
-        File outFile;
         Thread readerThread;
         Thread parserThread;
         Thread writerThread;
         Thread[] allThreads;
         ConfigFactory configFactory = null;
-        Calendar startCalendar;
 
         long startTime = System.currentTimeMillis();
         long endTime;
@@ -103,7 +124,7 @@ public class ParseRun {
         System.out.println("Running with symbols: " + Arrays.deepToString(symbols));
 
         try {
-            GzipInstream = new FileInputStream(new File(args.bookPath));
+            gzipInstream = new FileInputStream(new File(args.bookPath));
         } catch (FileNotFoundException e) {
             printErrAndExit("Error opening book file.");
         }
@@ -119,55 +140,110 @@ public class ParseRun {
         ParseRunConfig parseRunConfig = configFactory.getParseRunConfig();
         setProperties(parseRunConfig);
 
-        Backoffable sBackoffOne = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.String);
-        Backoffable sBackoffTwo = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.String);
+        sBackoffOne = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.String);
+        sBackoffTwo = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.String);
 
-        Backoffable dBackoffOne = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.DataPoint);
-        Backoffable dBackoffTwo = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.DataPoint);
+        dBackoffOne = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.DataPoint);
+        dBackoffTwo = parseRunConfig.makeBackoffFor(ParseRunConfig.BackoffType.DataPoint);
 
         outFile = new File(args.outPath);
-        WaitFreeQueue<String> linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE,
-                sBackoffOne,
-                sBackoffTwo);
-        WaitFreeQueue < DataPoint > dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE,
-                dBackoffOne,
-                dBackoffTwo);
+        linesReadQueue = new WaitFreeQueue<>(LINE_QUEUE_SIZE, sBackoffOne, sBackoffTwo);
+        dataPointQueue = new WaitFreeQueue<>(POINT_QUEUE_SIZE, dBackoffOne, dBackoffTwo);
+
+        marketOrderCollectionConfig = configFactory.getMarketOrderCollectionConfig();
+        orderCollectionFactory = new MarketOrderCollectionFactory(marketOrderCollectionConfig);
+        arcaParserConfig = configFactory.getArcaParserConfig();
+        hdf5WriterConfig = configFactory.getHdf5WriterConfig();
+        hdf5CompoundDSBridgeConfig = configFactory.getHdf5CompoundDSBridgeConfig();
+        startCalendar = startCalendarFromFilename(args.bookPath);
+
+
+        if (args.numPerRun == null) {
+            runForSymbols(symbols);
+        } else {
+            runLoop(symbols, args.numPerRun);
+        }
+
+
+        endTime = System.currentTimeMillis();
+        System.out.println("Successfully created " + args.outPath);
+        printTotalTime(startTime, endTime);
+    }
+
+    public static void runLoop(String[] allSymbols,
+                               @NotNull
+                               Integer numPerRun) {
+        String[] symbolsForThisRun;
+        HDF5Writer previousWriter = null;
+        try {
+            for (int i = 0; i < allSymbols.length; i += numPerRun) {
+                symbolsForThisRun = Arrays.copyOfRange(allSymbols, i, Math.min(i + numPerRun, allSymbols.length));
+                previousWriter = runForSymbols(symbolsForThisRun, i != 0);
+            }
+
+            if(previousWriter != null) {
+                previousWriter.closeFile();
+            }
+
+        } catch (InterruptedRunException e) {
+            System.out.println("Run was interrupted early. Quitting.");
+        }
+    }
+
+    public static HDF5Writer runForSymbols(String[] symbols) {
+        try {
+            return runForSymbols(symbols, false);
+        } catch (InterruptedRunException e) {
+            System.out.println("Run was interrupted early. Quitting.");
+//            we've already done all the error handling we can do, just fail
+            return null;
+        }
+    }
+
+    public static HDF5Writer runForSymbols(String[] symbols, boolean preserveForNextRun)
+            throws InterruptedRunException {
+
+        GzipReader gzipReader = null;
+        ArcaParser parser;
+        HDF5Writer writer;
+        Thread readerThread;
+        Thread parserThread;
+        Thread writerThread;
+        Thread[] allThreads;
+
+        long startTime = System.currentTimeMillis();
+        long endTime;
 
         try {
-            gzipReader = new GzipReader(GzipInstream, linesReadQueue);
-        } catch(IOException e) {
+            gzipReader = new GzipReader(gzipInstream, linesReadQueue);
+        } catch (IOException e) {
             printErrAndExit("Error opening book file for reading: " + e.toString());
         }
 
-        MarketOrderCollectionConfig marketOrderCollectionConfig = configFactory.getMarketOrderCollectionConfig();
-        MarketOrderCollectionFactory orderCollectionFactory =
-                new MarketOrderCollectionFactory(marketOrderCollectionConfig);
+        if (preserveForNextRun) {
+            hdf5WriterConfig.setOverwrite(false);
+        }
 
-        parser = new ArcaParser(symbols,
-                                linesReadQueue,
-                                dataPointQueue,
-                                orderCollectionFactory,
-                                configFactory.getArcaParserConfig());
-        writer = new HDF5Writer(dataPointQueue, outFile, configFactory.getHdf5WriterConfig(),
-                configFactory.getHdf5CompoundDSBridgeConfig());
+        parser = new ArcaParser(symbols, linesReadQueue, dataPointQueue, orderCollectionFactory, arcaParserConfig);
+        writer = new HDF5Writer(dataPointQueue, outFile, hdf5WriterConfig, hdf5CompoundDSBridgeConfig);
 
-        if ((startCalendar = startCalendarFromFilename(args.bookPath)) != null) {
+        if (preserveForNextRun) {
+            writer.setCloseFileAtEnd(false);
+        }
+
+
+        if (startCalendar != null) {
             parser.setStartCalendar(startCalendar);
-
         }
 
         readerThread = new Thread(gzipReader);
         parserThread = new Thread(parser);
         writerThread = new Thread(writer);
 
-        allThreads = new Thread[] {
-                readerThread,
-                parserThread,
-                writerThread
-        };
+        allThreads = new Thread[]{readerThread, parserThread, writerThread};
 
         System.out.println("Starting parser.");
-        for(Thread t : allThreads){
+        for (Thread t : allThreads) {
             t.start();
         }
         System.out.println("Parser started. Waiting.");
@@ -179,18 +255,21 @@ public class ParseRun {
         } catch (Exception e) {
             System.out.println("A thread threw an exception:" + e.toString());
             System.out.println("Stopping.");
-            return;
+            writer.closeFile();
+            throw new InterruptedRunException();
+        } finally {
+            printQueueUsage();
         }
+        return writer;
+    }
 
-        endTime = System.currentTimeMillis();
-        System.out.println("Successfully created " + args.outPath);
-        printRunTime(startTime, endTime);
-
+    private static void printQueueUsage() {
         System.out.println("Information for String queue:");
         linesReadQueue.printUsage();
         System.out.println("Information for Datapoint queue:");
         dataPointQueue.printUsage();
     }
+
 
     public static Calendar startCalendarFromFilename(String bookPath) {
 //        format is YYYYMMDD
@@ -222,11 +301,18 @@ public class ParseRun {
         return null;
     }
 
-
-    private static void printRunTime(long startMs, long endMs) {
+    private static void printTime(long startMs, long endMs, String segmentMsg) {
         double diff = endMs - startMs;
 
-        System.out.printf("Total time: %.3f sec\n", diff / 1000);
+        System.out.printf("%s time: %.3f sec\n", segmentMsg, diff / 1000);
+    }
+
+    private static void printRunTime(long startMs, long endMs) {
+        printTime(startMs, endMs, "Run");
+    }
+
+    private static void printTotalTime(long startMs, long endMs) {
+        printTime(startMs, endMs, "Total");
     }
 
     private static void setProperties(ParseRunConfig config) {

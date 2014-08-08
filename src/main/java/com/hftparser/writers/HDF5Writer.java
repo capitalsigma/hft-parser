@@ -16,6 +16,7 @@ public class HDF5Writer implements Runnable {
     private final HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder;
     private final IHDF5Writer fileWriter;
     private final WaitFreeQueue<DataPoint> inQueue;
+    private boolean closeFileAtEnd;
 
     private final int START_SIZE;
     // following FLUSH_FREQ from the original python
@@ -44,7 +45,11 @@ public class HDF5Writer implements Runnable {
         dsForTicker = new HashMap<>();
 
         inQueue = _inQueue;
+        closeFileAtEnd = false;
     }
+
+
+
 
     public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue, File outFile) {
         this(_inQueue, outFile, HDF5WriterConfig.getDefault(), HDF5CompoundDSBridgeConfig.getDefault());
@@ -64,6 +69,15 @@ public class HDF5Writer implements Runnable {
         bridge.appendElement(dataPoint.getWritable());
     }
 
+
+    public boolean isCloseFileAtEnd() {
+        return closeFileAtEnd;
+    }
+
+    public void setCloseFileAtEnd(boolean closeFileAtEnd) {
+        this.closeFileAtEnd = closeFileAtEnd;
+    }
+
     public void run() {
         DataPoint dataPoint;
 
@@ -79,9 +93,16 @@ public class HDF5Writer implements Runnable {
                 bridge.flush();
             }
 
-            fileWriter.close();
+            if (closeFileAtEnd) {
+                fileWriter.close();
+            }
         }
     }
+
+    public void closeFile() {
+        fileWriter.close();
+    }
+
 
     private static IHDF5Writer getWriter(File file, HDF5WriterConfig writerConfig) {
         IHDF5WriterConfigurator config = HDF5Factory.configure(file);

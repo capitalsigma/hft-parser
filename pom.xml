@@ -43,6 +43,11 @@
             <version>20140107</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.googlecode.jmockit</groupId>
+            <artifactId>jmockit</artifactId>
+            <version>1.7</version>
+        </dependency>
     </dependencies>
 
     <properties>

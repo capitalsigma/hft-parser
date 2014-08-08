@@ -10,7 +10,7 @@ public class HDF5WriterConfig {
     private final int start_size;
     private final int chunk_size;
     private final IHDF5WriterConfigurator.SyncMode sync_mode;
-    private final boolean overwrite;
+    private boolean overwrite;
     private final boolean keep_datasets_if_they_exist;
     private final boolean perform_numeric_conversions;
 
@@ -39,6 +39,9 @@ public class HDF5WriterConfig {
         return perform_numeric_conversions;
     }
 
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
+    }
 
     HDF5WriterConfig(JSONObject json) throws BadConfigFileError {
         start_size = json.getInt("start_size");

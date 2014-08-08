@@ -1,0 +1,7 @@
+It looks like it uses 12g left to its own devices for caching-50000-compressed-1-newchunk-caching-cutoff.json (24 g cap)
+
+caching-100000-compressed-1-newchunk-caching.json tops out at 15g
+
+caching-25000-async-5-threads.json tops out at 12 g
+
+caching-100000-async-5-threads.json tops out at 13g
