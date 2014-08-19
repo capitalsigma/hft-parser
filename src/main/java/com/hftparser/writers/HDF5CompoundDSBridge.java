@@ -15,6 +15,13 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
     private final T[] elToWrite;
     //    protected final HDF5CompoundType<T> type;
 
+
+    public static class FailedWriteError extends Exception {
+        public FailedWriteError(Throwable cause) {
+            super(cause);
+        }
+    }
+
     protected HDF5CompoundDSBridge() {
         elToWrite = null;
     }
@@ -51,14 +58,15 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
         return featureBuilder.features();
     }
 
-    public void appendElement(T element) {
+    public void appendElement(T element) throws FailedWriteError {
         elToWrite[0] = element;
         //            System.out.println("At offset: " + currentOffset);
         writer.writeArrayBlockWithOffset(fullPath, type, elToWrite, currentOffset++);
     }
 
 
-    public void flush() {
+    public void flush() throws FailedWriteError {
 
     }
+
 }

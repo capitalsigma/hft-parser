@@ -29,7 +29,7 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
     }
 
     @Override
-    public void appendElement(T element) {
+    public void appendElement(T element) throws HDF5CompoundDSAsyncBridge.FailedWriteError {
         cache.appendElement(element);
 
         if (cache.isFull()) {
@@ -38,16 +38,16 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
     }
 
     //    split this off so we can override
-    protected void doFlush() {
+    protected void doFlush() throws HDF5CompoundDSAsyncBridge.FailedWriteError {
         flush();
     }
 
     @Override
-    public void flush() {
+    public void flush() throws HDF5CompoundDSAsyncBridge.FailedWriteError {
         flush(cache);
     }
 
-    public void flush(ElementCache<T> cacheToFlush) {
+    public void flush(ElementCache<T> cacheToFlush)  {
         //        System.out.println("Called flush");
 
 
@@ -55,4 +55,5 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
         currentOffset += cacheToFlush.getCurrentCacheOffset();
         cacheToFlush.resetCurrentCacheOffset();
     }
+
 }

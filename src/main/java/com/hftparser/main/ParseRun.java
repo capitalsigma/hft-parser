@@ -11,6 +11,7 @@ import com.hftparser.readers.DataPoint;
 import com.hftparser.readers.GzipReader;
 import com.hftparser.readers.MarketOrderCollectionFactory;
 import com.hftparser.writers.HDF5Writer;
+import org.apache.commons.lang.mutable.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -205,8 +206,11 @@ public class ParseRun {
         Thread parserThread;
         Thread writerThread;
         Thread[] allThreads;
+        MutableBoolean pipelineError = new MutableBoolean();
 
         System.out.println("Running on symbol subset:" + Arrays.deepToString(symbols));
+
+
 
         long startTime = System.currentTimeMillis();
         long endTime;
@@ -215,7 +219,7 @@ public class ParseRun {
         initQueues();
 
         try {
-            gzipReader = new GzipReader(gzipInstream, linesReadQueue);
+            gzipReader = new GzipReader(gzipInstream, linesReadQueue, pipelineError);
         } catch (IOException e) {
             printErrAndExit("Error opening book file for reading: " + e.toString());
         }
@@ -224,8 +228,13 @@ public class ParseRun {
             hdf5WriterConfig.setOverwrite(false);
         }
 
-        parser = new ArcaParser(symbols, linesReadQueue, dataPointQueue, orderCollectionFactory, arcaParserConfig);
-        writer = new HDF5Writer(dataPointQueue, outFile, hdf5WriterConfig, hdf5CompoundDSBridgeConfig);
+        parser = new ArcaParser(symbols,
+                                linesReadQueue,
+                                dataPointQueue,
+                                orderCollectionFactory,
+                                arcaParserConfig,
+                                pipelineError);
+        writer = new HDF5Writer(dataPointQueue, outFile, hdf5WriterConfig, hdf5CompoundDSBridgeConfig, pipelineError);
 
         writer.setCloseFileAtEnd(false);
 

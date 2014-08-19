@@ -3,6 +3,7 @@ package com.hftparser.readers;
 
 import com.hftparser.config.ArcaParserConfig;
 import com.hftparser.containers.WaitFreeQueue;
+import org.apache.commons.lang.mutable.MutableBoolean;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -60,6 +61,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
     private final WaitFreeQueue<DataPoint> outQueue;
     @SuppressWarnings("FieldCanBeLocal")
     private final String[] tickers;
+    private volatile MutableBoolean pipelineError;
 
     // TODO: would it be faster to try to use eg an enum here?
 
@@ -107,11 +109,13 @@ public class ArcaParser extends AbstractParser implements Runnable {
                       WaitFreeQueue<String> _inQueue,
                       WaitFreeQueue<DataPoint> _outQueue,
                       MarketOrderCollectionFactory collectionFactory,
-                      ArcaParserConfig config) {
+                      ArcaParserConfig config,
+                      MutableBoolean pipelineError) {
 
         tickers = _tickers;
         inQueue = _inQueue;
         outQueue = _outQueue;
+        this.pipelineError = pipelineError;
 
         INITIAL_ORDER_HISTORY_SIZE = config.getInitial_order_history_size();
         OUTPUT_PROGRESS_EVERY = config.getOutput_progress_every();
@@ -146,7 +150,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
                       WaitFreeQueue<DataPoint> _outQueue,
                       MarketOrderCollectionFactory collectionFactory) {
 
-        this(_tickers, _inQueue, _outQueue, collectionFactory, ArcaParserConfig.getDefault());
+        this(_tickers, _inQueue, _outQueue, collectionFactory, ArcaParserConfig.getDefault(), new MutableBoolean());
+
     }
 
 
@@ -274,13 +279,21 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
             // spin until we successfully push
             //noinspection StatementWithEmptyBody
-            while (!outQueue.enq(toPush)) {
+            while (!outQueue.enq(toPush) && !pipelineError.booleanValue()) {
             }
         }
 
         //               if neither dataset has changed since the last time we wrote it, skip it
     }
 
+
+    Long safeParse(String toParse) {
+        if (toParse.length() == 0) {
+            return 0l;
+        } else {
+            return Long.parseLong(toParse);
+        }
+    }
 
     Long makePrice(String priceString) {
         String[] parts = priceString.split("\\.");
@@ -291,10 +304,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
         // System.out.println("got price: " + priceString);
         //		System.out.println("parsing price: " + Arrays.toString(parts));
 
-        assert parts.length == 1 || (parts.length == 2 && parts[1].length() <= 6);
-
-
-        intPart = Long.parseLong(parts[0]);
+        intPart = safeParse(parts[0]);
 
         if (parts.length == 2) {
             floatPart = Long.parseLong(parts[1]);
@@ -302,14 +312,16 @@ public class ArcaParser extends AbstractParser implements Runnable {
         } else {
             floatPart = 0;
         }
-        Long toRet =
-                intPart * PRICE_INTEGER_OFFSET + (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
 
-        // System.out.printf("int part: %d, float part: %d\n", intPart, floatPart);
-        // System.out.printf("toRet: %d\n", toRet);
+        if (sizeOfFloatPart > 6) {
+            throw new NumberFormatException("Can't have more than 6 decimal places. Got: " + priceString);
+        } else {
+            Long toRet =
+                    intPart * PRICE_INTEGER_OFFSET + (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
 
+            return toRet;
+        }
 
-        return toRet;
     }
 
     long makeTimestamp(String seconds, String ms) {
@@ -415,49 +427,55 @@ public class ArcaParser extends AbstractParser implements Runnable {
         RecordType recType;
 
 
-        // Stop work when the Gzipper tells us to, once we've pulled
-        // everything out of his queue
-        while (inQueue.acceptingOrders || !inQueue.isEmpty()) {
+        try {
+            // Stop work when the Gzipper tells us to, once we've pulled
+            // everything out of his queue
+            while (!pipelineError.booleanValue() && (inQueue.acceptingOrders || !inQueue.isEmpty())) {
+                // Work if we got something from the queue, otherwise spin
+                if ((toParse = inQueue.deq()) != null) {
+                    //                System.out.println("Parser got a line:" + toParse);
+                    linesSoFar++;
 
-            // Work if we got something from the queue, otherwise spin
-            if ((toParse = inQueue.deq()) != null) {
-                //                System.out.println("Parser got a line:" + toParse);
-                linesSoFar++;
+                    if (linesSoFar % OUTPUT_PROGRESS_EVERY == 0) {
+                        System.out.printf("Parsed %d lines\n", linesSoFar);
+                    }
 
-                if (linesSoFar % OUTPUT_PROGRESS_EVERY == 0) {
-                    System.out.printf("Parsed %d lines\n", linesSoFar);
+                    asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);
+
+                    // System.out.println("asSplit: " + Arrays.toString(asSplit));
+
+                    // Also note that containsKey is O(1)
+                    if ((recType = recordTypeLookup.get(asSplit[0])) == null) {
+                        // skip if it's not add, modify, delete
+                        continue;
+                    }
+
+                    // System.out.println("asSplit: " + Arrays.toString(asSplit));
+
+                    // Also note that containsKey is O(1)
+
+
+                    switch (recType) {
+                        case Add:
+                            parseAdd(asSplit);
+                            break;
+                        case Modify:
+                            parseModify(asSplit);
+                            break;
+                        case Delete:
+                            parseDelete(asSplit);
+                            break;
+                    }
                 }
 
-                asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);
-
-                // System.out.println("asSplit: " + Arrays.toString(asSplit));
-
-                // Also note that containsKey is O(1)
-                if ((recType = recordTypeLookup.get(asSplit[0])) == null) {
-                    // skip if it's not add, modify, delete
-                    continue;
-                }
-
-                // System.out.println("asSplit: " + Arrays.toString(asSplit));
-
-                // Also note that containsKey is O(1)
-
-
-                switch (recType) {
-                    case Add:
-                        parseAdd(asSplit);
-                        break;
-                    case Modify:
-                        parseModify(asSplit);
-                        break;
-                    case Delete:
-                        parseDelete(asSplit);
-                        break;
-                }
             }
-
+        } catch (Throwable throwable) {
+            pipelineError.setValue(true);
+            System.out.println("Parser failed. Stacktrace:");
+            throwable.printStackTrace();
+        } finally {
+            outQueue.acceptingOrders = false;
         }
-        outQueue.acceptingOrders = false;
 
     }
 

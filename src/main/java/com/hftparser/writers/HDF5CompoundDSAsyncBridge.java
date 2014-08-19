@@ -5,13 +5,15 @@ import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 /**
  * Created by patrick on 8/6/14.
  */
 public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T> {
-    private Executor executor;
-    private Writer lastWriter;
+    private ExecutorService executor;
+    private Future<?> lastWriter;
     private ElementCache<T> cacheOne;
     private ElementCache<T> cacheTwo;
 
@@ -42,7 +44,7 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
                                      int chunkSize,
                                      HDF5CompoundDSBridgeConfig bridgeConfig,
                                      ElementCacheFactory<T> cacheFactory,
-                                     Executor executor) {
+                                     ExecutorService executor) {
         super(name, type, writer, startSize, chunkSize, bridgeConfig, cacheFactory);
         cacheOne = cache;
         cacheTwo = cacheFactory.getCache();
@@ -58,28 +60,35 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
         }
     }
 
-    public Writer getLastWriter() {
+    public Future<?> getLastWriter() {
         return lastWriter;
     }
 
-    private void waitForLastWriter() {
+    private void waitForLastWriter() throws FailedWriteError {
         //noinspection StatementWithEmptyBody
-        while ((lastWriter != null) && (!lastWriter.isDone())) {
+        //        while ((lastWriter != null) && (!lastWriter.isDone())) {
+        //        }
+
+        try {
+            if (lastWriter != null) {
+                lastWriter.get();
+            }
+        } catch (Throwable t) {
+            throw new FailedWriteError(t);
         }
     }
 
     @Override
-    protected void doFlush() {
+    protected void doFlush() throws FailedWriteError {
         //        System.out.println("Called async doFlush");
         waitForLastWriter();
-        lastWriter = new Writer(cache);
+        lastWriter = executor.submit(new Writer(cache));
 
-        executor.execute(lastWriter);
         swapCaches();
     }
 
     @Override
-    public void flush() {
+    public void flush() throws FailedWriteError {
         waitForLastWriter();
         super.flush();
     }

@@ -69,4 +69,12 @@ public class DataPoint {
     public long getTimeStamp() {
         return timeStamp;
     }
+
+    public long[][] getBuy() {
+        return buy;
+    }
+
+    public long[][] getSell() {
+        return sell;
+    }
 }

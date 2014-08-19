@@ -8,6 +8,7 @@ import com.hftparser.config.HDF5WriterConfig;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.DataPoint;
 import com.hftparser.readers.WritableDataPoint;
+import org.apache.commons.lang.mutable.MutableBoolean;
 
 import java.io.File;
 import java.util.HashMap;
@@ -15,10 +16,11 @@ import java.util.HashMap;
 
 public class HDF5Writer implements Runnable {
     private final HashMap<String, HDF5CompoundDSBridge<WritableDataPoint>> dsForTicker;
-    private final HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder;
     private final IHDF5Writer fileWriter;
     private final WaitFreeQueue<DataPoint> inQueue;
     private boolean closeFileAtEnd;
+    private volatile MutableBoolean pipelineError;
+    private HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder;
 
     private final int START_SIZE;
     // following FLUSH_FREQ from the original python
@@ -33,11 +35,13 @@ public class HDF5Writer implements Runnable {
     public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue,
                       File outFile,
                       HDF5WriterConfig writerConfig,
-                      HDF5CompoundDSBridgeConfig bridgeConfig) {
+                      HDF5CompoundDSBridgeConfig bridgeConfig,
+                      MutableBoolean pipelineError) {
 
         fileWriter = getWriter(outFile, writerConfig);
         START_SIZE = writerConfig.getStart_size();
         CHUNK_SIZE = writerConfig.getChunk_size();
+        this.pipelineError = pipelineError;
 
         bridgeBuilder = new HDF5CompoundDSBridgeBuilder<>(fileWriter, bridgeConfig);
 
@@ -50,14 +54,32 @@ public class HDF5Writer implements Runnable {
 
         inQueue = _inQueue;
         closeFileAtEnd = false;
+
     }
+
+    public void setBridgeBuilder(HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder) {
+        this.bridgeBuilder = bridgeBuilder;
+    }
+
 
 
     public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue, File outFile) {
-        this(_inQueue, outFile, HDF5WriterConfig.getDefault(), HDF5CompoundDSBridgeConfig.getDefault());
+        this(_inQueue,
+             outFile,
+             HDF5WriterConfig.getDefault(),
+             HDF5CompoundDSBridgeConfig.getDefault(),
+             new MutableBoolean());
     }
 
-    private void writePoint(DataPoint dataPoint) {
+    public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue, File outFile, MutableBoolean pipelineError) {
+        this(_inQueue,
+             outFile,
+             HDF5WriterConfig.getDefault(),
+             HDF5CompoundDSBridgeConfig.getDefault(),
+             pipelineError);
+    }
+
+    private void writePoint(DataPoint dataPoint) throws HDF5CompoundDSBridge.FailedWriteError {
         String ticker = dataPoint.getTicker();
         HDF5CompoundDSBridge<WritableDataPoint> bridge;
 
@@ -84,15 +106,25 @@ public class HDF5Writer implements Runnable {
         DataPoint dataPoint;
 
         try {
-            while (inQueue.acceptingOrders || !inQueue.isEmpty()) {
+            while (!pipelineError.booleanValue() && (inQueue.acceptingOrders || !inQueue.isEmpty())) {
                 if ((dataPoint = inQueue.deq()) != null) {
                     //                    System.out.println("Writer got a datapoint.");
                     writePoint(dataPoint);
                 }
             }
+        } catch (HDF5CompoundDSBridge.FailedWriteError error) {
+            pipelineError.setValue(true);
+            System.out.println("Writer failed. Stack trace:");
+            error.printStackTrace();
         } finally {
             for (HDF5CompoundDSBridge<WritableDataPoint> bridge : dsForTicker.values()) {
-                bridge.flush();
+                try {
+                    bridge.flush();
+                } catch (HDF5CompoundDSBridge.FailedWriteError failedWriteError) {
+                    pipelineError.setValue(true);
+                    System.out.println("Failed trying to close existing file landles.");
+                    failedWriteError.printStackTrace();
+                }
             }
 
             if (closeFileAtEnd) {

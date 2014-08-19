@@ -6,10 +6,7 @@ import ch.systemsx.cisd.hdf5.IHDF5Writer;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * Created by patrick on 7/28/14.
@@ -20,7 +17,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     private long startSize;
     private int chunkSize;
     private final HDF5CompoundDSBridgeConfig bridgeConfig;
-    private Executor executor;
+    private AbstractExecutorService executor;
     private int corePoolSize = 3;
     private int maxPoolSize = 3;
     private long keepAliveSec = 30;
