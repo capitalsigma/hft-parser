@@ -1,6 +1,10 @@
 package com.hftparser.readers;
 
 import com.hftparser.containers.WaitFreeQueue;
+import org.apache.commons.lang.mutable.MutableBoolean;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,6 +12,8 @@ import org.junit.runners.JUnit4;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @SuppressWarnings("UnusedAssignment")
@@ -36,7 +42,7 @@ public class GzipReaderTest {
         // String location = loader.getResource(pathToFile).toString();
 
 
-        return new GzipReader(new FileInputStream(fileName), wfq);
+        return new GzipReader(new FileInputStream(fileName), wfq, new MutableBoolean());
     }
 
     @Test
@@ -78,5 +84,15 @@ public class GzipReaderTest {
         } catch (IOException exn) {
             Assert.fail("Bad input file. Exception: " + exn.toString());
         }
+    }
+
+    @Test
+    public void testPipelineError() throws IOException {
+        WaitFreeQueue<String> wfqOne = new WaitFreeQueue<>(5);
+        GzipReader readerOne = new GzipReader(new FileInputStream(TEST_FILE_ONE), wfqOne, new MutableBoolean(true));
+
+        readerOne.run();
+
+        assertThat(wfqOne.isEmpty(), CoreMatchers.is(true));
     }
 }

@@ -17,6 +17,7 @@ public class HDF5CompoundDSBridgeConfig {
     private int keep_alive_sec = 30;
     private int queue_size = 500;
     private boolean async = false;
+    private boolean parallel_write = false;
 
     HDF5CompoundDSBridgeConfig(JSONObject json) throws BadConfigFileError {
         switch (json.getString("storage_layout")) {
@@ -84,7 +85,12 @@ public class HDF5CompoundDSBridgeConfig {
             async = json.getBoolean("async");
         }
 
+        if (json.has("parallel_write")) {
+            parallel_write = json.getBoolean("parallel_write");
+        }
+
     }
+
 
     public HDF5CompoundDSBridgeConfig(HDF5StorageLayout storage_layout, byte deflate_level) {
         //        this.default_storage_layout = default_storage_layout;
@@ -141,6 +147,10 @@ public class HDF5CompoundDSBridgeConfig {
         return true;
     }
 
+    public boolean isParallel_write() {
+        return parallel_write;
+    }
+
     public boolean isCutoff() {
         return cutoff;
     }
@@ -189,6 +199,7 @@ public class HDF5CompoundDSBridgeConfig {
                 ", keep_alive_sec=" + keep_alive_sec +
                 ", queue_size=" + queue_size +
                 ", async=" + async +
+                ", parallel_write=" + parallel_write +
                 '}';
     }
 }

@@ -23,6 +23,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     private long keepAliveSec = 30;
     private int queueSize = 500;
     private boolean async;
+    private boolean parallelFlush;
     private ElementCacheFactory<T> cacheFactory;
 
     public HDF5CompoundType<T> getType() {
@@ -91,6 +92,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         keepAliveSec = bridgeConfig.getKeep_alive_sec();
         queueSize = bridgeConfig.getQueue_size();
         async = bridgeConfig.isAsync();
+        parallelFlush = bridgeConfig.isParallel_write();
     }
 
     public HDF5CompoundDSBridge<T> build(
@@ -99,7 +101,10 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         } else {
-            if (async) {
+//            System.out.println("Building. Parallel flush? " + parallelFlush);
+            if (parallelFlush) {
+                return buildParallelFlush(name);
+            } else if (async) {
                 return buildAsync(name);
             } else if (bridgeConfig.getCache_size() > 0) {
                 //                System.out.println("Building caching");
@@ -142,6 +147,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
                 ", keepAliveSec=" + keepAliveSec +
                 ", queueSize=" + queueSize +
                 ", async=" + async +
+                ", parallelFlush=" + parallelFlush +
                 ", cacheFactory=" + cacheFactory +
                 '}';
     }
@@ -170,5 +176,25 @@ public class HDF5CompoundDSBridgeBuilder<T> {
                                                cacheFactory,
                                                executor);
 
+    }
+
+
+    public HDF5CompoundDSParallelFlushBridge<T> buildParallelFlush(
+            @NotNull
+            DatasetName name) {
+        if (executor == null) {
+            initExecutor();
+        }
+//
+//        System.out.println("Building parallel flush bridge");
+
+        return new HDF5CompoundDSParallelFlushBridge<>(name,
+                                                       type,
+                                                       writer,
+                                                       startSize,
+                                                       chunkSize,
+                                                       bridgeConfig,
+                                                       cacheFactory,
+                                                       executor);
     }
 }

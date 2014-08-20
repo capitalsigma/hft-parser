@@ -5,6 +5,8 @@ import com.hftparser.readers.WritableDataPoint;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 
+import java.util.concurrent.Future;
+
 import static org.junit.Assert.*;
 
 public class HDF5CompoundDSAsyncBridgeTest extends HDF5CompoundDSCutoffCachingBridgeTest {
@@ -16,7 +18,6 @@ public class HDF5CompoundDSAsyncBridgeTest extends HDF5CompoundDSCutoffCachingBr
     @Override
     public void setUp() throws Exception {
         super.setUp();
-
     }
 
     @Override
@@ -36,7 +37,7 @@ public class HDF5CompoundDSAsyncBridgeTest extends HDF5CompoundDSCutoffCachingBr
     }
 
     public void testWriterWasSpawned() throws Exception {
-        HDF5CompoundDSAsyncBridge.Writer writer = getDtBridge().getLastWriter();
+        Future<?> writer = getDtBridge().getLastWriter();
         Thread.sleep(200);
 
         assertNotNull(writer);
@@ -52,6 +53,10 @@ public class HDF5CompoundDSAsyncBridgeTest extends HDF5CompoundDSCutoffCachingBr
     @Override
     public void testFlush() throws Exception {
         super.testFlush();
+        testForWriter();
+    }
+
+    protected void testForWriter() {
         assertNull(getDtBridge().getLastWriter());
     }
 

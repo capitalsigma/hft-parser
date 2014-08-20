@@ -1,0 +1,36 @@
+{
+    "ParseRun" : {
+        "line_queue_size": 500000,
+        "point_queue_size": 500000,
+        "backoff": true,
+		"min_backoff_s": 20,
+		"max_backoff_s": 500,
+		"min_backoff_d": 20,
+		"max_backoff_d": 500
+	},
+	"ArcaParser": {
+		"initial_order_history_size": 500000,
+		"output_progress_every": 5000000
+	},
+	"HDF5Writer": {
+		"start_size": 50000,
+		"chunk_size": 400164,
+		"sync_mode": "SYNC",
+		"overwrite": true,
+		"keep_datasets_if_they_exist": true,
+		"perform_numeric_conversions": false
+	},
+	"HDF5CompoundDSBridge" : {
+		"default_storage_layout": false,
+		"storage_layout": "CHUNKED",
+		"deflate_level": 1,
+		"cache_size": 5,
+		"cutoff": true,
+		"async": true,
+		"parallel_write": true,
+		"core_pool_size": 2,
+		"max_pool_size": 2,
+		"keep_alive_sec": 30,
+		"queue_size": 15
+	}
+}

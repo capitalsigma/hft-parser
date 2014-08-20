@@ -1,7 +1,10 @@
 package com.hftparser.readers;
 
+import com.hftparser.config.ArcaParserConfig;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.main.ParseRun;
+import org.apache.commons.lang.mutable.MutableBoolean;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +38,10 @@ public class ArcaParserTest {
 
     private final String TEST_TIMESTAMPS = "A,1,3940662558851079,P,B,100,FOO,116.5200,14400,566,E,AARCA";
 
+    private final String TEST_ALL_DEC = "A,1,3940662558851079,P,B,100,FOO,.123456,14400,566,E,AARCA";
+
+    private final String TEST_ERRORS = "A,1,3940662558851079,P,B,100,FOO,.12345678,14400,566,E,AARCA";
+
     MarketOrderCollectionFactory collectionFactory;
     private WaitFreeQueue<String> inQ;
     private WaitFreeQueue<DataPoint> outQ;
@@ -43,12 +50,20 @@ public class ArcaParserTest {
 
     @Before
     public void setUp() {
+        setParser(new MutableBoolean());
+    }
+
+    public void setParser(MutableBoolean mutableBoolean) {
         collectionFactory = new MarketOrderCollectionFactory();
         inQ = new WaitFreeQueue<>(5);
         outQ = new WaitFreeQueue<>(5);
-        parser = new ArcaParser(TEST_TICKERS, inQ, outQ, collectionFactory);
+        parser = new ArcaParser(TEST_TICKERS,
+                                inQ,
+                                outQ,
+                                collectionFactory,
+                                ArcaParserConfig.getDefault(),
+                                mutableBoolean);
     }
-
 
     @Test
     public void testSetStartDate() throws Exception {
@@ -318,5 +333,50 @@ public class ArcaParserTest {
 
         assertTrue(test1);
         assertTrue(test2);
+    }
+
+    @Test
+    public void testPipelineError() throws InterruptedException {
+        setParser(new MutableBoolean(true));
+
+        ArcaParser parser = this.parser;
+
+        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_ADD_SELL1);
+        inQ.enq(TEST_ADD_BUY2);
+
+        runParserThread(parser);
+
+        assertThat(outQ.isEmpty(), is(true));
+    }
+
+    @Test
+    public void testNoIntegerPart() throws Exception {
+        inQ.enq(TEST_ALL_DEC);
+        runParserThread();
+
+        DataPoint out = outQ.deq();
+
+        assertNotNull(out);
+
+        long[][] res = out.getBuy();
+        long[] expected = new long[]{123456, 100};
+
+        assertThat(res.length, is(1));
+
+        Assert.assertArrayEquals(res[0], expected);
+    }
+
+    @Test
+    public void testError() throws Exception {
+        MutableBoolean errState = new MutableBoolean();
+        setParser(errState);
+
+        inQ.enq(TEST_ERRORS);
+
+        runParserThread();
+
+        assertThat(outQ.isEmpty(), is(true));
+        assertThat(errState.booleanValue(), is(true));
     }
 }
