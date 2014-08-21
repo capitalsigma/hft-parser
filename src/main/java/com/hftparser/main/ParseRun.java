@@ -152,6 +152,8 @@ public class ParseRun {
         endTime = System.currentTimeMillis();
         System.out.println("Successfully created " + args.outPath);
         printTotalTime(startTime, endTime);
+        System.exit(0);
+
     }
 
     private static void initQueues() {

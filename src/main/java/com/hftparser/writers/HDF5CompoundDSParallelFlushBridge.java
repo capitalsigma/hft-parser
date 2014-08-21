@@ -23,7 +23,7 @@ public class HDF5CompoundDSParallelFlushBridge<T> extends HDF5CompoundDSAsyncBri
 
     @Override
     public void flush() throws FailedWriteError {
-        System.out.println("Forcing parallel flush");
+//        System.out.println("Forcing parallel flush");
         super.doFlush();
 
     }
