@@ -24,7 +24,6 @@ public class HDF5Writer implements Runnable {
 
     private final int START_SIZE;
     // following FLUSH_FREQ from the original python
-    //      TODO: this is a BYTE SIZE, not a number of rows, and IT SHOULD BE A MULTIPLE OF THE ROW SIZE
     private final int CHUNK_SIZE;
 
     private final String BOOK_DS_NAME = "books";
@@ -104,6 +103,9 @@ public class HDF5Writer implements Runnable {
 
     public void run() {
         DataPoint dataPoint;
+
+    // TODO: we aren't catching it correctly (and dying) when there is a low-level write error
+    // (e.g. the file is clobberred by another run). why?
 
         try {
             while (!pipelineError.booleanValue() && (inQueue.acceptingOrders || !inQueue.isEmpty())) {

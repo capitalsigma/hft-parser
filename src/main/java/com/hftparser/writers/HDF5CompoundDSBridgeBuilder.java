@@ -157,7 +157,8 @@ public class HDF5CompoundDSBridgeBuilder<T> {
                                           maxPoolSize,
                                           keepAliveSec,
                                           TimeUnit.SECONDS,
-                                          new LinkedBlockingQueue<Runnable>());
+                                          new ArrayBlockingQueue<Runnable>(queueSize));
+
     }
 
     public HDF5CompoundDSAsyncBridge<T> buildAsync(
