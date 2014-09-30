@@ -3,8 +3,6 @@ package com.hftparser.readers;
 import com.hftparser.containers.WaitFreeQueue;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

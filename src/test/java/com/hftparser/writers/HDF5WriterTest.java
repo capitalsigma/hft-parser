@@ -8,14 +8,12 @@ import com.hftparser.readers.DataPoint;
 import com.hftparser.readers.WritableDataPoint;
 import mockit.Mock;
 import mockit.MockUp;
-import mockit.Mocked;
 import mockit.integration.junit4.JMockit;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import java.io.File;
 import java.util.HashMap;

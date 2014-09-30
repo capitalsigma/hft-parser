@@ -2,10 +2,8 @@ package com.hftparser.writers;
 
 import com.hftparser.config.ConfigFactory;
 import com.hftparser.readers.WritableDataPoint;
-import org.junit.After;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 public class HDF5CompoundDSParallelFlushBridgeTest extends HDF5CompoundDSAsyncBridgeTest {
     protected String TEST_CONFIG = "src/test/resources/parallel-flush-config.json";

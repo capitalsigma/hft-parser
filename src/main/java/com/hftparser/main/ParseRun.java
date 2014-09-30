@@ -11,7 +11,7 @@ import com.hftparser.readers.DataPoint;
 import com.hftparser.readers.GzipReader;
 import com.hftparser.readers.MarketOrderCollectionFactory;
 import com.hftparser.writers.HDF5Writer;
-import org.apache.commons.lang.mutable.*;
+import org.apache.commons.lang.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
