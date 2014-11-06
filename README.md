@@ -4,9 +4,9 @@ The easiest way to run the parser is with the `run.sh` shell script. The syntax 
 
     ./run.sh [infile].csv.gz [outfile].h5 [config].json [num_per_pass]
 
-Here, `[infile].cs.gz` is the input ARCABook file, `[outfile].h5` is the name of the h5 file where the output should be saved, `[config].json` is the configuration file to use, and `[num_per_pass]` is the number of symbols to include in each pass. These options will be described in more detail later. Currently, `run.sh` uses the default symbol set.
+Here, `[infile].cs.gz` is the input ARCABook file, `[outfile].h5` is the name of the h5 file where the output should be saved, `[config].json` is the configuration file to use, and `[num_per_pass]` is the number of symbols to include in each pass. These options will be described in more detail later. Currently, `run.sh` uses the default symbol set. If another symbol set is preferred, it is best to edit this shell script and set it here for every run.
 
-This will save a copy of the  program's output in the default log directory, `logs/`, in addition to the contents of `config.json` and the symbols used. The logfile contains the total runtime, the Java heapsize used, and the number of times that the "line queue" and "datapoint" queues were unsuccessfully enqueued to/dequeued from. The purpose of including this information is so that after test runs, it is possible to know exactly what configuration was responsible for the runtime.
+This will save a copy of the  program's output in the default log directory, `logs/`, in addition to the contents of `config.json` and the symbols used. The logfile contains the total runtime, the Java heapsize used, and the number of times that the "line queue" and "datapoint" queues were unsuccessfully enqueued to/dequeued from. The purpose of including this information is so that after test runs, it is possible to know exactly what configuration was responsible for the runtime. Note that the program itself doesn't do any logging -- it relies on you to capture its output to stdout somewhere.
 
 The most important part of this script is the option `MAX_MEM` at the top. It sets the Java heap size. It should be edited once on each machine the program is copied to to account for the amount of memory available on that machine.
 
@@ -18,7 +18,7 @@ Use the `pom.xml` included to compile with Maven, via `mvn compile`.
 
 Run the `jar` produced by Maven as follows:
 
-    java -XmsN -XmsN -d64 [OPTIONS]
+    java -jar PATH_TO_JAR.jar -XmsN -XmsN -d64 [OPTIONS]
 
 Where `N` is the Java heap size. The Java heap size is the maximum amount of memory that the JVM is allowed to use once the program starts. It is *extremely* memory hungry, and this *must* be raised above the default for even a moderately large run.
 
