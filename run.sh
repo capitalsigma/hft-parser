@@ -6,6 +6,7 @@ LOGS_DIR="logs/"
 
 
 target_jar="-jar target/hft-parser-1.0-SNAPSHOT-jar-with-dependencies.jar"
+symb="-s arca-data/all_symbols.txt"
 in_book="-b $1"
 out_file="-o $2"
 config_file="-c $3"
