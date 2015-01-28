@@ -43,6 +43,8 @@ public class ArcaParserTest {
 
     private final String TEST_ERRORS = "A,1,3940662558851079,P,B,100,FOO,.12345678,14400,566,E,AARCA";
 
+    private final String TEST_EMPTY_MS = "A,1,1,P,B,2500,FOO,1,28800,,E,ARCAX,";
+
     MarketOrderCollectionFactory collectionFactory;
     private WaitFreeQueue<String> inQ;
     private WaitFreeQueue<DataPoint> outQ;
@@ -69,6 +71,7 @@ fail */
                                 ArcaParserConfig.getDefault(),
                                 mutableBoolean);
     }
+
 
     @Test
     public void testSetStartDate() throws Exception {
@@ -166,6 +169,16 @@ fail */
         assertTrue(one.equals(buyExpected));
         assertTrue(two.equals(modifyExpected));
         assertTrue(three.equals(deleteExpected));
+    }
+
+    @Test
+    public void testEmptyMs() throws Exception {
+        inQ.enq(TEST_EMPTY_MS);
+        runParserThread();
+
+        DataPoint expected = new DataPoint("FOO", new long[][]{{1000000l, 2500l}}, new long[][]{}, 28800000000l, 1);
+
+        assertThat(outQ.deq(), equalTo(expected));
     }
 
     private void runParserThread(ArcaParser parser) throws InterruptedException {

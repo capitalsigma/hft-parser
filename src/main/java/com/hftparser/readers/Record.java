@@ -73,15 +73,25 @@ abstract class Record {
         if (sizeOfFloatPart > 6) {
             throw new NumberFormatException("Can't have more than 6 decimal places. Got: " + priceString);
         } else {
-            Long toRet =
-                    intPart * PRICE_INTEGER_OFFSET + (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
+            Long toRet = intPart * PRICE_INTEGER_OFFSET +
+                    (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
 
             return toRet;
         }
     }
 
+/*
+    ArcaBook apparently uses an empty millisecond field to denote things that happen at an offset of 0 ms from the
+    second value. This is not documented.
+ */
     protected long makeTimestamp(String seconds, String ms) {
-        return Long.parseLong(seconds) * 1000000l + Long.parseLong(ms) * 1000l + startTimestamp;
+        Long parsedMs;
+        if (ms.length() == 0) {
+            parsedMs = 0l;
+        } else {
+            parsedMs = Long.parseLong(ms) * 1000l;
+        }
+        return Long.parseLong(seconds) * 1000000l + parsedMs + startTimestamp;
     }
 
 
