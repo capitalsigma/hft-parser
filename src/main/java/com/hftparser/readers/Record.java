@@ -41,6 +41,10 @@ abstract class Record {
         return ticker;
     }
 
+    public static void setStartTimestamp(long startTimestamp) {
+        Record.startTimestamp = startTimestamp;
+    }
+
     protected long makeRefNum(String refNumStr) {
         int charsToTake = Math.min(19, refNumStr.length());
         return Long.parseLong(refNumStr.substring(0, charsToTake));
@@ -56,9 +60,6 @@ abstract class Record {
         long floatPart;
         long intPart;
         int sizeOfFloatPart = 0;
-
-        // System.out.println("got price: " + priceString);
-        //		System.out.println("parsing price: " + Arrays.toString(parts));
 
         intPart = safeParse(parts[0]);
 
@@ -106,6 +107,16 @@ abstract class Record {
     public long getSeqNum() {
         return seqNum;
     }
+
+    @Override
+    public String toString() {
+        return "Record{" +
+                "ticker='" + ticker + '\'' +
+                ", seqNum=" + seqNum +
+                ", refNum=" + refNum +
+                ", orderType=" + orderType +
+                '}';
+    }
 }
 
 
@@ -119,15 +130,13 @@ class AddRecord extends Record {
     private Long price;
 
     public AddRecord(String[] asSplit) {
+        ticker = tickerFromSplit(asSplit);
         seqNum = Long.parseLong(asSplit[1]); // drop last char out of 20
-        timeStamp = makeTimestamp(asSplit[8], asSplit[9]);
         refNum = makeRefNum(asSplit[2]);
-        ticker = asSplit[6];
+        orderType = makeOrderType(asSplit[4]);
         qty = Integer.parseInt(asSplit[5]);
-
-        // we do his trick from original to floating point error
         price = makePrice(asSplit[7]);
-
+        timeStamp = makeTimestamp(asSplit[8], asSplit[9]);
     }
 
     //    Find the ticker for this record without building a new one, so we can test if we need to parse it
@@ -145,6 +154,7 @@ class AddRecord extends Record {
         }
 
         toUpdate.put(price, qty + oldQty);
+        orderHistory.get(ticker).put(refNum, new Order(price, qty));
     }
 
 

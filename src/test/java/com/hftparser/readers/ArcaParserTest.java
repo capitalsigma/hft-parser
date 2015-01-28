@@ -12,6 +12,7 @@ import org.junit.runners.JUnit4;
 
 import java.util.Calendar;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
@@ -54,6 +55,10 @@ public class ArcaParserTest {
     }
 
     public void setParser(MutableBoolean mutableBoolean) {
+/* We need to reset this in b/t tests, otherwise the static value that's set from the previous run causes tests to
+fail */
+        Record.setStartTimestamp(0);
+
         collectionFactory = new MarketOrderCollectionFactory();
         inQ = new WaitFreeQueue<>(5);
         outQ = new WaitFreeQueue<>(5);
@@ -110,13 +115,7 @@ public class ArcaParserTest {
 
         runParserThread();
 
-        actual = outQ.deq().getTimeStamp();
-
-        System.out.println("expected - actual = " + (expected - actual));
-
-        assertThat(actual, is(expected));
-
-
+        assertThat(outQ.deq().getTimeStamp(), is(expected));
     }
 
     @Test
@@ -131,10 +130,7 @@ public class ArcaParserTest {
         DataPoint expected = new DataPoint("FOO", new long[][]{}, expectedSells, 31830137000l, 24);
         DataPoint actual = outQ.deq();
 
-        System.out.println("Got actual: " + actual.toString());
-
-        assertTrue(actual.equals(expected));
-
+        assertThat(actual, equalTo(expected));
     }
 
 
@@ -283,9 +279,9 @@ public class ArcaParserTest {
 
         DataPoint buy2Expected = new DataPoint("FOO", expectedThreeBuy, expectedThreeSell, 28800737000l, 1);
 
-        assertTrue(buy1Expected.equals(outQ.deq()));
-        assertTrue(sell1Expected.equals(outQ.deq()));
-        assertTrue(buy2Expected.equals(outQ.deq()));
+        assertThat(outQ.deq(), equalTo(buy1Expected));
+        assertThat(outQ.deq(), equalTo(sell1Expected));
+        assertThat(outQ.deq(), equalTo(buy2Expected));
     }
 
     @Test
@@ -325,14 +321,8 @@ public class ArcaParserTest {
         System.out.println("TO TEST #2:");
         toTest2.print();
 
-        boolean test1 = expected1.equals(toTest1);
-        boolean test2 = expected2.equals(toTest2);
-
-        System.out.println("Test 1: " + test1);
-        System.out.println("Test 2: " + test2);
-
-        assertTrue(test1);
-        assertTrue(test2);
+        assertThat(toTest1, equalTo(expected1));
+        assertThat(toTest2, equalTo(expected2));
     }
 
     @Test

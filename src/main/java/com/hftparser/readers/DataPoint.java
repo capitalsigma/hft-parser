@@ -29,25 +29,30 @@ public class DataPoint {
     }
 
 
-    public boolean equals(DataPoint other) {
-        if (other == null) {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
-        boolean res = other.ticker.equals(ticker) &&
-                (other.seqNum == seqNum) &&
-                (other.timeStamp == timeStamp) &&
-                Arrays.deepEquals(other.buy, buy) &&
-                Arrays.deepEquals(other.sell, sell);
+        DataPoint dataPoint = (DataPoint) o;
 
-        //        System.out.println("Testing pair:");
-        //
-        //        print();
-        //        other.print();
-        //
-        //        System.out.println("Equal?" + res);
+        return dataPoint.ticker.equals(ticker) &&
+                (dataPoint.seqNum == seqNum) &&
+                (dataPoint.timeStamp == timeStamp) &&
+                Arrays.deepEquals(dataPoint.buy, buy) &&
+                Arrays.deepEquals(dataPoint.sell, sell);
+    }
 
-        return res;
+    @Override
+    public int hashCode() {
+        int result = (int) (timeStamp ^ (timeStamp >>> 32));
+        result = 31 * result + (int) (seqNum ^ (seqNum >>> 32));
+        result = 31 * result + (ticker != null ? ticker.hashCode() : 0);
+        return result;
     }
 
     public WritableDataPoint getWritable() {

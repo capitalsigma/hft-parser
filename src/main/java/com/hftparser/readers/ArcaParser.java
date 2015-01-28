@@ -6,10 +6,7 @@ import com.hftparser.containers.WaitFreeQueue;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 
 class Order {
@@ -172,9 +169,9 @@ public class ArcaParser extends AbstractParser implements Runnable {
                                              toBuyNow,
                                              toSellNow,
                                              record.getTimeStamp(),
-                                             record.getTimeStamp());
+                                             record.getSeqNum());
 
-            System.out.println("About to push a DataPoint:" + toPush.toString());
+//            System.out.println("About to push a DataPoint:" + toPush.toString());
 
             // spin until we successfully push
             //noinspection StatementWithEmptyBody
@@ -200,8 +197,6 @@ public class ArcaParser extends AbstractParser implements Runnable {
         } else {
             return null;
         }
-
-        //        FIXME FIXME handle delete
     }
 
 
@@ -242,8 +237,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
                         // skip if it's not add, modify, delete
                         continue;
                     }
-
-                    // System.out.println("asSplit: " + Arrays.toString(asSplit));
+//
+//                    System.out.println("asSplit: " + Arrays.toString(asSplit));
 
                     // Also note that containsKey is O(1)
                     Record toProcess = null;
