@@ -89,6 +89,7 @@ public class ParseRun {
         Thread writerThread;
         Thread[] allThreads;
         ConfigFactory configFactory = null;
+        boolean success = true;
 
         long startTime = System.currentTimeMillis();
         long endTime;
@@ -141,13 +142,16 @@ public class ParseRun {
         hdf5CompoundDSBridgeConfig = configFactory.getHdf5CompoundDSBridgeConfig();
         startCalendar = startCalendarFromFilename(args.bookPath);
 
-
-        if (args.numPerRun == null) {
-            runLoop(symbols, symbols.length);
-        } else {
-            runLoop(symbols, args.numPerRun);
+        try {
+            if (args.numPerRun == null) {
+                runLoop(symbols, symbols.length);
+            } else {
+                runLoop(symbols, args.numPerRun);
+            }
+        } catch (Throwable throwable) {
+            System.out.println("FAILED ON INPUT FILE" + args.bookPath);
+            // Shouldn't need to log more things here because the other threads should have done it already
         }
-
 
         endTime = System.currentTimeMillis();
         System.out.println("Successfully created " + args.outPath);

@@ -130,7 +130,7 @@ fail */
 
         long[][] expectedSells = new long[][]{{99999984400l, 100l}};
 
-        DataPoint expected = new DataPoint("FOO", new long[][]{}, expectedSells, 31830137000l, 24);
+        DataPoint expected = new ValidDataPoint("FOO", new long[][]{}, expectedSells, 31830137000l, 24);
         DataPoint actual = outQ.deq();
 
         assertThat(actual, equalTo(expected));
@@ -152,11 +152,11 @@ fail */
 
         long[][] expectedTwoBuy = {{382500, 900}};
 
-        DataPoint buyExpected = new DataPoint("FOO", expectedOneBuy, new long[][]{}, 28800737000l, 1);
+        DataPoint buyExpected = new ValidDataPoint("FOO", expectedOneBuy, new long[][]{}, 28800737000l, 1);
 
-        DataPoint modifyExpected = new DataPoint("FOO", expectedTwoBuy, new long[][]{}, 29909390000l, 43);
+        DataPoint modifyExpected = new ValidDataPoint("FOO", expectedTwoBuy, new long[][]{}, 29909390000l, 43);
 
-        DataPoint deleteExpected = new DataPoint("FOO", new long[][]{}, new long[][]{}, 28800857000l, 2);
+        DataPoint deleteExpected = new ValidDataPoint("FOO", new long[][]{}, new long[][]{}, 28800857000l, 2);
 
         DataPoint one = outQ.deq();
         DataPoint two = outQ.deq();
@@ -176,7 +176,7 @@ fail */
         inQ.enq(TEST_EMPTY_MS);
         runParserThread();
 
-        DataPoint expected = new DataPoint("FOO", new long[][]{{1000000l, 2500l}}, new long[][]{}, 28800000000l, 1);
+        DataPoint expected = new ValidDataPoint("FOO", new long[][]{{1000000l, 2500l}}, new long[][]{}, 28800000000l, 1);
 
         assertThat(outQ.deq(), equalTo(expected));
     }
@@ -252,7 +252,7 @@ fail */
 
         long[][] expectedOneBuy = {{275000000, 1000}};
 
-        DataPoint buy1Expected = new DataPoint("FOO", expectedOneBuy, new long[][]{}, 28800737000l, 1);
+        DataPoint buy1Expected = new ValidDataPoint("FOO", expectedOneBuy, new long[][]{}, 28800737000l, 1);
 
         assertTrue(buy1Expected.equals(outQ.deq()));
 
@@ -286,11 +286,11 @@ fail */
         long[][] expectedThreeSell = {{20000, 30000}};
 
 
-        DataPoint buy1Expected = new DataPoint("FOO", expectedOneBuy, new long[][]{}, 28800737000l, 1);
+        DataPoint buy1Expected = new ValidDataPoint("FOO", expectedOneBuy, new long[][]{}, 28800737000l, 1);
 
-        DataPoint sell1Expected = new DataPoint("FOO", expectedTwoBuy, expectedTwoSell, 28800739000l, 8);
+        DataPoint sell1Expected = new ValidDataPoint("FOO", expectedTwoBuy, expectedTwoSell, 28800739000l, 8);
 
-        DataPoint buy2Expected = new DataPoint("FOO", expectedThreeBuy, expectedThreeSell, 28800737000l, 1);
+        DataPoint buy2Expected = new ValidDataPoint("FOO", expectedThreeBuy, expectedThreeSell, 28800737000l, 1);
 
         assertThat(outQ.deq(), equalTo(buy1Expected));
         assertThat(outQ.deq(), equalTo(sell1Expected));
@@ -322,9 +322,9 @@ fail */
 
         long[][] expectedOrders2Buy = {{980000, 3000}, {382500, 900},};
 
-        DataPoint expected1 = new DataPoint("FOO", expectedOrders1Buy, expectedEmptySell, 29909390000l, 43);
+        DataPoint expected1 = new ValidDataPoint("FOO", expectedOrders1Buy, expectedEmptySell, 29909390000l, 43);
 
-        DataPoint expected2 = new DataPoint("FOO", expectedOrders2Buy, expectedEmptySell, 33643922000l, 2);
+        DataPoint expected2 = new ValidDataPoint("FOO", expectedOrders2Buy, expectedEmptySell, 33643922000l, 2);
 
         DataPoint toTest1 = outQ.deq();
         DataPoint toTest2 = outQ.deq();

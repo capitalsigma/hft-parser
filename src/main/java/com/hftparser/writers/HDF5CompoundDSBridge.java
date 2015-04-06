@@ -3,6 +3,7 @@ package com.hftparser.writers;
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.HDF5GenericStorageFeatures;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
+import ch.systemsx.cisd.hdf5.IHDF5Writer;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 
 /**
@@ -10,10 +11,8 @@ import com.hftparser.config.HDF5CompoundDSBridgeConfig;
  */
 class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
     protected long currentOffset;
-    //    protected final IHDF5CompoundWriter writer;
-    //    protected final String fullPath;
     private final T[] elToWrite;
-    //    protected final HDF5CompoundType<T> type;
+    private boolean poisoned;
 
 
     public static class FailedWriteError extends Exception {
@@ -64,9 +63,20 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
         writer.writeArrayBlockWithOffset(fullPath, type, elToWrite, currentOffset++);
     }
 
-
-    public void flush() throws FailedWriteError {
-
+    public void poison() {
+        poisoned = true;
     }
 
+    public void flush() throws FailedWriteError {
+        // Sublcasses are responsible for doing cleanup before we're called. So now it's safe to delete ourselves
+    }
+
+//    We need to pass in a fileWriter here in case we've been marked for deletion
+    public void flush(IHDF5Writer fileWriter) throws  FailedWriteError{
+        flush();
+
+        if (poisoned) {
+            fileWriter.delete(fullPath);
+        }
+    }
 }

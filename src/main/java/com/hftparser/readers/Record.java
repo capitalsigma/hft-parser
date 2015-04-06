@@ -190,6 +190,12 @@ class DeleteRecord extends Record {
         Order toDelete = tickerHistory.get(refNum);
         Long currentQty = toUpdate.get(toDelete.price);
 
+//        System.out.printf("History: %s, toDelete: %s, toUpdate: %s, currentQty: %s\n",
+//                          tickerHistory,
+//                          toDelete,
+//                          toUpdate,
+//                          currentQty);
+
         toUpdate.put(toDelete.price, currentQty - toDelete.quantity);
         tickerHistory.remove(refNum);
     }

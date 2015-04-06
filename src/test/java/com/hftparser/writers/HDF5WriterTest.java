@@ -5,6 +5,7 @@ import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.DataPoint;
+import com.hftparser.readers.ValidDataPoint;
 import com.hftparser.readers.WritableDataPoint;
 import mockit.Mock;
 import mockit.MockUp;
@@ -64,8 +65,8 @@ public class HDF5WriterTest {
 
     @Test
     public void testRun() throws Exception {
-        DataPoint testPoint1 = new DataPoint("FOO", new long[][]{{1, 2}}, new long[][]{{3, 4}}, 6, 10l);
-        DataPoint testPoint2 = new DataPoint("FOO", new long[][]{{4, 5}}, new long[][]{{6, 7}}, 7, 101l);
+        DataPoint testPoint1 = new ValidDataPoint("FOO", new long[][]{{1, 2}}, new long[][]{{3, 4}}, 6, 10l);
+        DataPoint testPoint2 = new ValidDataPoint("FOO", new long[][]{{4, 5}}, new long[][]{{6, 7}}, 7, 101l);
 
         WritableDataPoint expected1 = testPoint1.getWritable();
         WritableDataPoint expected2 = testPoint2.getWritable();
@@ -95,8 +96,8 @@ public class HDF5WriterTest {
 
         System.out.println("Built mock bridge");
 
-        DataPoint testPoint1 = new DataPoint("FOO", new long[][]{{1, 2}}, new long[][]{{3, 4}}, 6, 10l);
-        DataPoint testPoint2 = new DataPoint("FOO", new long[][]{{4, 5}}, new long[][]{{6, 7}}, 7, 101l);
+        DataPoint testPoint1 = new ValidDataPoint("FOO", new long[][]{{1, 2}}, new long[][]{{3, 4}}, 6, 10l);
+        DataPoint testPoint2 = new ValidDataPoint("FOO", new long[][]{{4, 5}}, new long[][]{{6, 7}}, 7, 101l);
 
         WritableDataPoint expected1 = testPoint1.getWritable();
         WritableDataPoint expected2 = testPoint2.getWritable();

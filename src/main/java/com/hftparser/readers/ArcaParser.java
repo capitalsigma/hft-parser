@@ -4,7 +4,6 @@ package com.hftparser.readers;
 import com.hftparser.config.ArcaParserConfig;
 import com.hftparser.containers.WaitFreeQueue;
 import org.apache.commons.lang.mutable.MutableBoolean;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -105,15 +104,15 @@ public class ArcaParser extends AbstractParser implements Runnable {
         OUTPUT_PROGRESS_EVERY = config.getOutput_progress_every();
 
         ordersNow = new HashMap<>(tickers.length);
-        orderHistory = new HashMap<>(tickers.length);
+        orderHistory = new NonnullHashMap<>(tickers.length);
 
         // First we initialize with empty hashmaps
         for (String ticker : tickers) {
-            Map<OrderType, MarketOrderCollection> toAdd = new HashMap<>();
+            Map<OrderType, MarketOrderCollection> toAdd = new NonnullHashMap<>();
             toAdd.put(OrderType.Buy, collectionFactory.buildBuy());
             toAdd.put(OrderType.Sell, collectionFactory.buildSell());
             ordersNow.put(ticker, toAdd);
-            orderHistory.put(ticker, new HashMap<Long, Order>());
+            orderHistory.put(ticker, new NonnullHashMap<Long, Order>());
         }
 
         // Set up a lookup table for our recordTypes
@@ -151,8 +150,14 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         MarketOrderCollection toUpdate = ordersForTicker.get(record.getOrderType());
 
-        record.process(toUpdate, orderHistory);
-
+        try {
+            record.process(toUpdate, orderHistory);
+        } catch (KeyError error) {
+            System.out.println("Error parsing record: " + record);
+            System.out.println(error.getMessage());
+//            We need to let it bubble up because the top level lets everyone else know that we died
+            throw error;
+        }
 
         MarketOrderCollection buyOrders = ordersForTicker.get(OrderType.Buy);
         MarketOrderCollection sellOrders = ordersForTicker.get(OrderType.Sell);
@@ -165,7 +170,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
             long[][] toSellNow = sellOrders.topN();
 
 
-            DataPoint toPush = new DataPoint(record.getTicker(),
+            DataPoint toPush = new ValidDataPoint(record.getTicker(),
                                              toBuyNow,
                                              toSellNow,
                                              record.getTimeStamp(),
@@ -208,9 +213,14 @@ public class ArcaParser extends AbstractParser implements Runnable {
         }
     }
 
+    private void purgeFailingTicker(String ticker) {
+        ordersNow.remove(ticker);
+        outQueue.enq(new PoisonDataPoint(ticker));
+    }
+
     public void run() {
         String toParse;
-        String[] asSplit;
+        String[] asSplit = null;
         int linesSoFar = 0;
 
         RecordType recType;
@@ -229,8 +239,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
                     }
 
                     asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);
-
-                    // System.out.println("asSplit: " + Arrays.toString(asSplit));
+//
+//                    System.out.println("asSplit: " + Arrays.toString(asSplit));
 
                     // Also note that containsKey is O(1)
                     if ((recType = recordTypeLookup.get(asSplit[0])) == null) {
@@ -255,16 +265,32 @@ public class ArcaParser extends AbstractParser implements Runnable {
                     }
 
                     if (toProcess != null) {
-                        processRecord(toProcess);
+                        try {
+                            processRecord(toProcess);
+                        } catch (KeyError keyError) {
+                            System.out.println(keyError.getMessage());
+                            keyError.printStackTrace();
+                            System.out.println(
+                                    "Attempted to process an invalid order. This is probably due to a duplicate add. " +
+                                            "Failing record: " + toProcess.toString());
+                            System.out.println("To troubleshoot, check the input file for malformed data.");
+                            System.out.println(
+                                    "The symbol " + toProcess.getTicker() + " will be removed from the output file.");
+                            purgeFailingTicker(toProcess.getTicker());
+                        }
                     }
 
-                }
+
+
+                    }
 
             }
         } catch (Throwable throwable) {
             pipelineError.setValue(true);
             System.out.println("Parser failed. Stacktrace:");
+            System.out.println("Failling row: " + (asSplit == null ? "null" : Arrays.toString(asSplit)));
             throwable.printStackTrace();
+            throw throwable;
         } finally {
             outQueue.acceptingOrders = false;
         }

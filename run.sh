@@ -14,7 +14,7 @@ num_per_run="-n $4"
 
 out_logfile="$LOGS_DIR/$(date +%s).txt"
 
-cmd_to_run="$JAVA -Xms$MAX_MEM -Xmx$MAX_MEM $JAVA_FLAGS $target_jar $in_book $out_file $config_file $num_per_run"
+cmd_to_run="$JAVA -Xms$MAX_MEM -Xmx$MAX_MEM $JAVA_FLAGS $target_jar $in_book $out_file $config_file $num_per_run $symb"
 
 echo $cmd_to_run > $out_logfile
 cat ${3} >> $out_logfile

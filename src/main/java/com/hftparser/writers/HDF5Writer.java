@@ -7,6 +7,7 @@ import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import com.hftparser.config.HDF5WriterConfig;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.readers.DataPoint;
+import com.hftparser.readers.PoisonDataPointException;
 import com.hftparser.readers.WritableDataPoint;
 import org.apache.commons.lang.mutable.MutableBoolean;
 
@@ -78,10 +79,8 @@ public class HDF5Writer implements Runnable {
              pipelineError);
     }
 
-    private void writePoint(DataPoint dataPoint) throws HDF5CompoundDSBridge.FailedWriteError {
-        String ticker = dataPoint.getTicker();
+    private HDF5CompoundDSBridge<WritableDataPoint> getDSBridgeForTicker(String ticker) {
         HDF5CompoundDSBridge<WritableDataPoint> bridge;
-
         if ((bridge = dsForTicker.get(ticker)) == null) {
             DatasetName name = new DatasetName(ticker, BOOK_DS_NAME);
             bridge = bridgeBuilder.build(name);
@@ -89,7 +88,19 @@ public class HDF5Writer implements Runnable {
             dsForTicker.put(ticker, bridge);
         }
 
-        bridge.appendElement(dataPoint.getWritable());
+        return bridge;
+    }
+
+
+    private void writePoint(DataPoint dataPoint) throws HDF5CompoundDSBridge.FailedWriteError {
+        HDF5CompoundDSBridge<WritableDataPoint> bridge = getDSBridgeForTicker(dataPoint.getTicker());
+
+        try {
+            bridge.appendElement(dataPoint.getWritable());
+        } catch (PoisonDataPointException ex) {
+//            Now we'll be deleted at the end
+            bridge.poison();
+        }
     }
 
 
@@ -121,10 +132,10 @@ public class HDF5Writer implements Runnable {
         } finally {
             for (HDF5CompoundDSBridge<WritableDataPoint> bridge : dsForTicker.values()) {
                 try {
-                    bridge.flush();
+                    bridge.flush(fileWriter);
                 } catch (HDF5CompoundDSBridge.FailedWriteError failedWriteError) {
                     pipelineError.setValue(true);
-                    System.out.println("Failed trying to close existing file landles.");
+                    System.out.println("Failed trying to close existing file handles.");
                     failedWriteError.printStackTrace();
                 }
             }
