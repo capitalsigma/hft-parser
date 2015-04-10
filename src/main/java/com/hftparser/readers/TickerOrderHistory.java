@@ -18,8 +18,6 @@ public class TickerOrderHistory {
     // Returns true if the next seqnum is valid and updates the current seqnum as a side effect, otherwise, returns
     // faslse
     public boolean updateSeqNum(long nextSeqNum) {
-        System.out.println("nextSeqNum = [" + nextSeqNum + "]");
-        System.out.println("lastSeqNum = " + lastSeqNum);
         if (nextSeqNum <= lastSeqNum) {
             return false;
         } else {

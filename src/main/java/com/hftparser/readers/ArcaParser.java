@@ -147,15 +147,11 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
     private void processRecord(Record record) {
         Map<OrderType, MarketOrderCollection> ordersForTicker = ordersNow.get(record.getTicker());
-
         MarketOrderCollection toUpdate = ordersForTicker.get(record.getOrderType());
 
-        System.out.println("toUpdate = " + toUpdate);
 
         //  We do no error handling here because exceptions are caught higher up
         record.process(toUpdate, orderHistories);
-
-        System.out.println("toUpdate = " + toUpdate);
 
         MarketOrderCollection buyOrders = ordersForTicker.get(OrderType.Buy);
         MarketOrderCollection sellOrders = ordersForTicker.get(OrderType.Sell);
@@ -250,8 +246,6 @@ public class ArcaParser extends AbstractParser implements Runnable {
                             toProcess = parseDelete(asSplit);
                             break;
                     }
-
-                    System.out.println("toProcess = " + toProcess);
 
                     if (toProcess != null) {
                         try {

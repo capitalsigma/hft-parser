@@ -26,15 +26,17 @@ public class ArcaParserTest {
     private final String[] TEST_TICKERS = {"FOO", "BAR"};
 
     private final String TEST_ADD_BUY1 = "A,1,12884901908,B,B,1000,FOO,2.75,28800,737,B,AARCA,";
-    private final String TEST_ADD_BUY2 = "A,1,12884902050,B,B,3200,FOO,0.98,28800,737,B,AARCA,";
+    private final String TEST_ADD_BUY2 = "A,10,12884902050,B,B,3200,FOO,0.98,28800,737,B,AARCA,";
 
-    private final String TEST_ADD_SELL1 = "A,8,12884902687,B,S,30000,FOO,0.02,28800,739,B,AARCA,";
+    private final String TEST_ADD_BUY1_DUP = "A,2,12884901908,B,B,1000,FOO,2.75,28800,737,B,AARCA,";
+
+    private final String TEST_ADD_SELL1 = "A,9,12884902687,B,S,30000,FOO,0.02,28800,739,B,AARCA,";
     private final String TEST_ADD_SELL2 = "A,12,12884902091,B,S,200000,BAR,0.0195,28800,740,B,AARCA,";
 
-    private final String TEST_DELETE_BUY1 = "D,2,12884901908,28800,857,FOO,B,B,AARCA,B,";
+    private final String TEST_DELETE_BUY1 = "D,52,12884901908,28800,857,FOO,B,B,AARCA,B,";
 
     private final String TEST_MODIFY_BUY1 = "M,43,12884901908,900,0.3825,29909,390,FOO,B,B,AARCA,B,";
-    private final String TEST_MODIFY_BUY2 = "M,2,12884902050,3000,0.98,33643,922,FOO,B,B,AARCA,B,";
+    private final String TEST_MODIFY_BUY2 = "M,50,12884902050,3000,0.98,33643,922,FOO,B,B,AARCA,B,";
 
     private final String TEST_WHOLE = "A,1,12884901908,B,B,1000,FOO,275,28800,737,B,AARCA,";
 
@@ -158,7 +160,7 @@ fail */
 
         DataPoint modifyExpected = new ValidDataPoint("FOO", expectedTwoBuy, new long[][]{}, 29909390000l, 43);
 
-        DataPoint deleteExpected = new ValidDataPoint("FOO", new long[][]{}, new long[][]{}, 28800857000l, 2);
+        DataPoint deleteExpected = new ValidDataPoint("FOO", new long[][]{}, new long[][]{}, 28800857000l, 52);
 
         DataPoint one = outQ.deq();
         DataPoint two = outQ.deq();
@@ -291,9 +293,9 @@ fail */
 
         DataPoint buy1Expected = new ValidDataPoint("FOO", expectedOneBuy, new long[][]{}, 28800737000l, 1);
 
-        DataPoint sell1Expected = new ValidDataPoint("FOO", expectedTwoBuy, expectedTwoSell, 28800739000l, 8);
+        DataPoint sell1Expected = new ValidDataPoint("FOO", expectedTwoBuy, expectedTwoSell, 28800739000l, 9);
 
-        DataPoint buy2Expected = new ValidDataPoint("FOO", expectedThreeBuy, expectedThreeSell, 28800737000l, 1);
+        DataPoint buy2Expected = new ValidDataPoint("FOO", expectedThreeBuy, expectedThreeSell, 28800737000l, 10);
 
         assertThat(outQ.deq(), equalTo(buy1Expected));
         assertThat(outQ.deq(), equalTo(sell1Expected));
@@ -309,14 +311,12 @@ fail */
 //        private final String TEST_ADD_SELL2 = "A,12,12884902091,B,S,200000,BAR,0.0195,28800,740,B,AARCA,";
 
         inQ.enq(TEST_ADD_BUY1);
-        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_ADD_BUY1_DUP);
         inQ.enq(TEST_ADD_SELL2);
         inQ.enq(TEST_ADD_BUY2);
         inQ.enq(TEST_ADD_BUY1);
-        inQ.enq(TEST_ADD_BUY1);
-        inQ.enq(TEST_ADD_BUY1);
-        inQ.enq(TEST_DELETE_BUY1);
         inQ.enq(TEST_MODIFY_BUY1);
+        inQ.enq(TEST_DELETE_BUY1);
 
 
         runParserThread(parser);
@@ -367,7 +367,7 @@ fail */
 
         DataPoint expected1 = new ValidDataPoint("FOO", expectedOrders1Buy, expectedEmptySell, 29909390000l, 43);
 
-        DataPoint expected2 = new ValidDataPoint("FOO", expectedOrders2Buy, expectedEmptySell, 33643922000l, 2);
+        DataPoint expected2 = new ValidDataPoint("FOO", expectedOrders2Buy, expectedEmptySell, 33643922000l, 50);
 
         DataPoint toTest1 = outQ.deq();
         DataPoint toTest2 = outQ.deq();

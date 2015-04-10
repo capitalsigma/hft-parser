@@ -106,8 +106,6 @@ abstract class Record {
     }
 
     public void process(MarketOrderCollection toUpdate, Map<String, TickerOrderHistory> orderHistories) {
-        System.out.println("Record.process");
-        new Exception().printStackTrace();
         // Skip if seqnum is bad
         if (prepare(orderHistories)) {
             processTemplateMethod(toUpdate, orderHistories);
