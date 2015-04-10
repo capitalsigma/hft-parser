@@ -212,7 +212,9 @@ class AddRecord extends Record {
         public Record getFailing() {
             return failing;
         }
-    }    @Override
+    }
+
+    @Override
     public String toString() {
         return "AddRecord{" +
                 "qty=" + qty +
@@ -274,6 +276,10 @@ class ModifyRecord extends Record {
 
     public int getQty() {
         return qty;
+    }
+
+    public Long getPrice() {
+        return price;
     }    @Override
     protected void processTemplateMethod(MarketOrderCollection toUpdate,
                                          Map<String, TickerOrderHistory> orderHistories) {
@@ -300,9 +306,6 @@ class ModifyRecord extends Record {
         toUpdate.put(price, qty + qtyOfNewPriceToAdd);
     }
 
-    public Long getPrice() {
-        return price;
-    }
 
 
 

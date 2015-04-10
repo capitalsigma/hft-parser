@@ -75,13 +75,13 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
         }
     }
 
+    public boolean isPoisoned() {
+        return poisoned;
+    }
+
     public static class FailedWriteError extends Exception {
         public FailedWriteError(Throwable cause) {
             super(cause);
         }
-    }
-
-    public boolean isPoisoned() {
-        return poisoned;
     }
 }

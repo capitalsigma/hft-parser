@@ -58,18 +58,18 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
     }
 
     @Override
+    public void prepareFlush() throws FailedWriteError {
+        waitForLastWriter();
+        super.prepareFlush();
+    }
+
+    @Override
     protected void doFlush() throws FailedWriteError {
         //        System.out.println("Called async doFlush");
         waitForLastWriter();
         lastWriter = executor.submit(new Writer(cache));
 
         swapCaches();
-    }
-
-    @Override
-    public void prepareFlush() throws FailedWriteError {
-        waitForLastWriter();
-        super.prepareFlush();
     }
 
     public class Writer implements Runnable {
