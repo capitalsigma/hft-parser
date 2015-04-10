@@ -65,8 +65,12 @@ public class HDF5CompoundDSBridgeTest {
 
     @Test
     public void testPoison() throws Exception {
+        assertThat(writer.object().exists("/group/foo"), is(true));
+
         dtBridge.poison();
         dtBridge.flush(writer);
+
+        assertThat(writer.object().exists("/group/foo"), is(false));
     }
 
 

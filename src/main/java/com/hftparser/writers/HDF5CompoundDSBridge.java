@@ -15,7 +15,6 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
     protected long currentOffset;
     private boolean poisoned;
 
-
     protected HDF5CompoundDSBridge() {
         elToWrite = null;
     }
@@ -30,7 +29,7 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
 
         HDF5GenericStorageFeatures features = initFeatures(bridgeConfig);
 
-        writer.createArray(name.getFullPath(), type, startSize, chunkSize, features);
+        writer.createArray(fullPath, type, startSize, chunkSize, features);
         currentOffset = 0;
         //noinspection unchecked
         elToWrite = (T[]) new Object[1];
@@ -80,5 +79,9 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
         public FailedWriteError(Throwable cause) {
             super(cause);
         }
+    }
+
+    public boolean isPoisoned() {
+        return poisoned;
     }
 }

@@ -171,4 +171,6 @@ public class HDF5Writer implements Runnable {
     public HashMap<String, HDF5CompoundDSBridge<WritableDataPoint>> getDsForTicker() {
         return dsForTicker;
     }
+
+
 }
