@@ -28,12 +28,4 @@ public class HDF5CompoundDSParallelFlushBridgeTest extends HDF5CompoundDSAsyncBr
     protected void testForWriter() {
         assertNotNull(getDtBridge().getLastWriter());
     }
-
-//    @After
-//    @Override
-//    public void tearDown() throws Exception {
-//        super.tearDown();
-//
-//        assertThat(dtBridge instanceof HDF5CompoundDSParallelFlushBridge, is(true));
-//    }
 }

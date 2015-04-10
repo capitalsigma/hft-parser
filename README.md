@@ -1,3 +1,12 @@
+# Building the parser
+
+This project relies on Maven and Java version >= 7. To build the parser, `cd` into the main directory and run:
+
+    mvn clean compile assembly:single
+
+And, once it completes successfully, the executable will be available under `target/hft-parser-1
+.0-SNAPSHOT-jar-with-dependencies.jar`. This is the directory that `run.sh` expects.
+
 # Quickstart
 
 The easiest way to run the parser is with the `run.sh` shell script. The syntax for using it is:
@@ -8,7 +17,8 @@ Here, `[infile].cs.gz` is the input ARCABook file, `[outfile].h5` is the name of
 
 This will save a copy of the  program's output in the default log directory, `logs/`, in addition to the contents of `config.json` and the symbols used. The logfile contains the total runtime, the Java heapsize used, and the number of times that the "line queue" and "datapoint" queues were unsuccessfully enqueued to/dequeued from. The purpose of including this information is so that after test runs, it is possible to know exactly what configuration was responsible for the runtime. Note that if you want all of your logs in one big file, you need to capture the output of `run.sh` somewhere. Otherwise, the logs for each run will only live in separate `logs/$timestamp.txt` files, where `$timestamp` is the UNIX timestamp that the run began at.
 
-The most important part of this script is the option `MAX_MEM` at the top. It sets the Java heap size. It **must** be edited once on each machine the program is copied to to account for the amount of memory available on that machine. Good values
+The **most important part** of this script is the option `MAX_MEM` at the top. It sets the Java heap size. It **must**
+be edited once on each machine the program is copied to to account for the amount of memory available on that machine. Good values
 
 # Compiling
 

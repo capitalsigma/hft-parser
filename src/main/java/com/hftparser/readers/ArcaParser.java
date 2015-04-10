@@ -242,7 +242,6 @@ public class ArcaParser extends AbstractParser implements Runnable {
                             processRecord(toProcess);
                         } catch (AddRecord.DuplicateAddError ex) {
                             System.out.println(ex.getMessage());
-                            ex.printStackTrace();
                             System.out.println(
                                     "The symbol " + toProcess.getTicker() + " will be removed from the output file.");
                             purgeFailingTicker(toProcess.getTicker());
