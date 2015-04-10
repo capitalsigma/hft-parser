@@ -6,7 +6,7 @@ import com.hftparser.data.WritableDataPoint;
 import static org.junit.Assert.assertNotNull;
 
 public class HDF5CompoundDSParallelFlushBridgeTest extends HDF5CompoundDSAsyncBridgeTest {
-    protected String TEST_CONFIG = "src/test/resources/parallel-flush-config.json";
+    protected String TEST_CONFIG = "src/test/resources/parallel-prepareFlush-config.json";
 
     @Override
     protected void setConfig() throws Exception {

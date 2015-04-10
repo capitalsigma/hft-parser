@@ -123,6 +123,13 @@ public class HDF5WriterTest {
         assertTrue(pipelineError.booleanValue());
     }
 
+
+    @Test
+    public void testPoisonDataPoint() throws Exception {
+
+
+    }
+
     @After
     public void tearDown() throws Exception {
         inQ.acceptingOrders = false;

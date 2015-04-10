@@ -79,7 +79,7 @@ public class HDF5CompoundDSZeroOutCachingBridgeTest {
         for (int i = 0; i < 6; i++) {
             dtBridge.appendElement(testPoint1);
         }
-        dtBridge.flush();
+        dtBridge.prepareFlush();
 
         actual = dtBridge.readBlock(0, 10);
 

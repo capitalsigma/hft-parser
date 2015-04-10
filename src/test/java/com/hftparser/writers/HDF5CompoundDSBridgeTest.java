@@ -1,16 +1,26 @@
 package com.hftparser.writers;
 
+import ch.systemsx.cisd.hdf5.HDF5CompoundType;
+import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
+import com.hftparser.config.HDF5CompoundDSBridgeConfig;
+import com.hftparser.data.DataPoint;
 import com.hftparser.data.DataSetName;
+import com.hftparser.data.PoisonDataPoint;
 import com.hftparser.data.WritableDataPoint;
+import mockit.Mock;
+import mockit.MockUp;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.*;
 
 public class HDF5CompoundDSBridgeTest {
     private final String TEST_PATH = "test-out.h5";
@@ -54,11 +64,19 @@ public class HDF5CompoundDSBridgeTest {
     }
 
     @Test
+    public void testPoison() throws Exception {
+        dtBridge.poison();
+        dtBridge.flush(writer);
+    }
+
+
+    @Test
     public void testDoesntOverflowStackBecauseOfALibraryBug() {
     }
 
     @After
     public void tearDown() throws Exception {
         writer.close();
+
     }
 }

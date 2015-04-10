@@ -67,9 +67,9 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
     }
 
     @Override
-    public void flush() throws FailedWriteError {
+    public void prepareFlush() throws FailedWriteError {
         waitForLastWriter();
-        super.flush();
+        super.prepareFlush();
     }
 
     public class Writer implements Runnable {

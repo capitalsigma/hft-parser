@@ -62,13 +62,14 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
         poisoned = true;
     }
 
-    public void flush() throws FailedWriteError {
+    // No one else is allowed to call this -- it's supposed to be subclassed
+    protected void prepareFlush() throws FailedWriteError {
         // Sublcasses are responsible for doing cleanup before we're called. So now it's safe to delete ourselves
     }
 
     //    We need to pass in a fileWriter here in case we've been marked for deletion
     public void flush(IHDF5Writer fileWriter) throws FailedWriteError {
-        flush();
+        prepareFlush();
 
         if (poisoned) {
             fileWriter.delete(fullPath);

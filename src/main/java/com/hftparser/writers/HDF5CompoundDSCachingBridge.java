@@ -39,17 +39,17 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
     }
 
     @Override
-    public void flush() throws HDF5CompoundDSAsyncBridge.FailedWriteError {
+    public void prepareFlush() throws HDF5CompoundDSAsyncBridge.FailedWriteError {
         flush(cache);
     }
 
     //    split this off so we can override
     protected void doFlush() throws HDF5CompoundDSAsyncBridge.FailedWriteError {
-        flush();
+        prepareFlush();
     }
 
     public void flush(ElementCache<T> cacheToFlush) {
-        //        System.out.println("Called flush");
+        //        System.out.println("Called prepareFlush");
 
 
         writer.writeArrayBlockWithOffset(fullPath, type, cacheToFlush.getElements(), currentOffset);

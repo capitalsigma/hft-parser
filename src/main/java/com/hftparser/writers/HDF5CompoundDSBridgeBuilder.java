@@ -105,7 +105,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         } else {
-            //            System.out.println("Building. Parallel flush? " + parallelFlush);
+            //            System.out.println("Building. Parallel prepareFlush? " + parallelFlush);
             if (parallelFlush) {
                 return buildParallelFlush(name);
             } else if (async) {
@@ -191,7 +191,7 @@ public class HDF5CompoundDSBridgeBuilder<T> {
             initExecutor();
         }
         //
-        //        System.out.println("Building parallel flush bridge");
+        //        System.out.println("Building parallel prepareFlush bridge");
 
         return new HDF5CompoundDSParallelFlushBridge<>(name,
                                                        type,
