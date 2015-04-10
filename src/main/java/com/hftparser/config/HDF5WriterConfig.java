@@ -10,38 +10,10 @@ public class HDF5WriterConfig {
     private final int start_size;
     private final int chunk_size;
     private final IHDF5WriterConfigurator.SyncMode sync_mode;
-    private boolean overwrite;
     private final boolean keep_datasets_if_they_exist;
     private final boolean perform_numeric_conversions;
+    private boolean overwrite;
 
-
-    public int getStart_size() {
-        return start_size;
-    }
-
-    public int getChunk_size() {
-        return chunk_size;
-    }
-
-    public IHDF5WriterConfigurator.SyncMode getSync_mode() {
-        return sync_mode;
-    }
-
-    public boolean isOverwrite() {
-        return overwrite;
-    }
-
-    public boolean isKeep_datasets_if_they_exist() {
-        return keep_datasets_if_they_exist;
-    }
-
-    public boolean isPerform_numeric_conversions() {
-        return perform_numeric_conversions;
-    }
-
-    public void setOverwrite(boolean overwrite) {
-        this.overwrite = overwrite;
-    }
 
     HDF5WriterConfig(JSONObject json) throws BadConfigFileError {
         start_size = json.getInt("start_size");
@@ -91,6 +63,49 @@ public class HDF5WriterConfig {
         this.start_size = start_size;
     }
 
+    public static HDF5WriterConfig getDefault() {
+        return new HDF5WriterConfig(true, true, true, IHDF5WriterConfigurator.SyncMode.SYNC_BLOCK, 100, 10);
+    }
+
+    public int getStart_size() {
+        return start_size;
+    }
+
+    public int getChunk_size() {
+        return chunk_size;
+    }
+
+    public IHDF5WriterConfigurator.SyncMode getSync_mode() {
+        return sync_mode;
+    }
+
+    public boolean isOverwrite() {
+        return overwrite;
+    }
+
+    public void setOverwrite(boolean overwrite) {
+        this.overwrite = overwrite;
+    }
+
+    public boolean isKeep_datasets_if_they_exist() {
+        return keep_datasets_if_they_exist;
+    }
+
+    public boolean isPerform_numeric_conversions() {
+        return perform_numeric_conversions;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = start_size;
+        result = 31 * result + chunk_size;
+        result = 31 * result + sync_mode.hashCode();
+        result = 31 * result + (overwrite ? 1 : 0);
+        result = 31 * result + (keep_datasets_if_they_exist ? 1 : 0);
+        result = 31 * result + (perform_numeric_conversions ? 1 : 0);
+        return result;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -109,17 +124,6 @@ public class HDF5WriterConfig {
     }
 
     @Override
-    public int hashCode() {
-        int result = start_size;
-        result = 31 * result + chunk_size;
-        result = 31 * result + sync_mode.hashCode();
-        result = 31 * result + (overwrite ? 1 : 0);
-        result = 31 * result + (keep_datasets_if_they_exist ? 1 : 0);
-        result = 31 * result + (perform_numeric_conversions ? 1 : 0);
-        return result;
-    }
-
-    @Override
     public String toString() {
         return "HDF5WriterConfig{" +
                 "start_size=" + start_size +
@@ -129,9 +133,5 @@ public class HDF5WriterConfig {
                 ", keep_datasets_if_they_exist=" + keep_datasets_if_they_exist +
                 ", perform_numeric_conversions=" + perform_numeric_conversions +
                 '}';
-    }
-
-    public static HDF5WriterConfig getDefault() {
-        return new HDF5WriterConfig(true, true, true, IHDF5WriterConfigurator.SyncMode.SYNC_BLOCK, 100, 10);
     }
 }

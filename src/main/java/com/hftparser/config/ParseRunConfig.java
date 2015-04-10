@@ -15,10 +15,32 @@ public class ParseRunConfig {
     private final int min_backoff_s;
     private final int max_backoff_s;
     private final int min_backoff_d;
+    private final int max_backoff_d;
 
-    public static enum BackoffType {
-        String,
-        DataPoint
+    ParseRunConfig(JSONObject json) {
+        line_queue_size = json.getInt("line_queue_size");
+        point_queue_size = json.getInt("point_queue_size");
+        backoff = json.getBoolean("backoff");
+        min_backoff_s = json.getInt("min_backoff_s");
+        max_backoff_s = json.getInt("max_backoff_s");
+        min_backoff_d = json.getInt("min_backoff_d");
+        max_backoff_d = json.getInt("max_backoff_d");
+    }
+
+    public ParseRunConfig(int line_queue_size,
+                          int point_queue_size,
+                          boolean backoff,
+                          int min_backoff_s,
+                          int max_backoff_s,
+                          int min_backoff_d,
+                          int max_backoff_d) {
+        this.line_queue_size = line_queue_size;
+        this.point_queue_size = point_queue_size;
+        this.backoff = backoff;
+        this.min_backoff_s = min_backoff_s;
+        this.max_backoff_s = max_backoff_s;
+        this.min_backoff_d = min_backoff_d;
+        this.max_backoff_d = max_backoff_d;
     }
 
     public int getLine_queue_size() {
@@ -49,34 +71,6 @@ public class ParseRunConfig {
         return max_backoff_d;
     }
 
-    private final int max_backoff_d;
-
-    ParseRunConfig(JSONObject json) {
-        line_queue_size = json.getInt("line_queue_size");
-        point_queue_size = json.getInt("point_queue_size");
-        backoff = json.getBoolean("backoff");
-        min_backoff_s = json.getInt("min_backoff_s");
-        max_backoff_s = json.getInt("max_backoff_s");
-        min_backoff_d = json.getInt("min_backoff_d");
-        max_backoff_d = json.getInt("max_backoff_d");
-    }
-
-    public ParseRunConfig(int line_queue_size,
-                          int point_queue_size,
-                          boolean backoff,
-                          int min_backoff_s,
-                          int max_backoff_s,
-                          int min_backoff_d,
-                          int max_backoff_d) {
-        this.line_queue_size = line_queue_size;
-        this.point_queue_size = point_queue_size;
-        this.backoff = backoff;
-        this.min_backoff_s = min_backoff_s;
-        this.max_backoff_s = max_backoff_s;
-        this.min_backoff_d = min_backoff_d;
-        this.max_backoff_d = max_backoff_d;
-    }
-
     public Backoffable makeBackoffFor(BackoffType ty) {
         if (!backoff) {
             return new NoOpBackoff();
@@ -88,6 +82,18 @@ public class ParseRunConfig {
             return new Backoff(min_backoff_d, max_backoff_d);
         }
 
+    }
+
+    @Override
+    public int hashCode() {
+        int result = line_queue_size;
+        result = 31 * result + point_queue_size;
+        result = 31 * result + (backoff ? 1 : 0);
+        result = 31 * result + min_backoff_s;
+        result = 31 * result + max_backoff_s;
+        result = 31 * result + min_backoff_d;
+        result = 31 * result + max_backoff_d;
+        return result;
     }
 
     @Override
@@ -110,15 +116,8 @@ public class ParseRunConfig {
 
     }
 
-    @Override
-    public int hashCode() {
-        int result = line_queue_size;
-        result = 31 * result + point_queue_size;
-        result = 31 * result + (backoff ? 1 : 0);
-        result = 31 * result + min_backoff_s;
-        result = 31 * result + max_backoff_s;
-        result = 31 * result + min_backoff_d;
-        result = 31 * result + max_backoff_d;
-        return result;
+    public static enum BackoffType {
+        String,
+        DataPoint
     }
 }

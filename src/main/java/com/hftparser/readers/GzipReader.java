@@ -7,10 +7,10 @@ import java.io.*;
 import java.util.zip.GZIPInputStream;
 
 public class GzipReader implements Runnable {
-    // InputStream file;
-    private BufferedReader reader;
     private final WaitFreeQueue<String> queue;
     private final MutableBoolean pipelineError;
+    // InputStream file;
+    private BufferedReader reader;
 
     // TODO: find out what encoding the files actually use, and set it
     // correctly for InputStreamReader

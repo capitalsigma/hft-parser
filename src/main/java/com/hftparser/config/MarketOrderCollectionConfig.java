@@ -10,6 +10,22 @@ public class MarketOrderCollectionConfig {
     private final int maxKeyCount;
     private final boolean caching;
 
+    public MarketOrderCollectionConfig(int startCapacity, int maxKeyCount, boolean caching) {
+        this.startCapacity = startCapacity;
+        this.maxKeyCount = maxKeyCount;
+        this.caching = caching;
+    }
+
+    public MarketOrderCollectionConfig(JSONObject json) {
+        startCapacity = json.getInt("start_capacity");
+        maxKeyCount = json.getInt("max_key_count");
+        caching = json.getBoolean("caching");
+    }
+
+    public static MarketOrderCollectionConfig getDefault() {
+        return new MarketOrderCollectionConfig(100, 10, false);
+    }
+
     public int getStartCapacity() {
         return startCapacity;
     }
@@ -22,16 +38,12 @@ public class MarketOrderCollectionConfig {
         return caching;
     }
 
-    public MarketOrderCollectionConfig(int startCapacity, int maxKeyCount, boolean caching) {
-        this.startCapacity = startCapacity;
-        this.maxKeyCount = maxKeyCount;
-        this.caching = caching;
-    }
-
-    public MarketOrderCollectionConfig(JSONObject json) {
-        startCapacity = json.getInt("start_capacity");
-        maxKeyCount = json.getInt("max_key_count");
-        caching = json.getBoolean("caching");
+    @Override
+    public int hashCode() {
+        int result = startCapacity;
+        result = 31 * result + maxKeyCount;
+        result = 31 * result + (caching ? 1 : 0);
+        return result;
     }
 
     @Override
@@ -53,17 +65,5 @@ public class MarketOrderCollectionConfig {
         }
         return startCapacity == that.startCapacity;
 
-    }
-
-    @Override
-    public int hashCode() {
-        int result = startCapacity;
-        result = 31 * result + maxKeyCount;
-        result = 31 * result + (caching ? 1 : 0);
-        return result;
-    }
-
-    public static MarketOrderCollectionConfig getDefault() {
-        return new MarketOrderCollectionConfig(100, 10, false);
     }
 }

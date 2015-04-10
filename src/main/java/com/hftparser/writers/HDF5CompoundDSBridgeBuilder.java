@@ -16,19 +16,36 @@ import java.util.concurrent.TimeUnit;
  * Created by patrick on 7/28/14.
  */
 public class HDF5CompoundDSBridgeBuilder<T> {
-    private HDF5CompoundType<T> type;
     private final IHDF5CompoundWriter writer;
+    private final HDF5CompoundDSBridgeConfig bridgeConfig;
+    private final boolean parallelFlush;
+    private final ElementCacheFactory<T> cacheFactory;
+    private HDF5CompoundType<T> type;
     private long startSize;
     private int chunkSize;
-    private final HDF5CompoundDSBridgeConfig bridgeConfig;
     private AbstractExecutorService executor;
     private int corePoolSize = 3;
     private int maxPoolSize = 3;
     private long keepAliveSec = 30;
     private int queueSize = 500;
     private boolean async;
-    private final boolean parallelFlush;
-    private final ElementCacheFactory<T> cacheFactory;
+
+    public HDF5CompoundDSBridgeBuilder(IHDF5Writer writer) {
+        this(writer, HDF5CompoundDSBridgeConfig.getDefault());
+    }
+
+    HDF5CompoundDSBridgeBuilder(IHDF5Writer writer, HDF5CompoundDSBridgeConfig bridgeConfig) {
+        this.bridgeConfig = bridgeConfig;
+        this.writer = writer.compound();
+        this.cacheFactory = new ElementCacheFactory<>(bridgeConfig.getCache_size(), bridgeConfig.isCutoff());
+
+        corePoolSize = bridgeConfig.getCore_pool_size();
+        maxPoolSize = bridgeConfig.getMax_pool_size();
+        keepAliveSec = bridgeConfig.getKeep_alive_sec();
+        queueSize = bridgeConfig.getQueue_size();
+        async = bridgeConfig.isAsync();
+        parallelFlush = bridgeConfig.isParallel_write();
+    }
 
     public HDF5CompoundType<T> getType() {
         return type;
@@ -82,30 +99,13 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         this.async = async;
     }
 
-    public HDF5CompoundDSBridgeBuilder(IHDF5Writer writer) {
-        this(writer, HDF5CompoundDSBridgeConfig.getDefault());
-    }
-
-    HDF5CompoundDSBridgeBuilder(IHDF5Writer writer, HDF5CompoundDSBridgeConfig bridgeConfig) {
-        this.bridgeConfig = bridgeConfig;
-        this.writer = writer.compound();
-        this.cacheFactory = new ElementCacheFactory<>(bridgeConfig.getCache_size(), bridgeConfig.isCutoff());
-
-        corePoolSize = bridgeConfig.getCore_pool_size();
-        maxPoolSize = bridgeConfig.getMax_pool_size();
-        keepAliveSec = bridgeConfig.getKeep_alive_sec();
-        queueSize = bridgeConfig.getQueue_size();
-        async = bridgeConfig.isAsync();
-        parallelFlush = bridgeConfig.isParallel_write();
-    }
-
     public HDF5CompoundDSBridge<T> build(
             @NotNull
             DataSetName name) throws HDF5FormatNotFoundException {
         if (type == null || writer == null) {
             throw new HDF5FormatNotFoundException();
         } else {
-//            System.out.println("Building. Parallel flush? " + parallelFlush);
+            //            System.out.println("Building. Parallel flush? " + parallelFlush);
             if (parallelFlush) {
                 return buildParallelFlush(name);
             } else if (async) {
@@ -190,8 +190,8 @@ public class HDF5CompoundDSBridgeBuilder<T> {
         if (executor == null) {
             initExecutor();
         }
-//
-//        System.out.println("Building parallel flush bridge");
+        //
+        //        System.out.println("Building parallel flush bridge");
 
         return new HDF5CompoundDSParallelFlushBridge<>(name,
                                                        type,

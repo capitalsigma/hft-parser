@@ -28,10 +28,6 @@ public class ElementCacheFactory<T> {
         return isCutoff;
     }
 
-    public void setCutoff(boolean isCutoff) {
-        this.isCutoff = isCutoff;
-    }
-
     public T getEmptyElement() {
         return emptyElement;
     }
@@ -42,6 +38,10 @@ public class ElementCacheFactory<T> {
 
     public CutoffElementCache<T> getCutoff() {
         return new CutoffElementCache<>(maxSize);
+    }
+
+    public void setCutoff(boolean isCutoff) {
+        this.isCutoff = isCutoff;
     }
 
     public ZeroOutElementCache<T> getZeroOut() {

@@ -6,7 +6,7 @@ import java.util.HashMap;
  * Modifies the default HashMap implementation to throw an exception when a key isn't present
  */
 public class NonnullHashMap<K, V> extends HashMap<K, V> {
-//    Need this to be a runtime exception so we don't break the contract of Map
+    //    Need this to be a runtime exception so we don't break the contract of Map
 
 
     public NonnullHashMap(int initialCapacity) {

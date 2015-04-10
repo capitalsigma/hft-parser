@@ -110,6 +110,11 @@ public class HDF5CompoundDSBridgeConfig {
         this.cutoff = cutoff;
     }
 
+    public static HDF5CompoundDSBridgeConfig getDefault() {
+        return new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
+                                              HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL);
+    }
+
     public HDF5StorageLayout getStorage_layout() {
         return storage_layout;
     }
@@ -120,24 +125,6 @@ public class HDF5CompoundDSBridgeConfig {
 
     public int getCache_size() {
         return cache_size;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        HDF5CompoundDSBridgeConfig that = (HDF5CompoundDSBridgeConfig) o;
-
-        if (deflate_level != that.deflate_level) {
-            return false;
-        }
-        return storage_layout == that.storage_layout;
-
     }
 
     public boolean isParallel_write() {
@@ -175,9 +162,22 @@ public class HDF5CompoundDSBridgeConfig {
         return result;
     }
 
-    public static HDF5CompoundDSBridgeConfig getDefault() {
-        return new HDF5CompoundDSBridgeConfig(HDF5StorageLayout.CHUNKED,
-                                              HDF5GenericStorageFeatures.MAX_DEFLATION_LEVEL);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        HDF5CompoundDSBridgeConfig that = (HDF5CompoundDSBridgeConfig) o;
+
+        if (deflate_level != that.deflate_level) {
+            return false;
+        }
+        return storage_layout == that.storage_layout;
+
     }
 
     @Override

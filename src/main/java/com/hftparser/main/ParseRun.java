@@ -5,11 +5,11 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.hftparser.config.*;
 import com.hftparser.containers.Backoffable;
-import com.hftparser.containers.WaitFreeQueue;
-import com.hftparser.readers.ArcaParser;
-import com.hftparser.data.DataPoint;
-import com.hftparser.readers.GzipReader;
 import com.hftparser.containers.MarketOrderCollectionFactory;
+import com.hftparser.containers.WaitFreeQueue;
+import com.hftparser.data.DataPoint;
+import com.hftparser.readers.ArcaParser;
+import com.hftparser.readers.GzipReader;
 import com.hftparser.writers.HDF5Writer;
 import org.apache.commons.lang.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
@@ -50,30 +50,6 @@ public class ParseRun {
     private static Calendar startCalendar;
     private static InputStream gzipInstream;
     private static String bookPath;
-
-    private static class Args {
-        @Parameter
-        private List<String> parameters = new ArrayList<>();
-
-        @Parameter(names = {"-symbols", "-s"}, description = "CSV containing symbols")
-        private String symbolPath;
-
-        @Parameter(names = {"-book ", "-b"}, description = "Gzipped CSV of book data")
-        private String bookPath;
-
-        @Parameter(names = {"-out", "-o"}, description = "Output .h5 file")
-        private String outPath;
-
-        @Parameter(names = {"-config", "-c"}, description = "JSON-formatted config file")
-        private String configPath;
-
-        @Parameter(names = {"-num", "-n"}, description = "Number of lines per run")
-        private Integer numPerRun;
-
-        //        @Parameter(names = {"-stats", "-s"}, description = "Output file for run statistics")
-        //        private String statsPath;
-    }
-
 
     @SuppressWarnings("ConstantConditions")
     public static void main(String[] argv) {
@@ -208,7 +184,6 @@ public class ParseRun {
         System.out.println("Running on symbol subset:" + Arrays.deepToString(symbols));
 
 
-
         long startTime = System.currentTimeMillis();
         long endTime;
 
@@ -276,7 +251,6 @@ public class ParseRun {
         dataPointQueue.printUsage();
     }
 
-
     public static Calendar startCalendarFromFilename(String bookPath) {
         //        format is YYYYMMDD
         String datePattern = "\\D+(\\d{4})(\\d{2})(\\d{2})\\.csv\\.gz";
@@ -335,8 +309,7 @@ public class ParseRun {
     }
 
     @NotNull
-    public static
-    String[] parseSymbolFile(File symbolFile) throws IOException {
+    public static String[] parseSymbolFile(File symbolFile) throws IOException {
         ArrayList<String> ret = new ArrayList<>();
         String line;
         BufferedReader reader = new BufferedReader(new FileReader(symbolFile));
@@ -347,6 +320,29 @@ public class ParseRun {
         reader.close();
 
         return ret.toArray(new String[ret.size()]);
+    }
+
+    private static class Args {
+        @Parameter
+        private List<String> parameters = new ArrayList<>();
+
+        @Parameter(names = {"-symbols", "-s"}, description = "CSV containing symbols")
+        private String symbolPath;
+
+        @Parameter(names = {"-book ", "-b"}, description = "Gzipped CSV of book data")
+        private String bookPath;
+
+        @Parameter(names = {"-out", "-o"}, description = "Output .h5 file")
+        private String outPath;
+
+        @Parameter(names = {"-config", "-c"}, description = "JSON-formatted config file")
+        private String configPath;
+
+        @Parameter(names = {"-num", "-n"}, description = "Number of lines per run")
+        private Integer numPerRun;
+
+        //        @Parameter(names = {"-stats", "-s"}, description = "Output file for run statistics")
+        //        private String statsPath;
     }
 
 }

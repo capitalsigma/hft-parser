@@ -20,18 +20,21 @@ public class WritableDataPoint {
 
     @CompoundElement(memberName = "ask", dimensions = {ArcaParser.LEVELS, 2})
     protected long[][] sell;
-
-    @CompoundElement(memberName = "timestamp")
-    private long timeStamp;
-
     @CompoundElement(memberName = "seqnum")
     protected long seqNum;
+    @CompoundElement(memberName = "timestamp")
+    private long timeStamp;
 
     public WritableDataPoint(long[][] buy, long[][] sell, long timeStamp, long seqNum) {
         this.buy = padArray(buy);
         this.sell = padArray(sell);
         this.timeStamp = timeStamp;
         this.seqNum = seqNum;
+    }
+
+    //    needed for the HDF5 business
+    public WritableDataPoint() {
+
     }
 
     private long[][] padArray(long[][] toPad) {
@@ -78,19 +81,6 @@ public class WritableDataPoint {
         //        return true;
     }
 
-    public boolean equals(WritableDataPoint other) {
-        return (other != null) &&
-                other.timeStamp == timeStamp &&
-                other.seqNum == seqNum &&
-                Arrays.deepEquals(other.buy, buy) &&
-                Arrays.deepEquals(other.sell, sell);
-    }
-
-    //    needed for the HDF5 business
-    public WritableDataPoint() {
-
-    }
-
     @Override
     public String toString() {
         return "WritableDataPoint{" +
@@ -99,5 +89,13 @@ public class WritableDataPoint {
                 ", timeStamp=" + timeStamp +
                 ", seqNum=" + seqNum +
                 '}';
+    }
+
+    public boolean equals(WritableDataPoint other) {
+        return (other != null) &&
+                other.timeStamp == timeStamp &&
+                other.seqNum == seqNum &&
+                Arrays.deepEquals(other.buy, buy) &&
+                Arrays.deepEquals(other.sell, sell);
     }
 }

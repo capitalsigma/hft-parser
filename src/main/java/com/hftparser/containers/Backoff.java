@@ -10,8 +10,8 @@ import java.util.Random;
 public class Backoff implements Backoffable {
     private final int minDelay;
     private final int maxDelay;
-    private int limit;
     private final Random random;
+    private int limit;
 
     public Backoff(int min, int max) {
         minDelay = min;

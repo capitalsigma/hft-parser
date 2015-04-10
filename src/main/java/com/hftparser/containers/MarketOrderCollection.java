@@ -5,9 +5,9 @@ import java.util.TreeSet;
 
 
 public abstract class MarketOrderCollection extends HashMap<Long, Long> {
+    protected final int maxKeyCount;
     protected TreeSet<Long> sortedKeys;
     protected int keyCount;
-    protected final int maxKeyCount;
 
     // In case we want to do something special later
     MarketOrderCollection() {

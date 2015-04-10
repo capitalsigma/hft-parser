@@ -13,29 +13,9 @@ import java.util.concurrent.Future;
  */
 public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T> {
     private final ExecutorService executor;
-    private Future<?> lastWriter;
     private final ElementCache<T> cacheOne;
     private final ElementCache<T> cacheTwo;
-
-    public class Writer implements Runnable {
-        volatile boolean isDone = false;
-        final ElementCache<T> cacheToWrite;
-
-        public Writer(ElementCache<T> cacheToWrite) {
-            this.cacheToWrite = cacheToWrite;
-        }
-
-        @Override
-        public void run() {
-            //            System.out.println("Flushing.");
-            flush(cacheToWrite);
-            isDone = true;
-        }
-
-        public boolean isDone() {
-            return isDone;
-        }
-    }
+    private Future<?> lastWriter;
 
     public HDF5CompoundDSAsyncBridge(DataSetName name,
                                      HDF5CompoundType<T> type,
@@ -50,7 +30,6 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
         cacheTwo = cacheFactory.getCache();
         this.executor = executor;
     }
-
 
     private void swapCaches() {
         if (cache == cacheOne) {
@@ -91,5 +70,25 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
     public void flush() throws FailedWriteError {
         waitForLastWriter();
         super.flush();
+    }
+
+    public class Writer implements Runnable {
+        final ElementCache<T> cacheToWrite;
+        volatile boolean isDone = false;
+
+        public Writer(ElementCache<T> cacheToWrite) {
+            this.cacheToWrite = cacheToWrite;
+        }
+
+        @Override
+        public void run() {
+            //            System.out.println("Flushing.");
+            flush(cacheToWrite);
+            isDone = true;
+        }
+
+        public boolean isDone() {
+            return isDone;
+        }
     }
 }

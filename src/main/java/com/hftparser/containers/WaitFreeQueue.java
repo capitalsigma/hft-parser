@@ -10,14 +10,14 @@ import java.util.concurrent.atomic.AtomicLong;
 //TODO: remove this tracking stuff after profiling
 // Source: The Art of Multiprocessor Programming, p. 69
 public class WaitFreeQueue<T> {
-    private volatile int head = 0;
-    private volatile int tail = 0;
     private final Backoffable inBackoff;
     private final Backoffable outBackoff;
     private final T[] items;
-    public volatile boolean acceptingOrders;
     private final AtomicLong fullHits;
     private final AtomicLong emptyHits;
+    public volatile boolean acceptingOrders;
+    private volatile int head = 0;
+    private volatile int tail = 0;
 
 
     public WaitFreeQueue(int capacity, Backoffable inBackoff, Backoffable outBackoff) {

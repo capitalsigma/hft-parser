@@ -9,15 +9,15 @@ public interface DataPoint {
     void print();
 
     @Override
+    int hashCode();
+
+    @Override
     boolean equals(Object o);
 
     @Override
-    int hashCode();
+    String toString();
 
     WritableDataPoint getWritable();
-
-    @Override
-    String toString();
 
     long getTimeStamp();
 

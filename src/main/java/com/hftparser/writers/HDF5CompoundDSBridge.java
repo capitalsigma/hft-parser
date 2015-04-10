@@ -11,16 +11,10 @@ import com.hftparser.data.DataSetName;
  * Created by patrick on 7/28/14.
  */
 class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
-    protected long currentOffset;
     private final T[] elToWrite;
+    protected long currentOffset;
     private boolean poisoned;
 
-
-    public static class FailedWriteError extends Exception {
-        public FailedWriteError(Throwable cause) {
-            super(cause);
-        }
-    }
 
     protected HDF5CompoundDSBridge() {
         elToWrite = null;
@@ -72,12 +66,18 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
         // Sublcasses are responsible for doing cleanup before we're called. So now it's safe to delete ourselves
     }
 
-//    We need to pass in a fileWriter here in case we've been marked for deletion
-    public void flush(IHDF5Writer fileWriter) throws  FailedWriteError{
+    //    We need to pass in a fileWriter here in case we've been marked for deletion
+    public void flush(IHDF5Writer fileWriter) throws FailedWriteError {
         flush();
 
         if (poisoned) {
             fileWriter.delete(fullPath);
+        }
+    }
+
+    public static class FailedWriteError extends Exception {
+        public FailedWriteError(Throwable cause) {
+            super(cause);
         }
     }
 }

@@ -10,15 +10,14 @@ import java.util.TimeZone;
  * Responsible for parsing and processing a single row of the input CSV
  */
 abstract class Record {
+    private static final TimeZone DEFAULT_TZ = TimeZone.getTimeZone("America/New_York");
+    private static long startTimestamp = 0;
     // offset for integer part of the price -- we pass it around as a
     // float to avoid floating point error. So we make the int part
     // bigger by this amount, and add in the float part in the
     // lower-order digits.
     private final int PRICE_OFFSET_EXP = 6;
     private final int PRICE_INTEGER_OFFSET = (int) Math.pow(10, 6);
-    private static final TimeZone DEFAULT_TZ = TimeZone.getTimeZone("America/New_York");
-
-    private static long startTimestamp = 0;
     protected String ticker;
     protected long seqNum; // need 9 digits
     protected long refNum; // need 20, but just taking last 19
@@ -37,16 +36,16 @@ abstract class Record {
         return startTimestamp;
     }
 
+    public static void setStartTimestamp(long startTimestamp) {
+        Record.startTimestamp = startTimestamp;
+    }
+
     public static TimeZone getDefaultTz() {
         return DEFAULT_TZ;
     }
 
     public String getTicker() {
         return ticker;
-    }
-
-    public static void setStartTimestamp(long startTimestamp) {
-        Record.startTimestamp = startTimestamp;
     }
 
     protected long makeRefNum(String refNumStr) {
@@ -77,15 +76,14 @@ abstract class Record {
         if (sizeOfFloatPart > 6) {
             throw new NumberFormatException("Can't have more than 6 decimal places. Got: " + priceString);
         } else {
-            return intPart * PRICE_INTEGER_OFFSET +
-                    (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
+            return intPart * PRICE_INTEGER_OFFSET + (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
         }
     }
 
-/*
-    ArcaBook apparently uses an empty millisecond field to denote things that happen at an offset of 0 ms from the
-    second value. This is not documented.
- */
+    /*
+        ArcaBook apparently uses an empty millisecond field to denote things that happen at an offset of 0 ms from the
+        second value. This is not documented.
+     */
     protected long makeTimestamp(String seconds, String ms) {
         Long parsedMs;
         if (ms.isEmpty()) {
@@ -199,14 +197,6 @@ class AddRecord extends Record {
         return qty;
     }
 
-    @Override
-    public String toString() {
-        return "AddRecord{" +
-                "qty=" + qty +
-                ", price=" + price +
-                "} " + super.toString();
-    }
-
     /**
      * Error to report adds with duplicate refNums
      */
@@ -222,7 +212,15 @@ class AddRecord extends Record {
         public Record getFailing() {
             return failing;
         }
+    }    @Override
+    public String toString() {
+        return "AddRecord{" +
+                "qty=" + qty +
+                ", price=" + price +
+                "} " + super.toString();
     }
+
+
 }
 
 // 1:seq, 2:order id, 3:seconds, 4:ms, 5:ticker, 9:type
@@ -274,7 +272,9 @@ class ModifyRecord extends Record {
         return asSplit[7];
     }
 
-    @Override
+    public int getQty() {
+        return qty;
+    }    @Override
     protected void processTemplateMethod(MarketOrderCollection toUpdate,
                                          Map<String, TickerOrderHistory> orderHistories) {
         Order changedOrder = new Order(price, qty);
@@ -300,13 +300,11 @@ class ModifyRecord extends Record {
         toUpdate.put(price, qty + qtyOfNewPriceToAdd);
     }
 
-    public int getQty() {
-        return qty;
-    }
-
     public Long getPrice() {
         return price;
     }
+
+
 
     @Override
     public String toString() {

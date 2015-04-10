@@ -20,15 +20,13 @@ public class HDF5Writer implements Runnable {
     private final HashMap<String, HDF5CompoundDSBridge<WritableDataPoint>> dsForTicker;
     private final IHDF5Writer fileWriter;
     private final WaitFreeQueue<DataPoint> inQueue;
-    private boolean closeFileAtEnd;
     private final MutableBoolean pipelineError;
-    private HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder;
-
     private final int START_SIZE;
     // following FLUSH_FREQ from the original python
     private final int CHUNK_SIZE;
-
     private final String BOOK_DS_NAME = "books";
+    private boolean closeFileAtEnd;
+    private HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder;
 
     // Here we try to open up a new HDF5 file in the path we've been
     // given, and raise abstraction-appropriate exceptions if
@@ -57,12 +55,6 @@ public class HDF5Writer implements Runnable {
 
     }
 
-    public void setBridgeBuilder(HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder) {
-        this.bridgeBuilder = bridgeBuilder;
-    }
-
-
-
     public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue, File outFile) {
         this(_inQueue,
              outFile,
@@ -71,12 +63,36 @@ public class HDF5Writer implements Runnable {
              new MutableBoolean());
     }
 
+
     public HDF5Writer(WaitFreeQueue<DataPoint> _inQueue, File outFile, MutableBoolean pipelineError) {
-        this(_inQueue,
-             outFile,
-             HDF5WriterConfig.getDefault(),
-             HDF5CompoundDSBridgeConfig.getDefault(),
-             pipelineError);
+        this(_inQueue, outFile, HDF5WriterConfig.getDefault(), HDF5CompoundDSBridgeConfig.getDefault(), pipelineError);
+    }
+
+    private static IHDF5Writer getWriter(File file, HDF5WriterConfig writerConfig) {
+        IHDF5WriterConfigurator config = HDF5Factory.configure(file);
+        if (writerConfig.isKeep_datasets_if_they_exist()) {
+            config.keepDataSetsIfTheyExist();
+        }
+        if (writerConfig.isOverwrite()) {
+            config.overwrite();
+        }
+
+        if (writerConfig.isPerform_numeric_conversions()) {
+            config.performNumericConversions();
+        }
+
+        config.syncMode(writerConfig.getSync_mode());
+
+
+        return config.writer();
+    }
+
+    public static IHDF5Writer getWriter(File file) {
+        return getWriter(file, HDF5WriterConfig.getDefault());
+    }
+
+    public void setBridgeBuilder(HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder) {
+        this.bridgeBuilder = bridgeBuilder;
     }
 
     private HDF5CompoundDSBridge<WritableDataPoint> getDSBridgeForTicker(String ticker) {
@@ -91,18 +107,16 @@ public class HDF5Writer implements Runnable {
         return bridge;
     }
 
-
     private void writePoint(DataPoint dataPoint) throws HDF5CompoundDSBridge.FailedWriteError {
         HDF5CompoundDSBridge<WritableDataPoint> bridge = getDSBridgeForTicker(dataPoint.getTicker());
 
         try {
             bridge.appendElement(dataPoint.getWritable());
         } catch (PoisonDataPointException ex) {
-//            Now we'll be deleted at the end
+            //            Now we'll be deleted at the end
             bridge.poison();
         }
     }
-
 
     public boolean isCloseFileAtEnd() {
         return closeFileAtEnd;
@@ -115,8 +129,8 @@ public class HDF5Writer implements Runnable {
     public void run() {
         DataPoint dataPoint;
 
-    // TODO: we aren't catching it correctly (and dying) when there is a low-level write error
-    // (e.g. the file is clobberred by another run). why?
+        // TODO: we aren't catching it correctly (and dying) when there is a low-level write error
+        // (e.g. the file is clobberred by another run). why?
 
         try {
             while (!pipelineError.booleanValue() && (inQueue.acceptingOrders || !inQueue.isEmpty())) {
@@ -148,30 +162,6 @@ public class HDF5Writer implements Runnable {
 
     public void closeFile() {
         fileWriter.close();
-    }
-
-
-    private static IHDF5Writer getWriter(File file, HDF5WriterConfig writerConfig) {
-        IHDF5WriterConfigurator config = HDF5Factory.configure(file);
-        if (writerConfig.isKeep_datasets_if_they_exist()) {
-            config.keepDataSetsIfTheyExist();
-        }
-        if (writerConfig.isOverwrite()) {
-            config.overwrite();
-        }
-
-        if (writerConfig.isPerform_numeric_conversions()) {
-            config.performNumericConversions();
-        }
-
-        config.syncMode(writerConfig.getSync_mode());
-
-
-        return config.writer();
-    }
-
-    public static IHDF5Writer getWriter(File file) {
-        return getWriter(file, HDF5WriterConfig.getDefault());
     }
 
     public IHDF5Writer getFileWriter() {

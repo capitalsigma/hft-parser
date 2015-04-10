@@ -7,15 +7,6 @@ import ch.systemsx.cisd.hdf5.HDF5LinkInformation;
  */
 public class DataSetName {
     private final String group;
-
-    public String getGroup() {
-        return group;
-    }
-
-    public String getDataSet() {
-        return dataSet;
-    }
-
     private final String dataSet;
 
     public DataSetName(String _group, String _dataSet) {
@@ -28,6 +19,14 @@ public class DataSetName {
         String thisDataset = linkInformation.getName();
 
         return new DataSetName(thisGroup, thisDataset);
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public String getDataSet() {
+        return dataSet;
     }
 
     public String getFullPath() {

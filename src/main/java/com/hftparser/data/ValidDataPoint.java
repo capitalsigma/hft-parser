@@ -30,6 +30,34 @@ public class ValidDataPoint implements DataPoint {
         System.out.println(this.toString());
     }
 
+    @Override
+    public WritableDataPoint getWritable() {
+        return new WritableDataPoint(buy, sell, timeStamp, seqNum);
+
+    }
+
+    @Override
+    public long getTimeStamp() {
+        return timeStamp;
+    }
+
+    @Override
+    public long[][] getBuy() {
+        return buy;
+    }
+
+    @Override
+    public long[][] getSell() {
+        return sell;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (timeStamp ^ (timeStamp >>> 32));
+        result = 31 * result + (int) (seqNum ^ (seqNum >>> 32));
+        result = 31 * result + (ticker != null ? ticker.hashCode() : 0);
+        return result;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -50,20 +78,6 @@ public class ValidDataPoint implements DataPoint {
     }
 
     @Override
-    public int hashCode() {
-        int result = (int) (timeStamp ^ (timeStamp >>> 32));
-        result = 31 * result + (int) (seqNum ^ (seqNum >>> 32));
-        result = 31 * result + (ticker != null ? ticker.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public WritableDataPoint getWritable() {
-        return new WritableDataPoint(buy, sell, timeStamp, seqNum);
-
-    }
-
-    @Override
     public String toString() {
         return "DataPoint{" +
                 "buy=" + Arrays.deepToString(buy) +
@@ -72,20 +86,5 @@ public class ValidDataPoint implements DataPoint {
                 ", seqNum=" + seqNum +
                 ", ticker='" + ticker + '\'' +
                 '}';
-    }
-
-    @Override
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
-    @Override
-    public long[][] getBuy() {
-        return buy;
-    }
-
-    @Override
-    public long[][] getSell() {
-        return sell;
     }
 }

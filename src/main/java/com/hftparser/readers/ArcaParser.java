@@ -47,37 +47,28 @@ class Order {
 }
 
 
-
-
 public class ArcaParser extends AbstractParser implements Runnable {
+    // like in Python -- this is our top N values in buy/sell prices we care about
+    public static final int LEVELS = 10;
     private final WaitFreeQueue<String> inQueue;
     private final WaitFreeQueue<DataPoint> outQueue;
     @SuppressWarnings("FieldCanBeLocal")
     private final String[] tickers;
     private final MutableBoolean pipelineError;
-
     // TODO: according to stackoverflow.com/questions/81346/, we can
     // save time if we roll a MutableLong to use for qtys. we can do
     // this later if it's not fast enough
     private final Map<String, Map<OrderType, MarketOrderCollection>> ordersNow;
-
     // We're here abusing the fact that (at least within a day), there
     // are less than 2^64 orders, and saving just the end of the
     // 20-digit order reference number. This may break.
     private final Map<String, TickerOrderHistory> orderHistories;
-
-    // Split CSVs on commas
-    private final String INPUT_SPLIT = ",";
     //    private final Pattern SPLITTER;
     //    private final Pattern ROW_NEEDED;
-
-
+    // Split CSVs on commas
+    private final String INPUT_SPLIT = ",";
     // For modify, we need to pull at most 12 things out of record
     private final int IMPORTANT_SYMBOL_COUNT = 13;
-
-    // like in Python -- this is our top N values in buy/sell prices we care about
-    public static final int LEVELS = 10;
-
     @SuppressWarnings("FieldCanBeLocal")
     private final int INITIAL_ORDER_HISTORY_SIZE;
     private final int OUTPUT_PROGRESS_EVERY;
@@ -162,10 +153,10 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
 
             DataPoint toPush = new ValidDataPoint(record.getTicker(),
-                                             toBuyNow,
-                                             toSellNow,
-                                             record.getTimeStamp(),
-                                             record.getSeqNum());
+                                                  toBuyNow,
+                                                  toSellNow,
+                                                  record.getTimeStamp(),
+                                                  record.getSeqNum());
 
             // spin until we successfully push
             //noinspection StatementWithEmptyBody
@@ -173,7 +164,6 @@ public class ArcaParser extends AbstractParser implements Runnable {
             }
         }
     }
-
 
 
     private AddRecord parseAdd(String[] asSplit) {
