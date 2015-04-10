@@ -23,6 +23,19 @@ abstract class Record {
     protected long timeStamp;
     protected OrderType orderType;
 
+    public class DuplicateAddError extends RuntimeException {
+        private Record failing;
+
+        public DuplicateAddError(Record failing) {
+            super("Failed attempting to parse record: " + failing +
+                          ", which is a duplicate. To troubleshoot, check the input file for malformed data.");
+            this.failing = failing;
+        }
+
+        public Record getFailing() {
+            return failing;
+        }
+    }
 
     public static void setStartCalendar(Calendar startDate) {
         startDate.setTimeZone(DEFAULT_TZ);
@@ -73,10 +86,9 @@ abstract class Record {
         if (sizeOfFloatPart > 6) {
             throw new NumberFormatException("Can't have more than 6 decimal places. Got: " + priceString);
         } else {
-            Long toRet = intPart * PRICE_INTEGER_OFFSET +
-                    (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
 
-            return toRet;
+            return intPart * PRICE_INTEGER_OFFSET +
+                    (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
         }
     }
 
@@ -163,8 +175,12 @@ class AddRecord extends Record {
             oldQty = 0l;
         }
 
+
         toUpdate.put(price, qty + oldQty);
-        orderHistory.get(ticker).put(refNum, new Order(price, qty));
+        // We just added something twice -- time to fail
+        if (orderHistory.get(ticker).put(refNum, new Order(price, qty)) != null) {
+            throw new DuplicateAddError(this);
+        }
     }
 
 

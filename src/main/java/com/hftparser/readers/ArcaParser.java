@@ -31,11 +31,8 @@ class Order {
         if (price != order.price) {
             return false;
         }
-        if (quantity != order.quantity) {
-            return false;
-        }
+        return quantity == order.quantity;
 
-        return true;
     }
 
     @Override
@@ -56,8 +53,6 @@ public class ArcaParser extends AbstractParser implements Runnable {
     @SuppressWarnings("FieldCanBeLocal")
     private final String[] tickers;
     private volatile MutableBoolean pipelineError;
-
-    // TODO: would it be faster to try to use eg an enum here?
 
     // TODO: according to stackoverflow.com/questions/81346/, we can
     // save time if we roll a MutableLong to use for qtys. we can do
@@ -104,15 +99,15 @@ public class ArcaParser extends AbstractParser implements Runnable {
         OUTPUT_PROGRESS_EVERY = config.getOutput_progress_every();
 
         ordersNow = new HashMap<>(tickers.length);
-        orderHistory = new NonnullHashMap<>(tickers.length);
+        orderHistory = new HashMap<>(INITIAL_ORDER_HISTORY_SIZE);
 
         // First we initialize with empty hashmaps
         for (String ticker : tickers) {
-            Map<OrderType, MarketOrderCollection> toAdd = new NonnullHashMap<>();
+            Map<OrderType, MarketOrderCollection> toAdd = new HashMap<>();
             toAdd.put(OrderType.Buy, collectionFactory.buildBuy());
             toAdd.put(OrderType.Sell, collectionFactory.buildSell());
             ordersNow.put(ticker, toAdd);
-            orderHistory.put(ticker, new NonnullHashMap<Long, Order>());
+            orderHistory.put(ticker, new HashMap<Long, Order>());
         }
 
         // Set up a lookup table for our recordTypes
@@ -144,6 +139,9 @@ public class ArcaParser extends AbstractParser implements Runnable {
         return Record.getStartTimestamp();
     }
 
+    public Map<String, Map<OrderType, MarketOrderCollection>> getOrdersNow() {
+        return ordersNow;
+    }
 
     private void processRecord(Record record) {
         Map<OrderType, MarketOrderCollection> ordersForTicker = ordersNow.get(record.getTicker());
@@ -223,6 +221,11 @@ public class ArcaParser extends AbstractParser implements Runnable {
         String[] asSplit = null;
         int linesSoFar = 0;
 
+        /* The spec tells us that seqnums are unique and globally increasing, and we will choose to believe that. We
+        throw out any orders that are repeated.
+        */
+        int currentSeqNum = -1;
+
         RecordType recType;
 
         try {
@@ -239,16 +242,14 @@ public class ArcaParser extends AbstractParser implements Runnable {
                     }
 
                     asSplit = toParse.split(INPUT_SPLIT, IMPORTANT_SYMBOL_COUNT + 1);
-//
-//                    System.out.println("asSplit: " + Arrays.toString(asSplit));
 
                     // Also note that containsKey is O(1)
                     if ((recType = recordTypeLookup.get(asSplit[0])) == null) {
                         // skip if it's not add, modify, delete
                         continue;
                     }
-//
-//                    System.out.println("asSplit: " + Arrays.toString(asSplit));
+                    //
+                    //                    System.out.println("asSplit: " + Arrays.toString(asSplit));
 
                     // Also note that containsKey is O(1)
                     Record toProcess = null;
@@ -267,23 +268,15 @@ public class ArcaParser extends AbstractParser implements Runnable {
                     if (toProcess != null) {
                         try {
                             processRecord(toProcess);
-                        } catch (KeyError keyError) {
-                            System.out.println(keyError.getMessage());
-                            keyError.printStackTrace();
-                            System.out.println(
-                                    "Attempted to process an invalid order. This is probably due to a duplicate add. " +
-                                            "Failing record: " + toProcess.toString());
-                            System.out.println("To troubleshoot, check the input file for malformed data.");
+                        } catch (Record.DuplicateAddError ex) {
+                            System.out.println(ex.getMessage());
+                            ex.printStackTrace();
                             System.out.println(
                                     "The symbol " + toProcess.getTicker() + " will be removed from the output file.");
                             purgeFailingTicker(toProcess.getTicker());
                         }
                     }
-
-
-
-                    }
-
+                }
             }
         } catch (Throwable throwable) {
             pipelineError.setValue(true);

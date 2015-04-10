@@ -49,7 +49,6 @@ public class HDF5Writer implements Runnable {
         bridgeBuilder.setChunkSize(CHUNK_SIZE);
         bridgeBuilder.setTypeFromInferred(WritableDataPoint.class);
 
-        // TODO: we know how big it is, we should inst. appropriately
         dsForTicker = new HashMap<>();
 
         inQueue = _inQueue;

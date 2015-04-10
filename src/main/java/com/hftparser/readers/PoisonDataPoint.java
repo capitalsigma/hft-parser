@@ -8,7 +8,7 @@ package com.hftparser.readers;
  *
  */
 public class PoisonDataPoint implements DataPoint {
-    String ticker;
+    private final String ticker;
 
     public PoisonDataPoint(String ticker) {
         this.ticker = ticker;
@@ -42,5 +42,24 @@ public class PoisonDataPoint implements DataPoint {
     @Override
     public long[][] getSell() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        PoisonDataPoint that = (PoisonDataPoint) o;
+
+        return ticker.equals(that.ticker);
+    }
+
+    @Override
+    public int hashCode() {
+        return ticker.hashCode();
     }
 }

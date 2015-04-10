@@ -4,6 +4,7 @@ import com.hftparser.config.ArcaParserConfig;
 import com.hftparser.containers.WaitFreeQueue;
 import com.hftparser.main.ParseRun;
 import org.apache.commons.lang.mutable.MutableBoolean;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,8 +13,7 @@ import org.junit.runners.JUnit4;
 
 import java.util.Calendar;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 // TODO: add a test to check a modify followed by a delete
@@ -26,9 +26,9 @@ public class ArcaParserTest {
     private final String TEST_ADD_BUY2 = "A,1,12884902050,B,B,3200,FOO,0.98,28800,737,B,AARCA,";
 
     private final String TEST_ADD_SELL1 = "A,8,12884902687,B,S,30000,FOO,0.02,28800,739,B,AARCA,";
-    String TEST_ADD_SELL2 = "A,12,12884902091,B,S,200000,BAR,0.0195,28800,740,B,AARCA,";
+    private final String TEST_ADD_SELL2 = "A,12,12884902091,B,S,200000,BAR,0.0195,28800,740,B,AARCA,";
 
-    String TEST_DELETE_BUY1 = "D,2,12884901908,28800,857,FOO,B,B,AARCA,B,";
+    private final String TEST_DELETE_BUY1 = "D,2,12884901908,28800,857,FOO,B,B,AARCA,B,";
 
     private final String TEST_MODIFY_BUY1 = "M,43,12884901908,900,0.3825,29909,390,FOO,B,B,AARCA,B,";
     private final String TEST_MODIFY_BUY2 = "M,2,12884902050,3000,0.98,33643,922,FOO,B,B,AARCA,B,";
@@ -110,7 +110,6 @@ fail */
     public void testTimestamps() throws Exception {
         Calendar toSet = ParseRun.startCalendarFromFilename("arcabookftp20101102.csv.gz");
         long expected = 1288684800566000l;
-        long actual;
 
         parser.setStartCalendar(toSet);
 
@@ -225,6 +224,7 @@ fail */
     public void testInstantiate() {
         try {
 
+            @SuppressWarnings("UnusedDeclaration")
             ArcaParser parser = new ArcaParser(TEST_TICKERS,
                                                new WaitFreeQueue<String>(3),
                                                new WaitFreeQueue<DataPoint>(3),
@@ -295,6 +295,46 @@ fail */
         assertThat(outQ.deq(), equalTo(buy1Expected));
         assertThat(outQ.deq(), equalTo(sell1Expected));
         assertThat(outQ.deq(), equalTo(buy2Expected));
+    }
+
+
+    @Test
+    public void testDuplicateAdd() throws Exception {
+        assertThat(parser.getOrdersNow().keySet(), hasItem("FOO"));
+        assertThat(parser.getOrdersNow().keySet(), hasItem("BAR"));
+
+//        private final String TEST_ADD_SELL2 = "A,12,12884902091,B,S,200000,BAR,0.0195,28800,740,B,AARCA,";
+
+        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_ADD_SELL2);
+        inQ.enq(TEST_ADD_BUY2);
+        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_ADD_BUY1);
+        inQ.enq(TEST_DELETE_BUY1);
+        inQ.enq(TEST_MODIFY_BUY1);
+
+
+        runParserThread(parser);
+
+
+        long[][] expectedOneBuy = {{2750000, 1000}};
+
+        long[][] expectedSell = {{19500, 200000}};
+
+
+        DataPoint buyExpected = new ValidDataPoint("FOO", expectedOneBuy, new long[][]{}, 28800737000l, 1);
+        DataPoint poisonExpected = new PoisonDataPoint("FOO");
+        DataPoint sellExpected = new ValidDataPoint("BAR", new long[][]{}, expectedSell, 28800740000l, 12);
+
+        assertThat(outQ.deq(), equalTo(buyExpected));
+        assertThat(outQ.deq(), equalTo(poisonExpected));
+        assertThat(outQ.deq(), equalTo(sellExpected));
+        assertThat(outQ.isEmpty(), is(true));
+
+        assertThat(parser.getOrdersNow().keySet(), not(hasItem("Foo")));
+        assertThat(parser.getOrdersNow().keySet(), hasItem("BAR"));
     }
 
     @Test
