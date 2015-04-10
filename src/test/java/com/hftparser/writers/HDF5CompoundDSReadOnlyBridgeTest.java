@@ -1,7 +1,8 @@
 package com.hftparser.writers;
 
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
-import com.hftparser.readers.WritableDataPoint;
+import com.hftparser.data.DataSetName;
+import com.hftparser.data.WritableDataPoint;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,7 +14,7 @@ import static org.junit.Assert.fail;
 
 public class HDF5CompoundDSReadOnlyBridgeTest {
     private final String TEST_PATH = "test-out.h5";
-    private final DatasetName TEST_DS = new DatasetName("group", "foo");
+    private final DataSetName TEST_DS = new DataSetName("group", "foo");
     private HDF5CompoundDSReadOnlyBridge<WritableDataPoint> dtBridge;
     private IHDF5Writer writer;
     private WritableDataPoint testPoint1;

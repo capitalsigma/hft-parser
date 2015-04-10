@@ -4,9 +4,10 @@ import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import com.hftparser.containers.WaitFreeQueue;
-import com.hftparser.readers.DataPoint;
-import com.hftparser.readers.ValidDataPoint;
-import com.hftparser.readers.WritableDataPoint;
+import com.hftparser.data.DataPoint;
+import com.hftparser.data.DataSetName;
+import com.hftparser.data.ValidDataPoint;
+import com.hftparser.data.WritableDataPoint;
 import mockit.Mock;
 import mockit.MockUp;
 import mockit.integration.junit4.JMockit;
@@ -35,7 +36,7 @@ public class HDF5WriterTest {
     public static class MockDSBridge extends MockUp<HDF5CompoundDSBridge<WritableDataPoint>> {
 
         @Mock
-        public void $init(DatasetName name,
+        public void $init(DataSetName name,
                          HDF5CompoundType<WritableDataPoint> type,
                          IHDF5CompoundWriter writer,
                          long startSize,

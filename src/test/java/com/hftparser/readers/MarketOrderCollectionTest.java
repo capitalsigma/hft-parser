@@ -1,5 +1,8 @@
 package com.hftparser.readers;
 
+import com.hftparser.containers.BuyOrders;
+import com.hftparser.containers.MarketOrderCollection;
+import com.hftparser.containers.SellOrders;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

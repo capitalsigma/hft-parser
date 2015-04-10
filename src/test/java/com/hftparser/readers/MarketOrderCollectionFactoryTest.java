@@ -1,5 +1,7 @@
 package com.hftparser.readers;
 
+import com.hftparser.containers.MarketOrderCollection;
+import com.hftparser.containers.MarketOrderCollectionFactory;
 import org.junit.Before;
 import org.junit.Test;
 

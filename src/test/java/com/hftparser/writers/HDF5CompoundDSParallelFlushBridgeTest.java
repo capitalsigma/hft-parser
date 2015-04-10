@@ -1,7 +1,7 @@
 package com.hftparser.writers;
 
 import com.hftparser.config.ConfigFactory;
-import com.hftparser.readers.WritableDataPoint;
+import com.hftparser.data.WritableDataPoint;
 
 import static org.junit.Assert.assertNotNull;
 

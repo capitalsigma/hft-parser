@@ -5,6 +5,7 @@ import ch.systemsx.cisd.hdf5.HDF5GenericStorageFeatures;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
+import com.hftparser.data.DataSetName;
 
 /**
  * Created by patrick on 7/28/14.
@@ -25,7 +26,7 @@ class HDF5CompoundDSBridge<T> extends HDF5CompoundDSReadOnlyBridge<T> {
         elToWrite = null;
     }
 
-    public HDF5CompoundDSBridge(DatasetName name,
+    public HDF5CompoundDSBridge(DataSetName name,
                                 HDF5CompoundType<T> type,
                                 IHDF5CompoundWriter writer,
                                 long startSize,

@@ -3,6 +3,7 @@ package com.hftparser.writers;
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
+import com.hftparser.data.DataSetName;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -36,7 +37,7 @@ public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T>
         }
     }
 
-    public HDF5CompoundDSAsyncBridge(DatasetName name,
+    public HDF5CompoundDSAsyncBridge(DataSetName name,
                                      HDF5CompoundType<T> type,
                                      IHDF5CompoundWriter writer,
                                      long startSize,

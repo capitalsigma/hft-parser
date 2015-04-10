@@ -1,8 +1,8 @@
-package com.hftparser.readers;
+package com.hftparser.containers;
 
 import java.util.TreeSet;
 
-class SellOrders extends MarketOrderCollection {
+public class SellOrders extends MarketOrderCollection {
     // ascending sort for prices, following utils.py
     public SellOrders() {
         this(100, 10);

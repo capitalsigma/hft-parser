@@ -3,6 +3,7 @@ package com.hftparser.writers;
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
+import com.hftparser.data.DataSetName;
 
 /**
  * Created by patrick on 7/31/14.
@@ -15,7 +16,7 @@ public class HDF5CompoundDSCachingBridge<T> extends HDF5CompoundDSBridge<T> {
         cache = null;
     }
 
-    public HDF5CompoundDSCachingBridge(DatasetName name,
+    public HDF5CompoundDSCachingBridge(DataSetName name,
                                        HDF5CompoundType<T> type,
                                        IHDF5CompoundWriter writer,
                                        long startSize,

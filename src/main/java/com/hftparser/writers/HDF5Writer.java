@@ -6,9 +6,10 @@ import ch.systemsx.cisd.hdf5.IHDF5WriterConfigurator;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
 import com.hftparser.config.HDF5WriterConfig;
 import com.hftparser.containers.WaitFreeQueue;
-import com.hftparser.readers.DataPoint;
-import com.hftparser.readers.PoisonDataPointException;
-import com.hftparser.readers.WritableDataPoint;
+import com.hftparser.data.DataPoint;
+import com.hftparser.data.DataSetName;
+import com.hftparser.data.PoisonDataPointException;
+import com.hftparser.data.WritableDataPoint;
 import org.apache.commons.lang.mutable.MutableBoolean;
 
 import java.io.File;
@@ -81,7 +82,7 @@ public class HDF5Writer implements Runnable {
     private HDF5CompoundDSBridge<WritableDataPoint> getDSBridgeForTicker(String ticker) {
         HDF5CompoundDSBridge<WritableDataPoint> bridge;
         if ((bridge = dsForTicker.get(ticker)) == null) {
-            DatasetName name = new DatasetName(ticker, BOOK_DS_NAME);
+            DataSetName name = new DataSetName(ticker, BOOK_DS_NAME);
             bridge = bridgeBuilder.build(name);
 
             dsForTicker.put(ticker, bridge);

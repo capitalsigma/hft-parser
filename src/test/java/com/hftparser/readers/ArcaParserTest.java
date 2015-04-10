@@ -1,10 +1,13 @@
 package com.hftparser.readers;
 
 import com.hftparser.config.ArcaParserConfig;
+import com.hftparser.containers.MarketOrderCollectionFactory;
 import com.hftparser.containers.WaitFreeQueue;
+import com.hftparser.data.DataPoint;
+import com.hftparser.data.PoisonDataPoint;
+import com.hftparser.data.ValidDataPoint;
 import com.hftparser.main.ParseRun;
 import org.apache.commons.lang.mutable.MutableBoolean;
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

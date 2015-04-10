@@ -2,6 +2,7 @@ package com.hftparser.writers;
 
 import ch.systemsx.cisd.hdf5.HDF5CompoundType;
 import ch.systemsx.cisd.hdf5.IHDF5CompoundWriter;
+import com.hftparser.data.DataSetName;
 
 /**
  * Created by patrick on 8/4/14.
@@ -17,7 +18,7 @@ public class HDF5CompoundDSReadOnlyBridge<T> {
         type = null;
     }
 
-    public HDF5CompoundDSReadOnlyBridge(DatasetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer) {
+    public HDF5CompoundDSReadOnlyBridge(DataSetName name, HDF5CompoundType<T> type, IHDF5CompoundWriter writer) {
         fullPath = name.getFullPath();
         this.writer = writer;
         this.type = type;

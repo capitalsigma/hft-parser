@@ -1,4 +1,4 @@
-package com.hftparser.readers;
+package com.hftparser.data;
 
 /**
  * Created by patrick on 4/5/15.

@@ -1,4 +1,4 @@
-package com.hftparser.readers;
+package com.hftparser.containers;
 
 import java.util.Collection;
 import java.util.Map;

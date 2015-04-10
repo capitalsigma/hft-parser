@@ -2,12 +2,6 @@ package com.hftparser.readers;
 
 import java.util.HashMap;
 
-class KeyError extends RuntimeException {
-    KeyError(String message) {
-        super(message);
-    }
-}
-
 /**
  * Modifies the default HashMap implementation to throw an exception when a key isn't present
  */
@@ -30,6 +24,12 @@ public class NonnullHashMap<K, V> extends HashMap<K, V> {
             throw new KeyError("Key not present: " + key.toString());
         } else {
             return maybeVal;
+        }
+    }
+
+    static class KeyError extends RuntimeException {
+        KeyError(String message) {
+            super(message);
         }
     }
 }

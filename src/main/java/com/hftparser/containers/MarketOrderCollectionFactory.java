@@ -1,4 +1,4 @@
-package com.hftparser.readers;
+package com.hftparser.containers;
 
 import com.hftparser.config.MarketOrderCollectionConfig;
 

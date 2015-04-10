@@ -1,6 +1,7 @@
-package com.hftparser.readers;
+package com.hftparser.data;
 
 import ch.systemsx.cisd.hdf5.CompoundElement;
+import com.hftparser.readers.ArcaParser;
 
 import java.util.Arrays;
 

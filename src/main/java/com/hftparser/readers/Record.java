@@ -1,5 +1,7 @@
 package com.hftparser.readers;
 
+import com.hftparser.containers.MarketOrderCollection;
+
 import java.util.Calendar;
 import java.util.Map;
 import java.util.TimeZone;
@@ -23,19 +25,8 @@ abstract class Record {
     protected long timeStamp;
     protected OrderType orderType;
 
-    public class DuplicateAddError extends RuntimeException {
-        private Record failing;
-
-        public DuplicateAddError(Record failing) {
-            super("Failed attempting to parse record: " + failing +
-                          ", which is a duplicate. To troubleshoot, check the input file for malformed data.");
-            this.failing = failing;
-        }
-
-        public Record getFailing() {
-            return failing;
-        }
-    }
+    // We set this in the parent class
+    protected TickerOrderHistory orderHistory;
 
     public static void setStartCalendar(Calendar startDate) {
         startDate.setTimeZone(DEFAULT_TZ);
@@ -115,8 +106,20 @@ abstract class Record {
         }
     }
 
-    abstract public void process(MarketOrderCollection toUpdate, Map<String, Map<Long, Order>> orderHistory);
+    public void process(MarketOrderCollection toUpdate, Map<String, TickerOrderHistory> orderHistories) {
+        // Skip if seqnum is bad
+        if (prepare(orderHistories)) {
+            processTemplateMethod(toUpdate, orderHistories);
+        }
+    }
 
+    protected abstract void processTemplateMethod(MarketOrderCollection toUpdate,
+                                                  Map<String, TickerOrderHistory> orderHistories);
+
+    protected boolean prepare(Map<String, TickerOrderHistory> orderHistories) {
+        orderHistory = orderHistories.get(ticker);
+        return orderHistory.updateSeqNum(seqNum);
+    }
 
     public OrderType getOrderType() {
         return orderType;
@@ -128,6 +131,10 @@ abstract class Record {
 
     public long getSeqNum() {
         return seqNum;
+    }
+
+    public long getRefNum() {
+        return refNum;
     }
 
     @Override
@@ -167,8 +174,8 @@ class AddRecord extends Record {
     }
 
     @Override
-    public void process(MarketOrderCollection toUpdate,
-                        Map<String, Map<Long, Order>> orderHistory) {
+    protected void processTemplateMethod(MarketOrderCollection toUpdate,
+                                         Map<String, TickerOrderHistory> orderHistories) {
         Long oldQty;
 
         if ((oldQty = toUpdate.get(price)) == null) {
@@ -178,12 +185,35 @@ class AddRecord extends Record {
 
         toUpdate.put(price, qty + oldQty);
         // We just added something twice -- time to fail
-        if (orderHistory.get(ticker).put(refNum, new Order(price, qty)) != null) {
+        if (orderHistory.put(refNum, new Order(price, qty)) != null) {
             throw new DuplicateAddError(this);
         }
     }
 
+    public Long getPrice() {
+        return price;
+    }
 
+    public int getQty() {
+        return qty;
+    }
+
+    /**
+     * Created by patrick on 4/10/15.
+     */
+    public static class DuplicateAddError extends RuntimeException {
+        private Record failing;
+
+        public DuplicateAddError(Record failing) {
+            super("Failed attempting to parse record: " + failing +
+                          ", which is a duplicate. To troubleshoot, check the input file for malformed data.");
+            this.failing = failing;
+        }
+
+        public Record getFailing() {
+            return failing;
+        }
+    }
 }
 
 // 1:seq, 2:order id, 3:seconds, 4:ms, 5:ticker, 9:type
@@ -201,20 +231,15 @@ class DeleteRecord extends Record {
     }
 
     @Override
-    public void process(MarketOrderCollection toUpdate, Map<String, Map<Long, Order>> orderHistory) {
-        Map<Long, Order> tickerHistory = orderHistory.get(ticker);
-        Order toDelete = tickerHistory.get(refNum);
+    protected void processTemplateMethod(MarketOrderCollection toUpdate,
+                                         Map<String, TickerOrderHistory> orderHistories) {
+        Order toDelete = orderHistory.get(refNum);
         Long currentQty = toUpdate.get(toDelete.price);
 
-//        System.out.printf("History: %s, toDelete: %s, toUpdate: %s, currentQty: %s\n",
-//                          tickerHistory,
-//                          toDelete,
-//                          toUpdate,
-//                          currentQty);
-
         toUpdate.put(toDelete.price, currentQty - toDelete.quantity);
-        tickerHistory.remove(refNum);
+        orderHistory.remove(refNum);
     }
+
 }
 
 // 1: seq, 2:ref num, 3:qty, 4:price, 5:sec, 6:ms, 7:ticker, b/s:11,
@@ -237,9 +262,12 @@ class ModifyRecord extends Record {
     }
 
     @Override
-    public void process(MarketOrderCollection toUpdate, Map<String, Map<Long, Order>> orderHistory) {
+    protected void processTemplateMethod(MarketOrderCollection toUpdate,
+                                         Map<String, TickerOrderHistory> orderHistories) {
+        super.process(toUpdate, orderHistories);
+
         Order changedOrder = new Order(price, qty);
-        Map<Long, Order> tickerHistory = orderHistory.get(ticker);
+        TickerOrderHistory tickerHistory = orderHistories.get(ticker);
         Order toModify = tickerHistory.get(refNum);
 
         //        otherwise we write out too many records
@@ -259,5 +287,13 @@ class ModifyRecord extends Record {
 
         tickerHistory.put(refNum, changedOrder);
         toUpdate.put(price, qty + qtyOfNewPriceToAdd);
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public Long getPrice() {
+        return price;
     }
 }

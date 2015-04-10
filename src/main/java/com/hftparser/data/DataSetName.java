@@ -1,11 +1,11 @@
-package com.hftparser.writers;
+package com.hftparser.data;
 
 import ch.systemsx.cisd.hdf5.HDF5LinkInformation;
 
 /**
  * Created by patrick on 7/28/14.
  */
-public class DatasetName {
+public class DataSetName {
     private final String group;
 
     public String getGroup() {
@@ -18,16 +18,16 @@ public class DatasetName {
 
     private final String dataSet;
 
-    public DatasetName(String _group, String _dataSet) {
+    public DataSetName(String _group, String _dataSet) {
         group = _group;
         dataSet = _dataSet;
     }
 
-    public static DatasetName fromHDF5LinkInformation(HDF5LinkInformation linkInformation) {
+    public static DataSetName fromHDF5LinkInformation(HDF5LinkInformation linkInformation) {
         String thisGroup = linkInformation.getParentPath();
         String thisDataset = linkInformation.getName();
 
-        return new DatasetName(thisGroup, thisDataset);
+        return new DataSetName(thisGroup, thisDataset);
     }
 
     public String getFullPath() {

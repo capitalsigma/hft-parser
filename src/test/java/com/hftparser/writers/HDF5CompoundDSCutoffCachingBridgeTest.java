@@ -4,7 +4,8 @@ import ch.systemsx.cisd.hdf5.HDF5GenericStorageFeatures;
 import ch.systemsx.cisd.hdf5.HDF5StorageLayout;
 import ch.systemsx.cisd.hdf5.IHDF5Writer;
 import com.hftparser.config.HDF5CompoundDSBridgeConfig;
-import com.hftparser.readers.WritableDataPoint;
+import com.hftparser.data.DataSetName;
+import com.hftparser.data.WritableDataPoint;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,7 @@ import static org.junit.Assert.*;
 
 public class HDF5CompoundDSCutoffCachingBridgeTest {
     protected final String TEST_PATH = "test-out.h5";
-    protected final DatasetName TEST_DS = new DatasetName("group", "foo");
+    protected final DataSetName TEST_DS = new DataSetName("group", "foo");
     protected WritableDataPoint testPoint1;
     protected WritableDataPoint emptyPoint;
     protected WritableDataPoint[] emptyPoints;

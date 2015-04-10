@@ -2,7 +2,12 @@ package com.hftparser.readers;
 
 
 import com.hftparser.config.ArcaParserConfig;
+import com.hftparser.containers.MarketOrderCollection;
+import com.hftparser.containers.MarketOrderCollectionFactory;
 import com.hftparser.containers.WaitFreeQueue;
+import com.hftparser.data.DataPoint;
+import com.hftparser.data.PoisonDataPoint;
+import com.hftparser.data.ValidDataPoint;
 import org.apache.commons.lang.mutable.MutableBoolean;
 
 import java.util.*;
@@ -62,7 +67,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
     // We're here abusing the fact that (at least within a day), there
     // are less than 2^64 orders, and saving just the end of the
     // 20-digit order reference number. This may break.
-    private final Map<String, Map<Long, Order>> orderHistory;
+    private final Map<String, TickerOrderHistory> orderHistories;
 
     // Split CSVs on commas
     private final String INPUT_SPLIT = ",";
@@ -99,7 +104,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
         OUTPUT_PROGRESS_EVERY = config.getOutput_progress_every();
 
         ordersNow = new HashMap<>(tickers.length);
-        orderHistory = new HashMap<>(INITIAL_ORDER_HISTORY_SIZE);
+        orderHistories = new HashMap<>(tickers.length);
 
         // First we initialize with empty hashmaps
         for (String ticker : tickers) {
@@ -107,7 +112,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
             toAdd.put(OrderType.Buy, collectionFactory.buildBuy());
             toAdd.put(OrderType.Sell, collectionFactory.buildSell());
             ordersNow.put(ticker, toAdd);
-            orderHistory.put(ticker, new HashMap<Long, Order>());
+            orderHistories.put(ticker, new TickerOrderHistory(INITIAL_ORDER_HISTORY_SIZE));
         }
 
         // Set up a lookup table for our recordTypes
@@ -148,20 +153,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         MarketOrderCollection toUpdate = ordersForTicker.get(record.getOrderType());
 
-        try {
-            record.process(toUpdate, orderHistory);
-        } catch (KeyError error) {
-            System.out.println("Error parsing record: " + record);
-            System.out.println(error.getMessage());
-//            We need to let it bubble up because the top level lets everyone else know that we died
-            throw error;
-        }
+        //  We do no error handling here because exceptions are caught higher up
+
+        record.process(toUpdate, orderHistories);
 
         MarketOrderCollection buyOrders = ordersForTicker.get(OrderType.Buy);
         MarketOrderCollection sellOrders = ordersForTicker.get(OrderType.Sell);
-
-        //        System.out.println("buy orders dirty? " + buyOrders.isDirty());
-        //        System.out.println("sell orders dirty? " + sellOrders.isDirty());
 
         if ((buyOrders.isDirty() || sellOrders.isDirty())) {
             long[][] toBuyNow = buyOrders.topN();
@@ -173,8 +170,6 @@ public class ArcaParser extends AbstractParser implements Runnable {
                                              toSellNow,
                                              record.getTimeStamp(),
                                              record.getSeqNum());
-
-//            System.out.println("About to push a DataPoint:" + toPush.toString());
 
             // spin until we successfully push
             //noinspection StatementWithEmptyBody
@@ -268,7 +263,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
                     if (toProcess != null) {
                         try {
                             processRecord(toProcess);
-                        } catch (Record.DuplicateAddError ex) {
+                        } catch (AddRecord.DuplicateAddError ex) {
                             System.out.println(ex.getMessage());
                             ex.printStackTrace();
                             System.out.println(

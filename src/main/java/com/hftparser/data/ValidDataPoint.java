@@ -1,4 +1,4 @@
-package com.hftparser.readers;
+package com.hftparser.data;
 
 import java.util.Arrays;
 

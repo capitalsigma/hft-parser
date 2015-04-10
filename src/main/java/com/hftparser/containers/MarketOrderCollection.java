@@ -1,10 +1,10 @@
-package com.hftparser.readers;
+package com.hftparser.containers;
 
 import java.util.HashMap;
 import java.util.TreeSet;
 
 
-abstract class MarketOrderCollection extends HashMap<Long, Long> {
+public abstract class MarketOrderCollection extends HashMap<Long, Long> {
     protected TreeSet<Long> sortedKeys;
     protected int keyCount;
     protected int maxKeyCount;
