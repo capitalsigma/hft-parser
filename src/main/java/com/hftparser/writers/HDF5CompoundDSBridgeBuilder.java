@@ -27,8 +27,8 @@ public class HDF5CompoundDSBridgeBuilder<T> {
     private long keepAliveSec = 30;
     private int queueSize = 500;
     private boolean async;
-    private boolean parallelFlush;
-    private ElementCacheFactory<T> cacheFactory;
+    private final boolean parallelFlush;
+    private final ElementCacheFactory<T> cacheFactory;
 
     public HDF5CompoundType<T> getType() {
         return type;

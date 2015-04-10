@@ -59,11 +59,7 @@ public class HDF5CompoundDSBridgeConfig {
             cache_size = json.getInt("cache_size");
         }
 
-        if (!json.has("cutoff")) {
-            cutoff = false;
-        } else {
-            cutoff = json.getBoolean("cutoff");
-        }
+        cutoff = json.has("cutoff") && json.getBoolean("cutoff");
 
         if (json.has("core_pool_size")) {
             core_pool_size = json.getInt("core_pool_size");
@@ -140,11 +136,8 @@ public class HDF5CompoundDSBridgeConfig {
         if (deflate_level != that.deflate_level) {
             return false;
         }
-        if (storage_layout != that.storage_layout) {
-            return false;
-        }
+        return storage_layout == that.storage_layout;
 
-        return true;
     }
 
     public boolean isParallel_write() {

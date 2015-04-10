@@ -51,11 +51,8 @@ public class MarketOrderCollectionConfig {
         if (maxKeyCount != that.maxKeyCount) {
             return false;
         }
-        if (startCapacity != that.startCapacity) {
-            return false;
-        }
+        return startCapacity == that.startCapacity;
 
-        return true;
     }
 
     @Override

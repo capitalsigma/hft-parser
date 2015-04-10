@@ -82,7 +82,7 @@ public class ParseRunConfig {
             return new NoOpBackoff();
         }
 
-        if (ty.equals(BackoffType.String)) {
+        if (ty == BackoffType.String) {
             return new Backoff(min_backoff_s, max_backoff_s);
         } else {
             return new Backoff(min_backoff_d, max_backoff_d);
@@ -104,12 +104,9 @@ public class ParseRunConfig {
         if (backoff != that.backoff) {
             return false;
         }
-        if (line_queue_size != that.line_queue_size) {
-            return false;
-        }
-        return max_backoff_d == that.max_backoff_d && max_backoff_s == that.max_backoff_s &&
-                min_backoff_d == that.min_backoff_d && min_backoff_s == that.min_backoff_s &&
-                point_queue_size == that.point_queue_size;
+        return line_queue_size == that.line_queue_size && max_backoff_d == that.max_backoff_d &&
+                max_backoff_s == that.max_backoff_s && min_backoff_d == that.min_backoff_d &&
+                min_backoff_s == that.min_backoff_s && point_queue_size == that.point_queue_size;
 
     }
 

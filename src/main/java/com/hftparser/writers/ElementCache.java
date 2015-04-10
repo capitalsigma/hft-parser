@@ -4,7 +4,7 @@ package com.hftparser.writers;
  * Created by patrick on 8/7/14.
  */
 public abstract class ElementCache<T> {
-    protected T[] cache;
+    protected final T[] cache;
     protected int currentCacheOffset;
 
     protected ElementCache(int maxSize) {

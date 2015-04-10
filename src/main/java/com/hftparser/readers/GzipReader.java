@@ -25,10 +25,6 @@ public class GzipReader implements Runnable {
         reader = new BufferedReader(decoder);
     }
 
-    public GzipReader(InputStream file, WaitFreeQueue<String> _queue, BufferedReader reader) throws IOException {
-        this(file, _queue, new MutableBoolean());
-    }
-
     public void run() {
         try {
             String toEnq;

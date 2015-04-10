@@ -150,9 +150,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
         MarketOrderCollection toUpdate = ordersForTicker.get(record.getOrderType());
 
-        //  We do no error handling here because exceptions are caught higher up
+        System.out.println("toUpdate = " + toUpdate);
 
+        //  We do no error handling here because exceptions are caught higher up
         record.process(toUpdate, orderHistories);
+
+        System.out.println("toUpdate = " + toUpdate);
 
         MarketOrderCollection buyOrders = ordersForTicker.get(OrderType.Buy);
         MarketOrderCollection sellOrders = ordersForTicker.get(OrderType.Sell);
@@ -221,7 +224,6 @@ public class ArcaParser extends AbstractParser implements Runnable {
             while (!pipelineError.booleanValue() && (inQueue.acceptingOrders || !inQueue.isEmpty())) {
                 // Work if we got something from the queue, otherwise spin
                 if ((toParse = inQueue.deq()) != null) {
-                    //                System.out.println("Parser got a line:" + toParse);
                     linesSoFar++;
 
                     if (linesSoFar % OUTPUT_PROGRESS_EVERY == 0) {
@@ -235,10 +237,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
                         // skip if it's not add, modify, delete
                         continue;
                     }
-                    //
-                    //                    System.out.println("asSplit: " + Arrays.toString(asSplit));
 
-                    // Also note that containsKey is O(1)
                     Record toProcess = null;
                     switch (recType) {
                         case Add:
@@ -251,6 +250,8 @@ public class ArcaParser extends AbstractParser implements Runnable {
                             toProcess = parseDelete(asSplit);
                             break;
                     }
+
+                    System.out.println("toProcess = " + toProcess);
 
                     if (toProcess != null) {
                         try {

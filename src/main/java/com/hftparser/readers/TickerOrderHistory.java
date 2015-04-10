@@ -18,7 +18,9 @@ public class TickerOrderHistory {
     // Returns true if the next seqnum is valid and updates the current seqnum as a side effect, otherwise, returns
     // faslse
     public boolean updateSeqNum(long nextSeqNum) {
-        if (nextSeqNum >= lastSeqNum) {
+        System.out.println("nextSeqNum = [" + nextSeqNum + "]");
+        System.out.println("lastSeqNum = " + lastSeqNum);
+        if (nextSeqNum <= lastSeqNum) {
             return false;
         } else {
             lastSeqNum = nextSeqNum;
@@ -34,42 +36,10 @@ public class TickerOrderHistory {
         return outstandingOrders.put(refNum, order);
     }
 
-//    public Set<Long> keySet() {
-//        return outstandingOrders.keySet();
-//    }
-//
-//    public Set<Map.Entry<Long, Order>> entrySet() {
-//        return outstandingOrders.entrySet();
-//    }
-//
-//    public boolean containsKey(Object o) {
-//        return outstandingOrders.containsKey(o);
-//    }
-//
     public Order remove(Long refNum) {
         return outstandingOrders.remove(refNum);
     }
-//
-//    public void putAll(Map<? extends Long, ? extends Order> map) {
-//        outstandingOrders.putAll(map);
-//    }
-//
-//    public boolean isEmpty() {
-//        return outstandingOrders.isEmpty();
-//    }
-//
-//    public void clear() {
-//        outstandingOrders.clear();
-//    }
-//
-//    public boolean containsValue(Object o) {
-//        return outstandingOrders.containsValue(o);
-//    }
-//
-//    public Collection<Order> values() {
-//        return outstandingOrders.values();
-//    }
-//
+
     public Order get(Long refNum) {
         return outstandingOrders.get(refNum);
     }

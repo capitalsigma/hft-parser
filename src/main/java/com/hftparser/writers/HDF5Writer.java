@@ -21,7 +21,7 @@ public class HDF5Writer implements Runnable {
     private final IHDF5Writer fileWriter;
     private final WaitFreeQueue<DataPoint> inQueue;
     private boolean closeFileAtEnd;
-    private volatile MutableBoolean pipelineError;
+    private final MutableBoolean pipelineError;
     private HDF5CompoundDSBridgeBuilder<WritableDataPoint> bridgeBuilder;
 
     private final int START_SIZE;

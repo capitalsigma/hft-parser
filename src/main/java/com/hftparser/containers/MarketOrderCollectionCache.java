@@ -8,7 +8,7 @@ import java.util.Set;
  * Created by patrick on 8/4/14.
  */
 public class MarketOrderCollectionCache extends MarketOrderCollection {
-    private MarketOrderCollection decoratedCollection;
+    private final MarketOrderCollection decoratedCollection;
     long[][] cache;
     private boolean dirty;
 
@@ -91,6 +91,7 @@ public class MarketOrderCollectionCache extends MarketOrderCollection {
         return decoratedCollection.containsValue(value);
     }
 
+    @SuppressWarnings("CloneDoesntCallSuperClone")
     @Override
     public Object clone() {
         return decoratedCollection.clone();

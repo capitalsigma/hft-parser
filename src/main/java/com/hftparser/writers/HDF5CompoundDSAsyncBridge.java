@@ -12,14 +12,14 @@ import java.util.concurrent.Future;
  * Created by patrick on 8/6/14.
  */
 public class HDF5CompoundDSAsyncBridge<T> extends HDF5CompoundDSCachingBridge<T> {
-    private ExecutorService executor;
+    private final ExecutorService executor;
     private Future<?> lastWriter;
-    private ElementCache<T> cacheOne;
-    private ElementCache<T> cacheTwo;
+    private final ElementCache<T> cacheOne;
+    private final ElementCache<T> cacheTwo;
 
     public class Writer implements Runnable {
         volatile boolean isDone = false;
-        ElementCache<T> cacheToWrite;
+        final ElementCache<T> cacheToWrite;
 
         public Writer(ElementCache<T> cacheToWrite) {
             this.cacheToWrite = cacheToWrite;

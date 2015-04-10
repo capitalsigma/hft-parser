@@ -77,7 +77,6 @@ abstract class Record {
         if (sizeOfFloatPart > 6) {
             throw new NumberFormatException("Can't have more than 6 decimal places. Got: " + priceString);
         } else {
-
             return intPart * PRICE_INTEGER_OFFSET +
                     (long) Math.pow(10, PRICE_OFFSET_EXP - sizeOfFloatPart) * floatPart;
         }
@@ -107,9 +106,14 @@ abstract class Record {
     }
 
     public void process(MarketOrderCollection toUpdate, Map<String, TickerOrderHistory> orderHistories) {
+        System.out.println("Record.process");
+        new Exception().printStackTrace();
         // Skip if seqnum is bad
         if (prepare(orderHistories)) {
             processTemplateMethod(toUpdate, orderHistories);
+        } else {
+            System.out.println(
+                    "WARNING: Ignoring an out-of-order seqNum. Check input data. Igoring for: " + this.toString());
         }
     }
 
@@ -182,7 +186,6 @@ class AddRecord extends Record {
             oldQty = 0l;
         }
 
-
         toUpdate.put(price, qty + oldQty);
         // We just added something twice -- time to fail
         if (orderHistory.put(refNum, new Order(price, qty)) != null) {
@@ -198,8 +201,16 @@ class AddRecord extends Record {
         return qty;
     }
 
+    @Override
+    public String toString() {
+        return "AddRecord{" +
+                "qty=" + qty +
+                ", price=" + price +
+                "} " + super.toString();
+    }
+
     /**
-     * Created by patrick on 4/10/15.
+     * Error to report adds with duplicate refNums
      */
     public static class DuplicateAddError extends RuntimeException {
         private final Record failing;
@@ -240,6 +251,10 @@ class DeleteRecord extends Record {
         orderHistory.remove(refNum);
     }
 
+    @Override
+    public String toString() {
+        return "DeleteRecord{} " + super.toString();
+    }
 }
 
 // 1: seq, 2:ref num, 3:qty, 4:price, 5:sec, 6:ms, 7:ticker, b/s:11,
@@ -264,8 +279,6 @@ class ModifyRecord extends Record {
     @Override
     protected void processTemplateMethod(MarketOrderCollection toUpdate,
                                          Map<String, TickerOrderHistory> orderHistories) {
-        super.process(toUpdate, orderHistories);
-
         Order changedOrder = new Order(price, qty);
         TickerOrderHistory tickerHistory = orderHistories.get(ticker);
         Order toModify = tickerHistory.get(refNum);
@@ -295,5 +308,13 @@ class ModifyRecord extends Record {
 
     public Long getPrice() {
         return price;
+    }
+
+    @Override
+    public String toString() {
+        return "ModifyRecord{" +
+                "qty=" + qty +
+                ", price=" + price +
+                "} " + super.toString();
     }
 }

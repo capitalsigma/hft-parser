@@ -51,9 +51,6 @@ public class ParseRun {
     private static InputStream gzipInstream;
     private static String bookPath;
 
-    //    private static int MIN_BACKOFF;
-    //    private static int MAX_BACKOFF;
-
     private static class Args {
         @Parameter
         private List<String> parameters = new ArrayList<>();
@@ -78,18 +75,12 @@ public class ParseRun {
     }
 
 
+    @SuppressWarnings("ConstantConditions")
     public static void main(String[] argv) {
         Args args = new Args();
         new JCommander(args, argv);
         String[] symbols = null;
-        ArcaParser parser;
-        HDF5Writer writer;
-        Thread readerThread;
-        Thread parserThread;
-        Thread writerThread;
-        Thread[] allThreads;
         ConfigFactory configFactory = null;
-        boolean success = true;
 
         long startTime = System.currentTimeMillis();
         long endTime;
