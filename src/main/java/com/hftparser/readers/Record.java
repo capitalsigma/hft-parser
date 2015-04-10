@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 /**
- * Created by patrick on 1/28/15.
+ * Responsible for parsing and processing a single row of the input CSV
  */
 abstract class Record {
     // offset for integer part of the price -- we pass it around as a
@@ -89,7 +89,7 @@ abstract class Record {
  */
     protected long makeTimestamp(String seconds, String ms) {
         Long parsedMs;
-        if (ms.length() == 0) {
+        if (ms.isEmpty()) {
             parsedMs = 0l;
         } else {
             parsedMs = Long.parseLong(ms) * 1000l;
@@ -99,7 +99,7 @@ abstract class Record {
 
 
     protected Long safeParse(String toParse) {
-        if (toParse.length() == 0) {
+        if (toParse.isEmpty()) {
             return 0l;
         } else {
             return Long.parseLong(toParse);
@@ -155,8 +155,8 @@ abstract class Record {
 // 0:type, 1:seq, 2:refNum, _, 4:b/s, 5:count, 6:ticker, 7:price, 8:sec,
 // 9:ms, _, _, _
 class AddRecord extends Record {
-    private int qty; // 8 digits
-    private Long price;
+    private final int qty; // 8 digits
+    private final Long price;
 
     public AddRecord(String[] asSplit) {
         ticker = tickerFromSplit(asSplit);
@@ -202,7 +202,7 @@ class AddRecord extends Record {
      * Created by patrick on 4/10/15.
      */
     public static class DuplicateAddError extends RuntimeException {
-        private Record failing;
+        private final Record failing;
 
         public DuplicateAddError(Record failing) {
             super("Failed attempting to parse record: " + failing +
@@ -244,8 +244,8 @@ class DeleteRecord extends Record {
 
 // 1: seq, 2:ref num, 3:qty, 4:price, 5:sec, 6:ms, 7:ticker, b/s:11,
 class ModifyRecord extends Record {
-    private int qty; // 8 digits
-    private Long price;
+    private final int qty; // 8 digits
+    private final Long price;
 
     public ModifyRecord(String[] asSplit) {
         seqNum = Long.parseLong(asSplit[1]);

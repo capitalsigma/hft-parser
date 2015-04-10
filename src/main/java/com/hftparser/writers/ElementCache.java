@@ -3,7 +3,7 @@ package com.hftparser.writers;
 /**
  * Created by patrick on 8/7/14.
  */
-abstract public class ElementCache<T> {
+public abstract class ElementCache<T> {
     protected T[] cache;
     protected int currentCacheOffset;
 
@@ -33,8 +33,8 @@ abstract public class ElementCache<T> {
     }
 
 
-    abstract public void setEmptyElement(T element);
+    public abstract void setEmptyElement(T element);
 
-    abstract protected T[] fixUp();
+    protected abstract T[] fixUp();
 }
 

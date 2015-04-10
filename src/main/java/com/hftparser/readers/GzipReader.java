@@ -10,7 +10,7 @@ public class GzipReader implements Runnable {
     // InputStream file;
     private BufferedReader reader;
     private final WaitFreeQueue<String> queue;
-    private volatile MutableBoolean pipelineError;
+    private final MutableBoolean pipelineError;
 
     // TODO: find out what encoding the files actually use, and set it
     // correctly for InputStreamReader

@@ -15,7 +15,7 @@ public class WaitFreeQueue<T> {
     private final Backoffable inBackoff;
     private final Backoffable outBackoff;
     private final T[] items;
-    volatile public boolean acceptingOrders;
+    public volatile boolean acceptingOrders;
     private final AtomicLong fullHits;
     private final AtomicLong emptyHits;
 

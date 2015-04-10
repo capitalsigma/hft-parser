@@ -33,10 +33,7 @@ class Order {
 
         Order order = (Order) o;
 
-        if (price != order.price) {
-            return false;
-        }
-        return quantity == order.quantity;
+        return price == order.price && quantity == order.quantity;
 
     }
 
@@ -57,7 +54,7 @@ public class ArcaParser extends AbstractParser implements Runnable {
     private final WaitFreeQueue<DataPoint> outQueue;
     @SuppressWarnings("FieldCanBeLocal")
     private final String[] tickers;
-    private volatile MutableBoolean pipelineError;
+    private final MutableBoolean pipelineError;
 
     // TODO: according to stackoverflow.com/questions/81346/, we can
     // save time if we roll a MutableLong to use for qtys. we can do
@@ -216,11 +213,6 @@ public class ArcaParser extends AbstractParser implements Runnable {
         String[] asSplit = null;
         int linesSoFar = 0;
 
-        /* The spec tells us that seqnums are unique and globally increasing, and we will choose to believe that. We
-        throw out any orders that are repeated.
-        */
-        int currentSeqNum = -1;
-
         RecordType recType;
 
         try {
@@ -285,4 +277,12 @@ public class ArcaParser extends AbstractParser implements Runnable {
 
     }
 
+    /**
+     * Created by patrick on 1/28/15.
+     */
+    public static enum RecordType {
+        Add,
+        Modify,
+        Delete
+    }
 }

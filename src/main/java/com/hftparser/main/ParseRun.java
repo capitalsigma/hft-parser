@@ -343,8 +343,8 @@ public class ParseRun {
         System.exit(1);
     }
 
-    public static
     @NotNull
+    public static
     String[] parseSymbolFile(File symbolFile) throws IOException {
         ArrayList<String> ret = new ArrayList<>();
         String line;
